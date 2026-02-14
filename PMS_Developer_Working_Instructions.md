@@ -8,9 +8,56 @@ Version 1.0 | Last Updated: February 2026
 
 ## Table of Contents
 
+- [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy)
 - [Section 1: First-Time Setup](#section-1-first-time-setup)
 - [Section 2: Implementing a Feature](#section-2-implementing-a-feature-over-multiple-days)
 - [Section 3: A Day in the Life](#section-3-a-day-in-the-life-of-a-pms-developer)
+
+---
+
+## Compliance Evidence Storage Policy
+
+> **This policy applies to all PMS developers and CI/CD pipelines.**
+
+### Authoritative Evidence Store
+
+The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, and review summaries — **must be committed to the repository** before being pushed to any secondary system.
+
+- **GitHub repo** = permanent, versioned, tamper-evident (git history provides an immutable audit trail)
+- **NotebookLM** = secondary queryable layer (indexes evidence already committed to the repo)
+
+### Evidence Commitment Rule
+
+Every evidence-generating step must follow this sequence:
+
+1. **Generate** the evidence artifact (report, scan result, matrix, etc.)
+2. **`git add`** the artifact to staging
+3. **`git commit`** with a descriptive message referencing requirement IDs
+4. **Then** push to NotebookLM (which indexes the committed file)
+
+> **Never push evidence to NotebookLM without first committing it to the repository.** NotebookLM is a convenience layer for querying — the repo is the legal record.
+
+### Evidence Directory Structure
+
+All compliance evidence resides under `docs/` in the repository:
+
+```
+docs/
+├── analyze/                  # /analyze consistency reports
+├── quality-reports/          # SonarQube quality gate results
+├── security/                 # Snyk scan results and security reports
+├── reviews/                  # CodeRabbit and PR review evidence
+├── test-evidence/            # Test execution reports
+├── sbom/                     # Software Bill of Materials (CycloneDX, SPDX)
+├── adr/                      # Architecture Decision Records
+├── traceability-matrix.md    # Requirements Traceability Matrix
+├── coverage-report.md        # Requirement test coverage report
+└── evidence-summary.md       # Unified evidence summary (CI-generated)
+```
+
+### Retention
+
+HIPAA requires a minimum **6-year retention period** for compliance documentation. GitHub's permanent git history satisfies this requirement. GitHub Actions artifacts (90-day retention) are **not** a substitute for committed evidence files.
 
 ---
 
@@ -320,7 +367,7 @@ claude
 # medication interaction alerts specification."
 ```
 
-8. **Run /analyze to validate consistency:**
+8. **Run /analyze to validate consistency and save the output:**
 
 ```bash
 /analyze
@@ -328,14 +375,24 @@ claude
 # Fix any issues flagged by the analyzer
 ```
 
-9. **Commit the specification and plan:**
+Save the `/analyze` output as evidence:
 
 ```bash
-git add .specify/
+# Save the /analyze report to the evidence directory
+# (Claude Code can generate this file from the /analyze output)
+claude
+# "Save the /analyze output to docs/analyze/medication-interaction-alerts-analyze.md"
+```
+
+9. **Commit the specification, plan, and analysis evidence:**
+
+```bash
+git add .specify/ docs/analyze/
 git commit -m "spec: add medication interaction alerts specification
 
+- Specification, technical plan, and /analyze consistency report
 Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002
-Spec-Kit phase: Specify + Plan"
+Spec-Kit phase: Specify + Plan + Analyze"
 ```
 
 10. **Push spec to NotebookLM:**
@@ -497,9 +554,20 @@ claude
 # for all SUB-MM requirements."
 ```
 
-4. **Push evidence to NotebookLM:**
+4. **Commit evidence to the repository:**
 
-In Claude Code, ask it to add the evidence as sources:
+```bash
+git add docs/traceability-matrix.md docs/coverage-report.md test-results.json
+git commit -m "evidence: update RTM and coverage report for medication alerts
+
+- Updated traceability matrix with SUB-MM-0001, SUB-MM-0002 mappings
+- Generated requirement test coverage report
+Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002"
+```
+
+5. **Push evidence to NotebookLM:**
+
+In Claude Code, ask it to add the committed evidence as sources:
 
 ```
 "Add docs/coverage-report.md as a source to the PMS: Test Evidence
@@ -560,7 +628,7 @@ gh pr merge --squash
 
 ### Post-Merge: Archive Evidence
 
-13. **Push final evidence to NotebookLM:**
+13. **Archive and commit PR review evidence:**
 
 ```bash
 # Get the merged PR review data
@@ -573,11 +641,31 @@ In Claude Code:
 ```
 "Summarize the CodeRabbit review and SonarQube results for
 PR #<PR_NUMBER>. Map findings to requirement IDs. Generate
-docs/reviews/pr-<PR_NUMBER>-evidence-summary.md. Then add it
-as a source to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
+docs/reviews/pr-<PR_NUMBER>-evidence-summary.md."
 ```
 
-Claude Code will generate the summary and use `notebooklm-mcp:source_add` to upload it.
+Commit the evidence to the repository:
+
+```bash
+git add docs/reviews/pr-<PR_NUMBER>-review.json \
+       docs/reviews/pr-<PR_NUMBER>-evidence-summary.md
+git commit -m "evidence: archive PR #<PR_NUMBER> review and quality results
+
+- CodeRabbit review summary with requirement mappings
+- SonarQube quality gate results
+Relates to: <REQUIREMENT_IDS>"
+```
+
+14. **Push committed evidence to NotebookLM:**
+
+In Claude Code:
+
+```
+"Add docs/reviews/pr-<PR_NUMBER>-evidence-summary.md as a source
+to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
+```
+
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 14. **Update CLAUDE.md if any architectural decisions were made.**
 
@@ -739,19 +827,34 @@ Open the **PMS: Quality & Security** notebook at [notebooklm.google.com](https:/
 
 > "Has anyone encountered \<ERROR_MESSAGE_OR_ISSUE\> in the PMS project? What was the solution?"
 
-2. **If no solution found, solve it and add the solution back:**
+2. **If no solution found, solve it and document the solution:**
 
 In Claude Code:
 
 ```
 "Document the bug I just fixed: <DESCRIPTION>.
 Generate a debugging note for docs/debugging/<ISSUE>.md
-that includes the error message, root cause, and fix.
-Then add it as a source to the PMS: Quality & Security
-notebook (<NLM_QS_ID>)."
+that includes the error message, root cause, and fix."
 ```
 
-Claude Code will generate the document and use `notebooklm-mcp:source_add` to upload it.
+Commit the debugging documentation:
+
+```bash
+git add docs/debugging/<ISSUE>.md
+git commit -m "docs: add debugging note for <ISSUE>
+
+- Error message, root cause, and fix documented
+Relates to: <REQUIREMENT_ID_IF_APPLICABLE>"
+```
+
+Then push the committed file to NotebookLM:
+
+```
+"Add docs/debugging/<ISSUE>.md as a source to the PMS: Quality &
+Security notebook (<NLM_QS_ID>)."
+```
+
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ---
 
@@ -834,9 +937,22 @@ claude
 # and test case TC-MED-001. Mark status as 'In Verification'."
 ```
 
-### Push Updated Evidence to NotebookLM
+### Commit Updated Evidence
 
-In Claude Code, ask it to sync updated artifacts:
+If the traceability matrix or any ADRs were updated today, commit them:
+
+```bash
+git add docs/traceability-matrix.md docs/adr/
+git commit -m "evidence: end-of-day RTM and ADR updates
+
+- Updated traceability matrix with today's implementation progress
+- Added/updated ADRs for architectural decisions made today
+Relates to: <REQUIREMENT_IDS>"
+```
+
+### Push Committed Evidence to NotebookLM
+
+In Claude Code, ask it to sync the committed artifacts:
 
 ```
 "Add docs/traceability-matrix.md as a source to the PMS: Requirements
@@ -846,7 +962,7 @@ notebook (<NLM_REQ_ID>)."
 & Design notebook (<NLM_ARCH_ID>)."
 ```
 
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool to upload these files.
+Claude Code will use the `notebooklm-mcp:source_add` MCP tool to upload the committed files.
 
 ### Update Your Sprint Status
 

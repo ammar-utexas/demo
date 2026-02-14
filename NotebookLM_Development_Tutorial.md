@@ -12,6 +12,10 @@ Based on the video tutorial by AI Labs Pro — [Watch the original video on YouT
 
 ## Table of Contents
 
+### Compliance Evidence Storage Policy
+
+- [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy)
+
 ### PART I — NotebookLM Fundamentals
 
 - [Introduction](#introduction)
@@ -41,6 +45,63 @@ Based on the video tutorial by AI Labs Pro — [Watch the original video on YouT
 - [Step 17: Snyk Continuous Security Monitoring](#step-17-snyk-continuous-security-monitoring)
 - [Evidence Pipeline Architecture](#evidence-pipeline-architecture)
 - [Summary & Next Steps](#summary--next-steps)
+
+---
+
+## Compliance Evidence Storage Policy
+
+> **This policy applies to all evidence workflows described in this tutorial.**
+
+### Authoritative Evidence Store
+
+The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, SBOMs, and review summaries — **must be committed to the repository** before being pushed to NotebookLM.
+
+| Store | Role | Retention | Properties |
+|-------|------|-----------|------------|
+| **GitHub Repository** | Primary / System of Record | **Permanent** (git history) | Versioned, tamper-evident, auditable, satisfies HIPAA 6-year requirement |
+| **GitHub Actions Artifacts** | Ephemeral CI output | **90 days** | Convenience only — never rely on as sole evidence store |
+| **NotebookLM** | Secondary / Query Layer | Platform-dependent | Indexes repo evidence for natural-language querying; not a legal record |
+
+### Evidence Commitment Rule
+
+Every evidence-generating step in this tutorial must follow this sequence:
+
+1. **Generate** the evidence artifact (report, scan result, matrix, etc.)
+2. **`git add`** the artifact to staging
+3. **`git commit`** with a descriptive message referencing requirement IDs
+4. **Then** push to NotebookLM (which indexes the committed file)
+
+> **Never push evidence to NotebookLM without first committing it to the repository.** NotebookLM is a convenience layer for querying — the repo is the legal record.
+
+### Evidence Directory Structure
+
+All compliance evidence resides under `docs/` in the repository:
+
+```
+docs/
+├── analyze/                  # /analyze consistency reports
+├── quality-reports/          # SonarQube quality gate results
+├── security/                 # Snyk scan results and security reports
+├── reviews/                  # CodeRabbit and PR review evidence
+├── test-evidence/            # Test execution reports
+├── sbom/                     # Software Bill of Materials (CycloneDX, SPDX)
+├── adr/                      # Architecture Decision Records
+├── traceability-matrix.md    # Requirements Traceability Matrix
+├── coverage-report.md        # Requirement test coverage report
+└── evidence-summary.md       # Unified evidence summary (CI-generated)
+```
+
+### Retention Comparison
+
+| Evidence Type | Before (Artifact-Only) | After (Repository-First) |
+|---------------|----------------------|--------------------------|
+| SonarQube results | 90-day artifact | **Permanent** — committed to `docs/quality-reports/` |
+| Snyk scan results | 90-day artifact | **Permanent** — committed to `docs/security/` |
+| Test coverage | 90-day artifact | **Permanent** — committed to `docs/test-evidence/` |
+| SBOM files | 90-day artifact | **Permanent** — committed to `docs/sbom/` |
+| CodeRabbit reviews | PR comments (permanent) | PR comments + committed summary in `docs/reviews/` |
+| /analyze output | Not stored | **Permanent** — committed to `docs/analyze/` |
+| Evidence summaries | Not stored | **Permanent** — committed to `docs/evidence-summary.md` |
 
 ---
 
@@ -568,9 +629,19 @@ This view answers: "Does every test verify a real requirement?"
 | TC-MED-001 | Drug interaction check < 5 sec | SYS-REQ-0006, SUB-MM-0001 | PASS | perf-test-med-001.json |
 | TC-MED-002 | Interaction severity classification | SYS-REQ-0006, SUB-MM-0002 | FAIL | bug-report-MM-042.md |
 
-### D. Push RTM to NotebookLM
+### D. Commit RTM and Push to NotebookLM
 
-In Claude Code, ask it to add the RTM:
+Commit the traceability matrix to the repository:
+
+```bash
+git add docs/traceability-matrix.md docs/traceability-matrix.json
+git commit -m "evidence: add requirements traceability matrix
+
+- Forward and backward traceability for all SYS-REQ and SUB requirements
+- Maps requirements to design, source modules, tests, and verification status"
+```
+
+Then push the committed RTM to NotebookLM. In Claude Code:
 
 ```
 "Add docs/traceability-matrix.md as a source to the PMS: Requirements
@@ -640,11 +711,27 @@ In Claude Code:
 docs/traceability-matrix.md. Generate a coverage report
 showing: requirements with passing tests, requirements with
 failing tests, and requirements with no tests. Save it as
-docs/coverage-report.md. Then add it as a source to the
+docs/coverage-report.md."
+```
+
+Commit the coverage report to the repository:
+
+```bash
+git add docs/coverage-report.md test-results.json
+git commit -m "evidence: generate requirement test coverage report
+
+- Cross-referenced test results with traceability matrix
+- Coverage summary by subsystem with gap analysis"
+```
+
+Then push the committed report to NotebookLM:
+
+```
+"Add docs/coverage-report.md as a source to the
 PMS: Test Evidence notebook (<NLM_TEST_ID>)."
 ```
 
-Claude Code will generate the report and use `notebooklm-mcp:source_add` to upload it.
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ### D. Coverage Summary Dashboard
 
@@ -665,6 +752,8 @@ Claude Code will generate the report and use `notebooklm-mcp:source_add` to uplo
 The final step of Part II ties everything together: NotebookLM becomes the living, queryable dashboard for your entire requirements engineering pipeline.
 
 ### A. Consolidate All Artifacts
+
+> **Reminder:** Per the [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy), all files listed below must already be committed to the repository before adding them as NotebookLM sources. If any are not yet committed, run `git add` and `git commit` first.
 
 In Claude Code, ask it to add all artifacts as sources to their respective notebooks:
 
@@ -710,9 +799,10 @@ After completing any implementation task:
 1. Run /analyze to verify spec consistency
 2. Run tests and generate coverage-report.md
 3. Update the traceability matrix
-4. Push updated artifacts to NotebookLM
-5. If a new architectural decision was made,
-   create an ADR and push to the architecture notebook
+4. git add and git commit all updated evidence files
+5. Push committed artifacts to NotebookLM
+6. If a new architectural decision was made,
+   create an ADR, commit it, and push to the architecture notebook
 ```
 
 > **🟣 The Complete Pipeline:** Specify (GitHub Spec Kit) → Plan → Analyze → Implement (Claude Code) → Test → Trace → Store (NotebookLM) → Query & Verify. Every stage is documented, every decision is grounded, and every requirement is traceable from inception through verification.
@@ -724,7 +814,7 @@ After completing any implementation task:
 This section closes the development loop by adding **continuous code quality verification** (SonarQube), **AI-powered peer review** (CodeRabbit), and **continuous security monitoring** (Snyk). Crucially, all output is stored as evidence in both **GitHub** (for developer workflow) and **NotebookLM** (for auditing and grounded queries).
 
 > **🟢 The Evidence Pipeline Principle**
-> Every tool in the pipeline produces artifacts. Every artifact is archived in two places: GitHub (Issues, PR comments, Actions artifacts, Code Scanning) for developer workflow, and NotebookLM for long-term querying, audit preparation, and cross-tool grounded answers. Nothing is ephemeral.
+> Every tool in the pipeline produces artifacts. Every artifact is **committed to the GitHub repository** as the permanent system of record, then indexed in NotebookLM for long-term querying, audit preparation, and cross-tool grounded answers. Committed files in `docs/` — not ephemeral CI artifacts — are the authoritative evidence store. Nothing is lost; everything is versioned and tamper-evident.
 
 ---
 
@@ -789,6 +879,20 @@ jobs:
           name: sonarqube-report-${{ github.sha }}
           path: .sonarqube/
           retention-days: 90
+
+      - name: Commit SonarQube Evidence
+        if: always()
+        run: |
+          mkdir -p docs/quality-reports
+          cp -r .sonarqube/ docs/quality-reports/sonarqube-${{ github.sha }}/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/quality-reports/
+          git commit -m "evidence(ci): archive SonarQube results for ${{ github.sha }}
+
+          - Quality gate status and metrics committed to docs/quality-reports/
+          - Permanent evidence per Compliance Evidence Storage Policy" || true
+          git push || true
 ```
 
 ### C. Map Quality Metrics to Requirements
@@ -801,19 +905,35 @@ jobs:
 | Bugs | 0 blockers | All SYS-REQ-* | GitHub: PR status check |
 | Reliability Rating | A | SYS-REQ-0006 (Alerts) | NotebookLM: Quality notebook |
 
-### D. Push Evidence to NotebookLM
+### D. Commit and Push Quality Evidence to NotebookLM
 
-After each CI run, use Claude Code to export and push quality evidence:
+After each CI run, use Claude Code to export and generate quality evidence:
 
 ```
 "Extract the SonarQube quality gate results from .sonarqube/
 and generate a quality-report.md with metrics, findings, and
 requirement traceability mappings. Save it as
-docs/quality-reports/quality-report-<TODAY>.md. Then add it
-as a source to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
+docs/quality-reports/quality-report-<TODAY>.md."
 ```
 
-Claude Code will generate the report and use `notebooklm-mcp:source_add` to upload it.
+Commit the quality report to the repository:
+
+```bash
+git add docs/quality-reports/quality-report-<TODAY>.md
+git commit -m "evidence: SonarQube quality report for <TODAY>
+
+- Quality gate metrics and findings with requirement traceability
+Relates to: SYS-REQ-0002, SYS-REQ-0007"
+```
+
+Then push the committed report to NotebookLM:
+
+```
+"Add docs/quality-reports/quality-report-<TODAY>.md as a source
+to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
+```
+
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 To query historical quality trends, open the **PMS: Quality & Security** notebook at [notebooklm.google.com](https://notebooklm.google.com) and ask:
 
@@ -885,7 +1005,7 @@ reviews:
 
 ### D. Evidence Collection from PR Reviews
 
-CodeRabbit posts reviews directly as GitHub PR comments, creating a permanent audit trail. Additionally, extract and archive review summaries:
+CodeRabbit posts reviews directly as GitHub PR comments, creating a permanent audit trail. Additionally, extract, commit, and archive review summaries:
 
 ```bash
 # Extract review evidence using GitHub CLI
@@ -899,12 +1019,28 @@ In Claude Code:
 "Summarize the CodeRabbit review from
 docs/reviews/pr-<PR_NUMBER>-review.json.
 Map each finding to a requirement ID.
-Generate docs/reviews/pr-<PR_NUMBER>-review-summary.md.
-Then add it as a source to the PMS: Quality & Security
-notebook (<NLM_QS_ID>)."
+Generate docs/reviews/pr-<PR_NUMBER>-review-summary.md."
 ```
 
-Claude Code will generate the summary and use `notebooklm-mcp:source_add` to upload it.
+Commit the review evidence to the repository:
+
+```bash
+git add docs/reviews/pr-<PR_NUMBER>-review.json \
+       docs/reviews/pr-<PR_NUMBER>-review-summary.md
+git commit -m "evidence: archive CodeRabbit review for PR #<PR_NUMBER>
+
+- Review findings mapped to requirement IDs
+- Summary with remediation status"
+```
+
+Then push the committed evidence to NotebookLM:
+
+```
+"Add docs/reviews/pr-<PR_NUMBER>-review-summary.md as a source
+to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
+```
+
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ### E. Review Metrics Dashboard
 
@@ -981,6 +1117,20 @@ jobs:
           path: snyk-deps.json
           retention-days: 90
 
+      - name: Commit Snyk Dependency Results
+        if: always()
+        run: |
+          mkdir -p docs/security
+          cp snyk-deps.json docs/security/snyk-deps-${{ github.sha }}.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/security/
+          git commit -m "evidence(ci): archive Snyk dependency scan for ${{ github.sha }}
+
+          - Dependency vulnerability results committed to docs/security/
+          - Permanent evidence per Compliance Evidence Storage Policy" || true
+          git push || true
+
   snyk-code:
     runs-on: ubuntu-latest
     steps:
@@ -1030,6 +1180,20 @@ jobs:
           name: snyk-container-${{ github.sha }}
           path: snyk-container.json
           retention-days: 90
+
+      - name: Commit Snyk Container Results
+        if: always()
+        run: |
+          mkdir -p docs/security
+          cp snyk-container.json docs/security/snyk-container-${{ github.sha }}.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/security/
+          git commit -m "evidence(ci): archive Snyk container scan for ${{ github.sha }}
+
+          - Container vulnerability results committed to docs/security/
+          - Permanent evidence per Compliance Evidence Storage Policy" || true
+          git push || true
 ```
 
 ### C. Map Vulnerabilities to Requirements
@@ -1048,24 +1212,34 @@ For FDA/HIPAA compliance, generate a Software Bill of Materials:
 
 ```bash
 # Generate SBOM in CycloneDX format
-snyk sbom --format cyclonedx > docs/sbom-cyclonedx.json
+snyk sbom --format cyclonedx > docs/sbom/sbom-cyclonedx.json
 
 # Generate SBOM in SPDX format
-snyk sbom --format spdx > docs/sbom-spdx.json
+snyk sbom --format spdx > docs/sbom/sbom-spdx.json
 ```
 
-In Claude Code, push to the compliance notebook:
+Commit the SBOM files to the repository:
+
+```bash
+git add docs/sbom/
+git commit -m "evidence: generate SBOM for FDA/HIPAA compliance
+
+- CycloneDX and SPDX format Software Bill of Materials
+- Permanent evidence per Compliance Evidence Storage Policy"
+```
+
+Then push the committed SBOMs to NotebookLM:
 
 ```
-"Add docs/sbom-cyclonedx.json as a source to the PMS: HIPAA & FDA
+"Add docs/sbom/sbom-cyclonedx.json as a source to the PMS: HIPAA & FDA
 Compliance notebook (<NLM_COMPLIANCE_ID>)."
 ```
 
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool.
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
-### E. Push Security Evidence to NotebookLM
+### E. Commit and Push Security Evidence to NotebookLM
 
-After each security scan, use Claude Code to archive evidence:
+After each security scan, use Claude Code to generate the security report:
 
 ```
 "Analyze snyk-deps.json, snyk-code.sarif, and
@@ -1074,12 +1248,28 @@ snyk-container.json. Generate a security-report.md that:
 2. Maps each to the relevant SYS-REQ/SUB requirement
 3. Notes remediation status and PR references
 4. Compares with previous report for trend analysis
-Save it as docs/security/security-report-<TODAY>.md.
-Then add it as a source to the PMS: Quality & Security
-notebook (<NLM_QS_ID>)."
+Save it as docs/security/security-report-<TODAY>.md."
 ```
 
-Claude Code will generate the report and use `notebooklm-mcp:source_add` to upload it.
+Commit the security report to the repository:
+
+```bash
+git add docs/security/security-report-<TODAY>.md
+git commit -m "evidence: Snyk security report for <TODAY>
+
+- Vulnerability findings by severity with requirement traceability
+- Remediation status and trend analysis
+Relates to: SYS-REQ-0001, SYS-REQ-0002"
+```
+
+Then push the committed report to NotebookLM:
+
+```
+"Add docs/security/security-report-<TODAY>.md as a source
+to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
+```
+
+Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ```bash
 # Continuous monitoring baseline
@@ -1102,11 +1292,11 @@ All three tools (SonarQube, CodeRabbit, Snyk) feed into a dual-store evidence ar
 
 | Tool | GitHub Location | Retention | Access |
 |------|----------------|-----------|--------|
-| SonarQube | PR status checks + Actions artifacts | 90 days (artifacts) | Developers, CI/CD |
-| CodeRabbit | PR review comments (permanent) | Permanent | All PR participants |
-| Snyk | Code Scanning alerts + SARIF + Actions artifacts | 90 days (artifacts) + permanent (SARIF) | Security tab |
-| Test Coverage | Actions artifacts + PR status checks | 90 days | Developers, CI/CD |
-| SBOM | Actions artifacts + Releases | Per release | Compliance team |
+| SonarQube | PR status checks + `docs/quality-reports/` (committed) | **Permanent** (git history) | Developers, CI/CD |
+| CodeRabbit | PR review comments + `docs/reviews/` (committed) | **Permanent** (git history) | All PR participants |
+| Snyk | Code Scanning alerts + `docs/security/` (committed) | **Permanent** (git history) | Security tab |
+| Test Coverage | `docs/coverage-report.md` + `docs/test-evidence/` (committed) | **Permanent** (git history) | Developers, CI/CD |
+| SBOM | `docs/sbom/` (committed) + Releases | **Permanent** (git history) | Compliance team |
 
 ### NotebookLM Evidence (Audit & Query)
 
@@ -1146,18 +1336,31 @@ jobs:
             2. CodeRabbit review findings summary
             3. Snyk vulnerability counts by severity
             4. Requirement traceability for all findings
-            5. Comparison with previous evidence summary"
+            5. Comparison with previous evidence summary
+            Save to docs/evidence-summary.md"
+
+      - name: Commit Evidence Summary
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/evidence-summary.md
+          git commit -m "evidence(ci): unified evidence summary for workflow run
+
+          - Compiled SonarQube, CodeRabbit, and Snyk results
+          - Requirement traceability and trend analysis
+          - Permanent evidence per Compliance Evidence Storage Policy" || true
+          git push || true
 
       - name: Push to NotebookLM
         run: |
-          # Use Claude Code to add the evidence summary via MCP
+          # Use Claude Code to add the committed evidence summary via MCP
           claude --print "Add docs/evidence-summary.md as a source to \
             NotebookLM notebook $NLM_QS_ID using notebooklm-mcp:source_add"
         env:
           NLM_QS_ID: ${{ vars.NLM_QS_NOTEBOOK_ID }}
 ```
 
-> **🟢 Dual-Store Benefit:** GitHub provides immediate developer access and CI/CD integration. NotebookLM provides long-term, grounded querying across the entire project history. Together, they ensure evidence is both actionable for developers and auditable for compliance teams.
+> **🟢 Repository-First, Dual-Store Benefit:** The GitHub repository is the permanent, authoritative evidence store (satisfying HIPAA's 6-year retention requirement via git history). NotebookLM indexes committed evidence for grounded, natural-language querying across the entire project history. Together, they ensure evidence is both actionable for developers and auditable for compliance teams — with the repo as the system of record.
 
 ---
 
@@ -1179,8 +1382,8 @@ This tutorial covered seventeen steps across three parts for building a complete
 - **SonarQube** catches quality issues with enforceable gates before code merges
 - **CodeRabbit** provides AI-powered reviews that reference your requirement IDs
 - **Snyk** monitors dependencies, containers, and code for vulnerabilities continuously
-- The **dual-store evidence pipeline** (GitHub + NotebookLM) ensures nothing is lost
-- For **regulated industries**, this pipeline produces audit-ready documentation with full traceability
+- The **repository-first evidence pipeline** commits all evidence to GitHub (permanent, versioned, tamper-evident), then indexes it in NotebookLM for querying — satisfying HIPAA's 6-year retention requirement
+- For **regulated industries**, this pipeline produces audit-ready documentation with full traceability and no reliance on ephemeral CI artifacts
 
 ### Next Steps
 
