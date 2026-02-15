@@ -27,6 +27,7 @@ _No bug fixes documented yet._
 
 - [Project Setup Guide](config/project-setup.md) — How to clone, install, and run all three projects
 - [Dependencies Overview](config/dependencies.md) — All libraries and why they were chosen
+- [Security Scanning](config/security-scanning.md) — SonarCloud, CodeRabbit, and Snyk configuration across all repos
 
 ## Release Management
 
