@@ -1,67 +1,61 @@
 # Project Agent Instructions
 
-## NotebookLM as Single Source of Truth
+## Repository Docs as Single Source of Truth
 
-This project uses **NotebookLM** as the central knowledge repository. All project context, decisions, and implementation details must be stored there — not in local markdown files, comments, or memory alone.
+This project uses **markdown files in the `docs/` directory** as the central knowledge repository. All project context, decisions, and implementation details must be stored there — committed to the repo and pushed to GitHub.
 
-### Notebook Management
+### Directory Structure
 
-- At the start of each session, check for an existing project notebook using `notebooklm notebook list`. If none exists, create one with `notebooklm create "<project-name>"`.
-- The notebook ID should be stored in `.notebooklm-project.json` at the project root for persistence across sessions.
+```
+docs/
+├── architecture/        # Architectural Decision Records (ADRs)
+├── features/            # Implementation details for completed features
+├── bugs/                # Root cause analyses for non-trivial bugs
+├── api/                 # API contracts, schemas, and interface docs
+├── config/              # Dependencies, environment setup, and configuration
+└── index.md             # Table of contents linking to all docs
+```
 
 ### What to Store
 
-**Architectural Decisions**
-- Record every architectural decision as a notebook source immediately when made.
-- Include the context, options considered, rationale, and trade-offs.
-- Tag entries clearly (e.g., prefix with `[ADR]` in the title).
+**Architectural Decisions** (`docs/architecture/`)
+- Record every architectural decision as a new markdown file immediately when made.
+- Use the naming convention: `NNNN-short-title.md` (e.g., `0001-chose-jwt-over-sessions.md`).
+- Include: context, options considered, rationale, and trade-offs.
 
-**Implementation Details**
-- After completing a feature or significant change, add a source summarizing:
+**Implementation Details** (`docs/features/`)
+- After completing a feature or significant change, add a markdown file summarizing:
   - What was built and why
   - Key files and components involved
   - Any non-obvious design choices
   - Known limitations or follow-up work
 
-**Bug Fixes and Incidents**
+**Bug Fixes and Incidents** (`docs/bugs/`)
 - Document root cause analysis for non-trivial bugs.
 - Include what was tried, what failed, and what ultimately resolved the issue.
 
-**API Contracts and Interfaces**
+**API Contracts and Interfaces** (`docs/api/`)
 - Store API schemas, interface definitions, and integration details.
 - Update these whenever contracts change.
 
-**Dependencies and Configuration**
+**Dependencies and Configuration** (`docs/config/`)
 - Record decisions about dependencies (why chosen, alternatives rejected).
 - Document environment-specific configuration and setup steps.
 
-### When to Update the Notebook
+### When to Update Docs
 
-- **Before starting work**: Query the notebook for relevant context (`notebooklm ask <notebookId> "<question>"`).
-- **After completing a feature**: Add implementation details as a new source.
-- **After an architectural decision**: Record it immediately — do not defer.
-- **After resolving a bug**: Document the root cause and fix.
-- **When onboarding context changes**: Update or replace outdated sources.
-
-### How to Interact with NotebookLM
-
-Use the `notebooklm` CLI or the `notebooklm-mcp` MCP tools:
-
-```bash
-# List notebooks
-notebooklm list
-
-# Ask the notebook a question (use it before making decisions)
-notebooklm ask <notebookId> "How does authentication work in this project?"
-
-# Add a source (after completing work)
-notebooklm source add <notebookId> --text "## [ADR] Chose JWT over sessions ..."
-```
+- **Before starting work**: Read relevant docs in `docs/` for existing context.
+- **After completing a feature**: Add implementation details to `docs/features/`.
+- **After an architectural decision**: Record it in `docs/architecture/` immediately — do not defer.
+- **After resolving a bug**: Document the root cause and fix in `docs/bugs/`.
+- **When onboarding context changes**: Update or replace outdated docs.
+- **Always update `docs/index.md`** when adding or removing a doc file.
 
 ### Rules
 
-1. **Never rely on memory alone.** If a decision or implementation detail matters, it goes in the notebook.
-2. **Query before you build.** Check the notebook for existing context before starting any non-trivial task.
-3. **Keep sources focused.** One topic per source — don't dump everything into a single entry.
-4. **Update, don't duplicate.** If context has changed, update the existing source rather than adding a conflicting one.
-5. **Notebook is authoritative.** When there is a conflict between the notebook and other sources (comments, docs, memory), the notebook wins.
+1. **Never rely on memory alone.** If a decision or implementation detail matters, it goes in `docs/`.
+2. **Read before you build.** Check `docs/` for existing context before starting any non-trivial task.
+3. **Keep docs focused.** One topic per file — don't dump everything into a single document.
+4. **Update, don't duplicate.** If context has changed, update the existing file rather than adding a conflicting one.
+5. **Docs are authoritative.** When there is a conflict between `docs/` and other sources (comments, memory), the docs win.
+6. **Commit and push.** Every doc change must be committed and pushed to GitHub so the repo stays the source of truth.
