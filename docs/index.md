@@ -4,8 +4,7 @@ This directory is the single source of truth for all project context, decisions,
 
 ## Architecture Decisions
 
-<!-- Add links to ADRs as they are created -->
-_No decisions recorded yet._
+- [ADR-0001: Use Repository-Based Knowledge Management](architecture/0001-repo-based-knowledge-management.md)
 
 ## Features
 
