@@ -1,8 +1,8 @@
-# Using NotebookLM as a Development Power Tool
+# Development Pipeline Tutorial
 
-**How to Integrate NotebookLM CLI with AI Agents for Smarter Development Workflows**
+**How to Build an Auditable Development Pipeline with AI Agents**
 
-Extended Edition: Claude Code + GitHub Spec Kit + NotebookLM for IEEE/DOD-Style Requirements Engineering — With SonarQube, CodeRabbit & Snyk for Continuous Code Quality and Security Monitoring
+Extended Edition: Claude Code + GitHub Spec Kit for IEEE/DOD-Style Requirements Engineering — With SonarQube, CodeRabbit & Snyk for Continuous Code Quality and Security Monitoring
 
 *Featuring a Healthcare Patient Management System Case Study*
 
@@ -16,15 +16,15 @@ Based on the video tutorial by AI Labs Pro — [Watch the original video on YouT
 
 - [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy)
 
-### PART I — NotebookLM Fundamentals
+### PART I — Knowledge Management Fundamentals
 
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
-- [Step 1: Install the NotebookLM CLI Tool](#step-1-install-the-notebooklm-cli-tool)
-- [Step 2: Authenticate with Your Google Account](#step-2-authenticate-with-your-google-account)
-- [Step 3: Second Brain for AI Agents](#step-3-set-up-notebooklm-as-a-second-brain-for-ai-agents)
+- [Step 1: Set Up the docs/ Knowledge Base](#step-1-set-up-the-docs-knowledge-base)
+- [Step 2: Configure Your AI Agent](#step-2-configure-your-ai-agent)
+- [Step 3: Second Brain for AI Agents](#step-3-set-up-docs-as-a-second-brain-for-ai-agents)
 - [Step 4: Enhanced Research Workflows](#step-4-enhanced-research-workflows)
-- [Step 5: Codebase Understanding with RepoMix](#step-5-understand-codebases-with-notebooklm-and-repomix)
+- [Step 5: Codebase Understanding with RepoMix](#step-5-understand-codebases-with-repomix)
 - [Step 6: Debugging Knowledge Base](#step-6-build-a-dedicated-debugging-knowledge-base)
 - [Step 7: Cross-Tool Context Builder](#step-7-cross-tool-context-builder)
 - [Step 8: Agent Navigation via Visualizations](#step-8-agent-navigation-via-visualizations)
@@ -36,7 +36,7 @@ Based on the video tutorial by AI Labs Pro — [Watch the original video on YouT
 - [Step 11: System & Subsystem Requirements](#step-11-define-system-level-and-subsystem-level-requirements)
 - [Step 12: Requirements Traceability Matrix](#step-12-build-the-requirements-traceability-matrix-rtm)
 - [Step 13: Automated Test Coverage Tracking](#step-13-automated-test-coverage-tracking)
-- [Step 14: Living Requirements Dashboard](#step-14-living-requirements-dashboard-with-notebooklm)
+- [Step 14: Living Requirements Dashboard](#step-14-living-requirements-dashboard)
 
 ### PART III — Code Quality, Reviews & Security Monitoring
 
@@ -54,13 +54,13 @@ Based on the video tutorial by AI Labs Pro — [Watch the original video on YouT
 
 ### Authoritative Evidence Store
 
-The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, SBOMs, and review summaries — **must be committed to the repository** before being pushed to NotebookLM.
+The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, SBOMs, and review summaries — **must be committed to the repository**.
 
 | Store | Role | Retention | Properties |
 |-------|------|-----------|------------|
 | **GitHub Repository** | Primary / System of Record | **Permanent** (git history) | Versioned, tamper-evident, auditable, satisfies HIPAA 6-year requirement |
 | **GitHub Actions Artifacts** | Ephemeral CI output | **90 days** | Convenience only — never rely on as sole evidence store |
-| **NotebookLM** | Secondary / Query Layer | Platform-dependent | Indexes repo evidence for natural-language querying; not a legal record |
+| **`docs/` directory** | Queryable documentation layer | **Permanent** (committed to repo) | Markdown files committed alongside the code for easy reading and agent access |
 
 ### Evidence Commitment Rule
 
@@ -69,9 +69,7 @@ Every evidence-generating step in this tutorial must follow this sequence:
 1. **Generate** the evidence artifact (report, scan result, matrix, etc.)
 2. **`git add`** the artifact to staging
 3. **`git commit`** with a descriptive message referencing requirement IDs
-4. **Then** push to NotebookLM (which indexes the committed file)
-
-> **Never push evidence to NotebookLM without first committing it to the repository.** NotebookLM is a convenience layer for querying — the repo is the legal record.
+4. **`git push`** to the remote repository
 
 ### Evidence Directory Structure
 
@@ -105,16 +103,16 @@ docs/
 
 ---
 
-# PART I — NotebookLM Fundamentals
+# PART I — Knowledge Management Fundamentals
 
 ## Introduction
 
-Google NotebookLM has evolved into a powerful knowledge management platform. When paired with its CLI (command-line interface), it becomes indispensable for modern AI-assisted development workflows.
+A well-organized knowledge base is essential for modern AI-assisted development workflows. By storing all project knowledge as markdown files in a `docs/` directory within your repository, you ensure that documentation is version-controlled, always available, and directly accessible by AI agents and developers alike.
 
-This tutorial covers seventeen steps across three parts. Part I covers NotebookLM fundamentals (Steps 1–9). Part II extends into IEEE/DOD-style requirements engineering with GitHub Spec Kit (Steps 10–14). Part III adds SonarQube code quality gates, CodeRabbit AI-powered reviews, and Snyk continuous security monitoring — with all evidence archived in both GitHub and NotebookLM (Steps 15–17).
+This tutorial covers seventeen steps across three parts. Part I covers knowledge management fundamentals using the `docs/` directory (Steps 1-9). Part II extends into IEEE/DOD-style requirements engineering with GitHub Spec Kit (Steps 10-14). Part III adds SonarQube code quality gates, CodeRabbit AI-powered reviews, and Snyk continuous security monitoring — with all evidence archived in the repository (Steps 15-17).
 
-> **💡 Why This Combination?**
-> NotebookLM provides grounded, citation-backed answers. GitHub Spec Kit provides structured specification management. Claude Code provides autonomous implementation. SonarQube, CodeRabbit, and Snyk provide continuous quality and security verification. Together, they create a complete pipeline where requirements are defined, implemented, reviewed, tested, and monitored with full traceability and evidence.
+> **Why This Combination?**
+> The `docs/` directory provides a reliable, version-controlled knowledge base. GitHub Spec Kit provides structured specification management. Claude Code provides autonomous implementation. SonarQube, CodeRabbit, and Snyk provide continuous quality and security verification. Together, they create a complete pipeline where requirements are defined, implemented, reviewed, tested, and monitored with full traceability and evidence.
 
 ---
 
@@ -122,7 +120,6 @@ This tutorial covers seventeen steps across three parts. Part I covers NotebookL
 
 Before you begin, make sure you have the following ready:
 
-- A Google account (for NotebookLM authentication)
 - Node.js and npm installed (for CLIs and tooling)
 - Claude Code CLI installed
 - Git and GitHub CLI (`gh`) installed
@@ -131,126 +128,160 @@ Before you begin, make sure you have the following ready:
 - CodeRabbit account — covered in Step 16
 - Snyk account and CLI — covered in Step 17
 
-> **⚠️ Note:** The exact CLI package names and installation commands may vary as tools evolve. Check the official repositories for the latest instructions.
+> **Note:** The exact CLI package names and installation commands may vary as tools evolve. Check the official repositories for the latest instructions.
 
 ---
 
-## Step 1: Install the NotebookLM CLI Tool
+## Step 1: Set Up the docs/ Knowledge Base
 
-*Video reference: 0:32*
+The `docs/` directory in your repository serves as the central knowledge base for the entire project. All architectural decisions, implementation details, debugging notes, and compliance evidence live here.
 
-The NotebookLM CLI provides terminal access to create notebooks, add sources, query content, and generate visualizations — all without opening a browser.
-
-### Installation
+### A. Create the Directory Structure
 
 ```bash
-npm install -g notebooklm-cli
+mkdir -p docs/{architecture,features,bugs,api,config,adr,security,quality-reports,reviews,test-evidence,sbom,analyze,debugging}
 ```
 
-### Verify Installation
+### B. Create the Index File
+
+Create `docs/index.md` as the table of contents for your knowledge base:
+
+```markdown
+# Project Knowledge Base
+
+This directory is the single source of truth for all project context,
+decisions, and implementation details.
+
+## Architecture Decisions
+- [ADR-0001: Example Decision](architecture/0001-example-decision.md)
+
+## Features
+<!-- Add links to feature docs as they are completed -->
+
+## Bug Fixes
+<!-- Add links to bug analyses as they are resolved -->
+
+## API Contracts
+<!-- Add links to API docs as they are defined -->
+
+## Configuration & Dependencies
+<!-- Add links to config docs as they are established -->
+```
+
+### C. Commit the Initial Structure
 
 ```bash
-nlm-cli --help
+git add docs/
+git commit -m "docs: initialize docs/ knowledge base structure
+
+- Directory structure for all project documentation
+- Index file as table of contents"
+git push
 ```
 
-This displays the available commands: `init` (install skills to your AI assistant), `update` (update to latest version), and `versions` (show version info).
-
-> **💡 Tip:** If the command is not found after installation, ensure your npm global bin directory is in your system PATH. Note: the binary is `nlm-cli`, not `nlm`.
+> **Best Practice:** Keep your `docs/index.md` updated as new documentation is added. This serves as the entry point for both developers and AI agents.
 
 ---
 
-## Step 2: Authenticate and Install Skills
+## Step 2: Configure Your AI Agent
 
-*Video reference: 1:01*
+Create an instructions file (`CLAUDE.md`) that tells your AI agent to use the `docs/` directory as its knowledge base.
 
-Before you can interact with NotebookLM, you need to install the NotebookLM Skills into your AI assistant and authenticate with your Google account.
+### A. Create CLAUDE.md
 
-### Install NotebookLM Skills
+```markdown
+# CLAUDE.md — Agent Instructions
 
-```bash
-nlm-cli init --ai claude
+## Knowledge Management
+- The `docs/` directory is the single source of truth for all project knowledge
+- Always read relevant docs before starting work
+- After completing a feature, update the docs with implementation details
+- Never rely solely on conversation memory — persist decisions to docs/
+
+## Documentation Rules
+1. Read before you build — check docs/ for existing context
+2. Keep docs focused — one topic per file
+3. Update, don't duplicate — if a doc exists, update it
+4. Docs are authoritative — they override any assumptions
+5. Commit and push — every doc change must be committed
 ```
 
-This installs the NotebookLM Skills into Claude Code, enabling MCP-based notebook operations (creating notebooks, adding sources, generating learning materials). Supported AI assistants: `claude`, `cursor`, `windsurf`, `continue`.
-
-### Authenticate
+### B. Commit and Push
 
 ```bash
-nlm login
+git add CLAUDE.md
+git commit -m "docs: add AI agent instructions (CLAUDE.md)"
+git push
 ```
-
-This opens a browser window where you sign in with your Google account. Once authenticated, credentials are saved locally so you do not need to sign in again for subsequent sessions.
-
-1. **Run the command above** — A browser window will open automatically.
-2. **Sign in with Google** — Use the Google account associated with your NotebookLM.
-3. **Return to your terminal** — The CLI confirms authentication was successful.
-
-> **⚠️ Important:** All notebook operations (creating notebooks, adding sources, generating content) are performed through Claude Code's MCP tools (`notebooklm-mcp:*`), not via direct terminal commands. Querying notebooks is done through the NotebookLM web interface at [notebooklm.google.com](https://notebooklm.google.com).
 
 ---
 
-## Step 3: Set Up NotebookLM as a Second Brain for AI Agents
-
-*Video reference: 1:24*
+## Step 3: Set Up docs/ as a Second Brain for AI Agents
 
 This is the foundational workflow. The idea is to give your AI agent a persistent, structured knowledge base that survives context window resets and can be shared across sessions.
 
-### A. Instruct Your Agent via a .md File
+### A. Store Architectural Decisions
 
-Create an instructions file (e.g., `CLAUDE.md` or `AGENTS.md`) that tells your AI agent to store all project knowledge in NotebookLM. Include directives like:
+When making architecture decisions, create Architecture Decision Records (ADRs):
 
-- Store all architectural decisions in the NotebookLM notebook
-- After completing a feature, update the notebook with implementation details
-- Use the notebook as the single source of truth for project context
-
-### B. Create the Notebook
-
-In Claude Code, ask it to create a notebook:
-
-```
-"Create a NotebookLM notebook titled 'Project: My App'."
+```bash
+# In Claude Code:
+"Create an ADR for the decision to use PostgreSQL over MongoDB.
+Save it as docs/adr/0001-use-postgresql.md with the standard
+ADR template: Context, Options Considered, Decision, Rationale,
+Consequences."
 ```
 
-Claude Code will use the `notebooklm-mcp:notebook_create` MCP tool. Save the returned notebook ID in your instructions file so the agent always knows which notebook to update.
+### B. Store Implementation Details
+
+After implementing a feature, document key details:
+
+```bash
+# In Claude Code:
+"Document the authentication implementation.
+Save it as docs/features/authentication.md covering:
+architecture, key modules, configuration, and known limitations."
+```
 
 ### C. Automate Updates
 
-In Claude Code, ask it to add sources:
+Add to your `CLAUDE.md`:
 
+```markdown
+## Post-Implementation Protocol
+After completing any implementation task:
+1. Update or create the relevant doc in docs/
+2. Update docs/index.md with the new link
+3. Commit and push the changes
 ```
-"Add ./docs/feature-auth.md as a source to the 'Project: My App' notebook (<ID>)."
-```
 
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool to upload the file.
-
-> **💡 Best Practice:** Keep your notebook organized by topic. Use separate sources for architecture decisions, API documentation, feature specs, and meeting notes.
+> **Best Practice:** Keep your docs organized by topic. Use separate files for architecture decisions, API documentation, feature specs, and debugging notes.
 
 ---
 
 ## Step 4: Enhanced Research Workflows
 
-*Video reference: 2:36*
-
-NotebookLM excels at research because it grounds answers in the sources you provide. Here is how to set up a research pipeline:
+The `docs/` directory excels at research because it provides grounded, traceable context that any agent or developer can reference.
 
 1. **Delegate the research topic** — Tell your AI agent what to research. It will find relevant sources and compile them.
-2. **Create a research notebook** — The agent creates a new NotebookLM notebook and uploads all collected sources.
-3. **Clear agent context** — Once sources are safely in NotebookLM, clear the agent's conversation context to avoid token bloat.
-4. **Query the notebook** — Instead of re-reading all sources, query for specific findings through the NotebookLM web interface at [notebooklm.google.com](https://notebooklm.google.com):
+2. **Save research findings** — The agent saves compiled research as markdown in `docs/`:
 
-> "What are the key findings on X?"
+```bash
+# In Claude Code:
+"Research the best practices for HIPAA-compliant data encryption.
+Save your findings to docs/research/hipaa-encryption-practices.md
+with citations and recommendations."
+```
 
-The response comes grounded in your uploaded sources with citations, ensuring high accuracy and traceability.
+3. **Reference in future sessions** — Instead of re-researching, agents and developers read the saved findings directly from `docs/`.
 
-> **⚠️ Important:** Clearing agent context after uploading sources is crucial. It prevents the agent from working with stale or bloated context while still having full access to all research via NotebookLM queries.
+> **Tip:** Committing research to the repo means it's version-controlled. If recommendations change, update the file and the git history preserves the full evolution.
 
 ---
 
-## Step 5: Understand Codebases with NotebookLM and RepoMix
+## Step 5: Understand Codebases with RepoMix
 
-*Video reference: 3:52*
-
-One of the most powerful use cases: turning an entire codebase into a queryable knowledge base.
+One of the most powerful use cases: turning an entire codebase into a structured knowledge document.
 
 ### A. Clone the Repository
 
@@ -265,126 +296,119 @@ npm install -g repomix
 repomix --output codebase.txt
 ```
 
-### C. Create a Notebook and Add the Source
+### C. Generate Documentation from the Codebase
 
-In Claude Code, ask it to create a notebook and add the source:
+In Claude Code:
 
 ```
-"Create a NotebookLM notebook titled 'Codebase: repo-name'
-and add ./codebase.txt as a source."
+"Analyze codebase.txt and generate:
+1. docs/architecture/system-overview.md — module relationships and dependencies
+2. docs/api/endpoints.md — all API endpoints with their handlers
+3. docs/architecture/data-flow.md — data flow through the system"
 ```
 
-Claude Code will use the `notebooklm-mcp:notebook_create` and `notebooklm-mcp:source_add` MCP tools.
+### D. Commit the Documentation
 
-### D. Visualize the Codebase
+```bash
+git add docs/architecture/ docs/api/
+git commit -m "docs: generate codebase documentation from RepoMix analysis"
+git push
+```
 
-NotebookLM can generate visual representations of your codebase:
-
-- Mind maps showing module relationships and dependencies
-- Infographics summarizing architecture and data flow
-- Data tables listing endpoints, models, or configuration
-
-These visualizations can be viewed in the NotebookLM Studio interface and exported for use by agents.
-
-> **💡 Tip:** For large codebases, consider using RepoMix with filters to focus on specific directories or file types.
+> **Tip:** For large codebases, consider using RepoMix with filters to focus on specific directories or file types.
 
 ---
 
 ## Step 6: Build a Dedicated Debugging Knowledge Base
 
-*Video reference: 6:16*
-
 Instead of relying on generic web searches for debugging, build a curated knowledge base that your agent consults first.
 
-### A. Create a Debugging Notebook
+### A. Create the Debugging Directory
 
-In Claude Code, ask it to create the notebook:
-
-```
-"Create a NotebookLM notebook titled 'Debugging Handbook'."
+```bash
+mkdir -p docs/debugging
 ```
 
-### B. Add Curated Sources
+### B. Document Solutions as You Find Them
 
-- Official documentation for your tech stack
-- Community forum solutions (Stack Overflow, GitHub Discussions)
-- Relevant GitHub repository READMEs and issue threads
-- Blog posts with proven solutions to common errors
+When you fix a bug, document the solution:
 
-In Claude Code, ask it to add sources:
-
+```bash
+# In Claude Code:
+"Document the fix for the database connection timeout issue.
+Save it as docs/debugging/db-connection-timeout.md with:
+- Error message
+- Root cause
+- Solution
+- Prevention tips"
 ```
-"Add the following sources to the Debugging Handbook notebook (<ID>):
-- URL: https://docs.example.com/troubleshooting
-- File: ./debugging-notes.md"
-```
-
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool for each source.
 
 ### C. Configure Agent Priority
 
-Update your agent's instructions (e.g., in `CLAUDE.md`):
+Update your `CLAUDE.md`:
 
 ```markdown
 When encountering a bug:
-1. First, query the Debugging Handbook notebook
+1. First, check docs/debugging/ for known solutions
 2. Only if no relevant solution is found, perform a web search
-3. If you find a new solution, add it to the notebook for future use
+3. If you find a new solution, save it to docs/debugging/ for future use
 ```
 
-> **💡 Pro Tip:** Have your agent automatically add successful debugging solutions back to the notebook. Over time, this creates a self-improving knowledge base tailored to your exact tech stack.
+> **Pro Tip:** Over time, this creates a self-improving knowledge base tailored to your exact tech stack.
 
 ---
 
 ## Step 7: Cross-Tool Context Builder
 
-*Video reference: 7:54*
+The `docs/` directory serves as a shared context layer accessible by multiple tools and team members.
 
-NotebookLM notebooks can serve as a shared context layer accessible by multiple tools and team members.
+### A. Centralize Documentation
 
-### A. Push Documentation to NotebookLM
-
-In Claude Code, ask it to create the notebook and add sources:
-
+```bash
+docs/
+├── api/
+│   └── api-reference.md       # API endpoints and contracts
+├── architecture/
+│   └── system-overview.md     # System architecture
+├── config/
+│   └── deployment-guide.md    # Deployment configuration
+└── index.md                   # Table of contents
 ```
-"Create a NotebookLM notebook titled 'App Documentation Hub'
-and add the following files as sources:
-- ./docs/api-reference.md
-- ./docs/architecture.md
-- ./docs/deployment-guide.md"
-```
-
-Claude Code will use `notebooklm-mcp:notebook_create` and `notebooklm-mcp:source_add` MCP tools.
 
 ### B. Enable Cross-Tool Access
 
-Any agent or MCP-compatible tool with the notebook ID can manage this shared knowledge base. To query the notebook, use the NotebookLM web interface at [notebooklm.google.com](https://notebooklm.google.com):
+Any AI agent with repository access can read the `docs/` directory:
 
-> "How is authentication handled in this app?"
-
-Claude Code, Cursor, Windsurf, or any MCP-compatible tool can add sources to the same notebook via `notebooklm-mcp:source_add`.
+- **Claude Code** reads docs directly from the filesystem
+- **GitHub Copilot** can reference docs in pull request context
+- **CI/CD pipelines** can validate documentation completeness
+- **New team members** can onboard by reading `docs/index.md`
 
 ---
 
 ## Step 8: Agent Navigation via Visualizations
 
-*Video reference: 9:02*
+Visualizations are not just for humans. AI agents can use structured documentation to navigate codebases more efficiently than crawling file systems.
 
-Visualizations are not just for humans. AI agents can use exported mind maps and structured data to navigate codebases more efficiently than crawling file systems.
+### A. Generate Structured Navigation Files
 
-### A. Generate Visualizations
+In Claude Code:
 
-- Mind maps showing module relationships (exportable as JSON)
-- Infographics summarizing architecture layers
-- Data tables mapping endpoints to their handlers
+```
+"Generate docs/architecture/module-map.md listing all modules,
+their responsibilities, key files, and dependencies."
 
-### B. Configure Agent to Use Visuals
+"Generate docs/api/endpoint-table.md as a markdown table mapping
+every API endpoint to its handler file and HTTP method."
+```
+
+### B. Configure Agent to Use Navigation Files
 
 ```markdown
 When navigating the codebase:
-1. Check the mind map JSON for module structure
-2. Consult the endpoint table for API routes
-3. Only crawl the file system if the visualization data is insufficient
+1. Check docs/architecture/module-map.md for module structure
+2. Consult docs/api/endpoint-table.md for API routes
+3. Only crawl the file system if the documentation is insufficient
 ```
 
 This approach is faster, uses fewer tokens, and gives the agent structured context rather than raw file contents.
@@ -393,53 +417,47 @@ This approach is faster, uses fewer tokens, and gives the agent structured conte
 
 ## Step 9: Grounded Security Audits
 
-*Video reference: 10:04*
-
 Perform security audits where every finding is backed by authoritative sources, not just AI inference.
 
-### A. Create a Security Handbook Notebook
+### A. Create Security Reference Documentation
 
-In Claude Code, ask it to create the notebook:
-
-```
-"Create a NotebookLM notebook titled 'Security Handbook'."
+```bash
+# In Claude Code:
+"Create docs/security/security-handbook.md covering:
+- OWASP Top 10 checklist for our tech stack
+- Security best practices for Node.js/TypeScript
+- Our custom security policies and compliance requirements"
 ```
 
 ### B. Add Security Sources
 
 - OWASP cheat sheets and guidelines
 - Security best practices for your specific tech stack
-- CVE database entries relevant to your dependencies
 - Custom security policies and compliance requirements
-
-In Claude Code, ask it to add sources:
-
-```
-"Add the following sources to the Security Handbook notebook (<ID>):
-- URL: https://cheatsheetseries.owasp.org/
-- File: ./security/internal-policy.md"
-```
-
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool for each source.
 
 ### C. Run Grounded Security Checks
 
-Open the **Security Handbook** notebook at [notebooklm.google.com](https://notebooklm.google.com) and ask:
+In Claude Code:
 
-> "Review this code for SQL injection vulnerabilities and cite the relevant OWASP guidelines."
+```
+"Review src/auth/ for security vulnerabilities. Cross-reference
+your findings with docs/security/security-handbook.md and cite
+the relevant OWASP guidelines. Save the audit report to
+docs/security/audit-<DATE>.md."
+```
 
-> **⚠️ Security Note:** While NotebookLM-grounded audits are valuable, they should complement — not replace — professional security reviews and automated scanning tools for production systems.
+> **Security Note:** While docs-grounded audits are valuable, they should complement — not replace — professional security reviews and automated scanning tools for production systems.
 
 ---
 
 # PART II — Requirements Engineering & Traceability
 
-## Claude Code + GitHub Spec Kit + NotebookLM
+## Claude Code + GitHub Spec Kit
 
-This section extends the NotebookLM workflow into a full **requirements engineering pipeline** using IEEE/DOD-style conventions. We use a **Healthcare Patient Management System (PMS)** as a running example, covering HIPAA compliance, HL7 FHIR interoperability, and FDA software validation requirements.
+This section extends the `docs/` workflow into a full **requirements engineering pipeline** using IEEE/DOD-style conventions. We use a **Healthcare Patient Management System (PMS)** as a running example, covering HIPAA compliance, HL7 FHIR interoperability, and FDA software validation requirements.
 
-> **🟣 The Three-Tool Architecture**
-> GitHub Spec Kit defines what to build (specifications). Claude Code builds it (implementation). NotebookLM remembers everything and provides grounded verification (knowledge base). Together they create an auditable chain from requirements through testing.
+> **The Three-Tool Architecture**
+> GitHub Spec Kit defines what to build (specifications). Claude Code builds it (implementation). The `docs/` directory remembers everything and provides the knowledge base. Together they create an auditable chain from requirements through testing.
 
 ---
 
@@ -486,7 +504,7 @@ This creates two key directories:
 
 ### B. Configure Claude Code Integration
 
-Create a `CLAUDE.md` at the repository root that links all three tools:
+Create a `CLAUDE.md` at the repository root that links all tools:
 
 ```markdown
 # CLAUDE.md — Agent Instructions for PMS Development
@@ -495,11 +513,9 @@ Create a `CLAUDE.md` at the repository root that links all three tools:
 This project uses Spec-Driven Development (SDD).
 Always use /specify, /plan, /analyze before implementing.
 
-## NotebookLM Integration
-- Requirements Notebook: <NLM_REQ_ID>
-- Architecture Notebook: <NLM_ARCH_ID>
-- Test Evidence Notebook: <NLM_TEST_ID>
-- Quality & Security Notebook: <NLM_QS_ID>
+## Knowledge Base
+All project documentation lives in the `docs/` directory.
+Read relevant docs before starting any work.
 
 ## Requirements Convention (IEEE 830 / DOD-STD-498)
 - System requirements: SYS-REQ-XXXX
@@ -512,28 +528,26 @@ Always use /specify, /plan, /analyze before implementing.
 4. Implement → Claude Code writes code
 5. Review → SonarQube + CodeRabbit
 6. Scan → Snyk security monitoring
-7. Archive → Push evidence to GitHub + NotebookLM
+7. Archive → Commit evidence to docs/
 ```
 
-### C. Create NotebookLM Knowledge Bases
+### C. Create Knowledge Base Structure
 
-In Claude Code, ask it to create the notebooks:
+Set up the `docs/` directory with subdirectories for all evidence types:
 
-```
-"Create the following NotebookLM notebooks:
-1. 'PMS: Requirements (IEEE 830)'
-2. 'PMS: Architecture & Design'
-3. 'PMS: Test Evidence & Traceability'
-4. 'PMS: Quality & Security Evidence'
-5. 'PMS: HIPAA & FDA Compliance'
-
-Then add https://www.hhs.gov/hipaa/for-professionals/security/
-as a source to the HIPAA & FDA Compliance notebook."
+```bash
+mkdir -p docs/{architecture,adr,features,security,quality-reports,reviews,test-evidence,sbom,analyze,debugging}
 ```
 
-Claude Code will use `notebooklm-mcp:notebook_create` and `notebooklm-mcp:source_add` MCP tools.
+Create `docs/index.md` as the central table of contents and commit:
 
-> **💡 Best Practice:** Store all notebook IDs in your CLAUDE.md so every agent session can immediately access the right knowledge base.
+```bash
+git add docs/
+git commit -m "docs: initialize knowledge base structure for PMS"
+git push
+```
+
+> **Best Practice:** Keep `docs/index.md` updated as you add documentation, so every agent session can immediately find the right knowledge.
 
 ---
 
@@ -573,23 +587,19 @@ Example decomposition for the Medication Management subsystem:
 | SUB-MM-0004 | SYS-REQ-0003 | Log all prescription events with prescriber ID and timestamp | Test |
 | SUB-MM-0005 | SYS-REQ-0004 | Support FHIR R4 MedicationRequest and MedicationDispense resources | Test / Demo |
 
-### C. Push Requirements to NotebookLM
+### C. Commit Requirements to the Repository
 
-In Claude Code, ask it to add all requirement specs as sources:
+```bash
+git add .specify/specs/
+git commit -m "spec: define system and subsystem requirements
 
-```
-"Add the following files as sources to the PMS: Requirements
-notebook (<NLM_REQ_ID>):
-- .specify/specs/system-requirements.md
-- .specify/specs/sub-pr-requirements.md
-- .specify/specs/sub-mm-requirements.md
-- .specify/specs/sub-cw-requirements.md
-- .specify/specs/sub-ra-requirements.md"
+- SYS-REQ-0001 through SYS-REQ-0007
+- SUB-PR, SUB-CW, SUB-MM, SUB-RA decompositions
+Follows IEEE 830 / DOD-STD-498 conventions"
+git push
 ```
 
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool for each file.
-
-> **💡 IEEE 830 Compliance:** Each requirement must be uniquely identifiable, unambiguous, verifiable, and traceable. The hierarchical ID scheme (SYS-REQ → SUB-XX) ensures every subsystem requirement traces back to a system-level need.
+> **IEEE 830 Compliance:** Each requirement must be uniquely identifiable, unambiguous, verifiable, and traceable. The hierarchical ID scheme (SYS-REQ → SUB-XX) ensures every subsystem requirement traces back to a system-level need.
 
 ---
 
@@ -629,9 +639,7 @@ This view answers: "Does every test verify a real requirement?"
 | TC-MED-001 | Drug interaction check < 5 sec | SYS-REQ-0006, SUB-MM-0001 | PASS | perf-test-med-001.json |
 | TC-MED-002 | Interaction severity classification | SYS-REQ-0006, SUB-MM-0002 | FAIL | bug-report-MM-042.md |
 
-### D. Commit RTM and Push to NotebookLM
-
-Commit the traceability matrix to the repository:
+### D. Commit the RTM
 
 ```bash
 git add docs/traceability-matrix.md docs/traceability-matrix.json
@@ -639,20 +647,14 @@ git commit -m "evidence: add requirements traceability matrix
 
 - Forward and backward traceability for all SYS-REQ and SUB requirements
 - Maps requirements to design, source modules, tests, and verification status"
+git push
 ```
 
-Then push the committed RTM to NotebookLM. In Claude Code:
-
-```
-"Add docs/traceability-matrix.md as a source to the PMS: Requirements
-notebook (<NLM_REQ_ID>)."
-```
-
-Now anyone can query traceability through the NotebookLM web interface at [notebooklm.google.com](https://notebooklm.google.com). Open the **PMS: Requirements** notebook and ask:
+Now anyone can review traceability by reading `docs/traceability-matrix.md`:
 
 > "Which subsystem requirements trace to SYS-REQ-0006 and what is their current test status?"
 
-> **🔴 Regulatory Requirement:** For FDA-regulated medical software (IEC 62304), the traceability matrix is a mandatory deliverable. Storing it in NotebookLM ensures auditors and developers can query specific traceability chains on demand.
+> **Regulatory Requirement:** For FDA-regulated medical software (IEC 62304), the traceability matrix is a mandatory deliverable. Storing it in the repository ensures auditors and developers can query specific traceability chains on demand.
 
 ---
 
@@ -722,16 +724,8 @@ git commit -m "evidence: generate requirement test coverage report
 
 - Cross-referenced test results with traceability matrix
 - Coverage summary by subsystem with gap analysis"
+git push
 ```
-
-Then push the committed report to NotebookLM:
-
-```
-"Add docs/coverage-report.md as a source to the
-PMS: Test Evidence notebook (<NLM_TEST_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ### D. Coverage Summary Dashboard
 
@@ -743,51 +737,43 @@ Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 | Reporting (RA) | 6 | 4 | 4 | 0 | 2 | 66.7% |
 | **TOTAL** | **41** | **35** | **32** | **3** | **6** | **85.4%** |
 
-> **⚠️ Gap Analysis:** Requirements with no tests (6 in this example) represent verification gaps. Claude Code can be directed to prioritize writing tests for these uncovered requirements.
+> **Gap Analysis:** Requirements with no tests (6 in this example) represent verification gaps. Claude Code can be directed to prioritize writing tests for these uncovered requirements.
 
 ---
 
-## Step 14: Living Requirements Dashboard with NotebookLM
+## Step 14: Living Requirements Dashboard
 
-The final step of Part II ties everything together: NotebookLM becomes the living, queryable dashboard for your entire requirements engineering pipeline.
+The final step of Part II ties everything together: the `docs/` directory becomes the living, queryable dashboard for your entire requirements engineering pipeline.
 
 ### A. Consolidate All Artifacts
 
-> **Reminder:** Per the [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy), all files listed below must already be committed to the repository before adding them as NotebookLM sources. If any are not yet committed, run `git add` and `git commit` first.
+> **Reminder:** Per the [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy), all artifacts must be committed to the repository.
 
-In Claude Code, ask it to add all artifacts as sources to their respective notebooks:
+In Claude Code, consolidate artifacts into the `docs/` directory:
 
 ```
-"Add the following sources to the appropriate NotebookLM notebooks:
+"Organize the following artifacts into docs/:
 
-PMS: Requirements notebook (<NLM_REQ_ID>):
-- All files in .specify/specs/
-- docs/traceability-matrix.md
+docs/ directory structure:
+- .specify/specs/ → requirements specifications
+- docs/traceability-matrix.md → RTM
+- docs/adr/ → architecture decision records
+- docs/coverage-report.md → test coverage
+- docs/test-evidence/ → test execution reports
 
-PMS: Architecture & Design notebook (<NLM_ARCH_ID>):
-- All files in .specify/plans/
-- All files in docs/adr/
-
-PMS: Test Evidence notebook (<NLM_TEST_ID>):
-- docs/coverage-report.md
-- All files in docs/test-evidence/
-
-PMS: HIPAA & FDA Compliance notebook (<NLM_COMPLIANCE_ID>):
-- docs/hipaa-assessment.md"
+Ensure docs/index.md links to all of these."
 ```
-
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool for each file.
 
 ### B. Query Patterns for Requirements Engineering
 
-| Query Type | Example Question | Grounded In |
-|------------|-----------------|-------------|
-| Traceability | Which test cases verify SYS-REQ-0002 and are any failing? | RTM + Test Reports |
-| Coverage Gap | Which subsystem requirements have no associated test cases? | RTM + Coverage Report |
-| Impact Analysis | If we change SYS-REQ-0004, which subsystem requirements and tests are affected? | RTM + Specs |
-| Compliance | Show all requirements related to HIPAA Security Rule audit trail provisions | Specs + HIPAA Docs |
-| Design Rationale | Why did we choose event-driven architecture for the clinical alerts pipeline? | ADRs + Specs |
-| Regression Risk | Which areas have the most failing tests and what requirements do they cover? | Test Reports + RTM |
+| Query Type | How to Find the Answer | Look In |
+|------------|----------------------|---------|
+| Traceability | Which test cases verify SYS-REQ-0002 and are any failing? | `docs/traceability-matrix.md` |
+| Coverage Gap | Which subsystem requirements have no associated test cases? | `docs/coverage-report.md` |
+| Impact Analysis | If we change SYS-REQ-0004, which subsystem requirements and tests are affected? | `docs/traceability-matrix.md` + `.specify/specs/` |
+| Compliance | Show all requirements related to HIPAA Security Rule audit trail provisions | `.specify/specs/` + `docs/security/` |
+| Design Rationale | Why did we choose event-driven architecture for the clinical alerts pipeline? | `docs/adr/` |
+| Regression Risk | Which areas have the most failing tests and what requirements do they cover? | `docs/test-evidence/` + `docs/traceability-matrix.md` |
 
 ### C. Automate the Update Cycle
 
@@ -800,21 +786,21 @@ After completing any implementation task:
 2. Run tests and generate coverage-report.md
 3. Update the traceability matrix
 4. git add and git commit all updated evidence files
-5. Push committed artifacts to NotebookLM
+5. git push to the remote repository
 6. If a new architectural decision was made,
-   create an ADR, commit it, and push to the architecture notebook
+   create an ADR and commit it
 ```
 
-> **🟣 The Complete Pipeline:** Specify (GitHub Spec Kit) → Plan → Analyze → Implement (Claude Code) → Test → Trace → Store (NotebookLM) → Query & Verify. Every stage is documented, every decision is grounded, and every requirement is traceable from inception through verification.
+> **The Complete Pipeline:** Specify (GitHub Spec Kit) → Plan → Analyze → Implement (Claude Code) → Test → Trace → Store (docs/) → Review & Verify. Every stage is documented, every decision is grounded, and every requirement is traceable from inception through verification.
 
 ---
 
 # PART III — Code Quality, Reviews & Security Monitoring
 
-This section closes the development loop by adding **continuous code quality verification** (SonarQube), **AI-powered peer review** (CodeRabbit), and **continuous security monitoring** (Snyk). Crucially, all output is stored as evidence in both **GitHub** (for developer workflow) and **NotebookLM** (for auditing and grounded queries).
+This section closes the development loop by adding **continuous code quality verification** (SonarQube), **AI-powered peer review** (CodeRabbit), and **continuous security monitoring** (Snyk). Crucially, all output is stored as evidence in the **GitHub repository** for auditing and traceability.
 
-> **🟢 The Evidence Pipeline Principle**
-> Every tool in the pipeline produces artifacts. Every artifact is **committed to the GitHub repository** as the permanent system of record, then indexed in NotebookLM for long-term querying, audit preparation, and cross-tool grounded answers. Committed files in `docs/` — not ephemeral CI artifacts — are the authoritative evidence store. Nothing is lost; everything is versioned and tamper-evident.
+> **The Evidence Pipeline Principle**
+> Every tool in the pipeline produces artifacts. Every artifact is **committed to the GitHub repository** as the permanent system of record. Committed files in `docs/` — not ephemeral CI artifacts — are the authoritative evidence store. Nothing is lost; everything is versioned and tamper-evident.
 
 ---
 
@@ -903,9 +889,9 @@ jobs:
 | Code Coverage | > 80% | All SUB-*-* requirements | GitHub: Actions artifact |
 | Duplicated Lines | < 3% | SYS-REQ-0007 (Performance) | SonarQube dashboard |
 | Bugs | 0 blockers | All SYS-REQ-* | GitHub: PR status check |
-| Reliability Rating | A | SYS-REQ-0006 (Alerts) | NotebookLM: Quality notebook |
+| Reliability Rating | A | SYS-REQ-0006 (Alerts) | `docs/quality-reports/` |
 
-### D. Commit and Push Quality Evidence to NotebookLM
+### D. Commit and Archive Quality Evidence
 
 After each CI run, use Claude Code to export and generate quality evidence:
 
@@ -924,22 +910,12 @@ git commit -m "evidence: SonarQube quality report for <TODAY>
 
 - Quality gate metrics and findings with requirement traceability
 Relates to: SYS-REQ-0002, SYS-REQ-0007"
+git push
 ```
 
-Then push the committed report to NotebookLM:
+To review historical quality trends, read through the reports in `docs/quality-reports/`.
 
-```
-"Add docs/quality-reports/quality-report-<TODAY>.md as a source
-to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
-
-To query historical quality trends, open the **PMS: Quality & Security** notebook at [notebooklm.google.com](https://notebooklm.google.com) and ask:
-
-> "What is the trend in code coverage for the Medication Management subsystem over the last 5 reports?"
-
-> **💡 Quality Gate as Gatekeeper:** Configure GitHub branch protection rules to require a passing SonarQube quality gate before merging PRs.
+> **Quality Gate as Gatekeeper:** Configure GitHub branch protection rules to require a passing SonarQube quality gate before merging PRs.
 
 ---
 
@@ -1031,16 +1007,8 @@ git commit -m "evidence: archive CodeRabbit review for PR #<PR_NUMBER>
 
 - Review findings mapped to requirement IDs
 - Summary with remediation status"
+git push
 ```
-
-Then push the committed evidence to NotebookLM:
-
-```
-"Add docs/reviews/pr-<PR_NUMBER>-review-summary.md as a source
-to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ### E. Review Metrics Dashboard
 
@@ -1053,7 +1021,7 @@ Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 | Average Review Time | < 3 min | < 3 min | Stable |
 | Requirement References | 87% | 62% | Improving |
 
-> **💡 CodeRabbit + Claude Code Synergy:** When CodeRabbit identifies issues, Claude Code can be directed to fix them: "Fix all critical issues from the CodeRabbit review on PR #42, ensuring each fix references the associated requirement ID in the commit message."
+> **CodeRabbit + Claude Code Synergy:** When CodeRabbit identifies issues, Claude Code can be directed to fix them: "Fix all critical issues from the CodeRabbit review on PR #42, ensuring each fix references the associated requirement ID in the commit message."
 
 ---
 
@@ -1226,18 +1194,10 @@ git commit -m "evidence: generate SBOM for FDA/HIPAA compliance
 
 - CycloneDX and SPDX format Software Bill of Materials
 - Permanent evidence per Compliance Evidence Storage Policy"
+git push
 ```
 
-Then push the committed SBOMs to NotebookLM:
-
-```
-"Add docs/sbom/sbom-cyclonedx.json as a source to the PMS: HIPAA & FDA
-Compliance notebook (<NLM_COMPLIANCE_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
-
-### E. Commit and Push Security Evidence to NotebookLM
+### E. Commit and Archive Security Evidence
 
 After each security scan, use Claude Code to generate the security report:
 
@@ -1260,33 +1220,23 @@ git commit -m "evidence: Snyk security report for <TODAY>
 - Vulnerability findings by severity with requirement traceability
 - Remediation status and trend analysis
 Relates to: SYS-REQ-0001, SYS-REQ-0002"
+git push
 ```
 
-Then push the committed report to NotebookLM:
-
-```
-"Add docs/security/security-report-<TODAY>.md as a source
-to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
+To review security posture at any time, read `docs/security/` for the latest reports.
 
 ```bash
 # Continuous monitoring baseline
 snyk monitor --json-file-output=snyk-monitor.json
 ```
 
-To query security posture at any time, open the **PMS: Quality & Security** notebook at [notebooklm.google.com](https://notebooklm.google.com) and ask:
-
-> "What critical vulnerabilities are currently unresolved and which requirements do they affect?"
-
-> **🔴 HIPAA Compliance:** The HIPAA Security Rule requires covered entities to conduct risk analysis and implement security measures. Snyk scans, combined with the SBOM and vulnerability-to-requirement mapping, provide documentary evidence of ongoing security due diligence. Store all evidence with retention policies of at least 6 years per HIPAA requirements.
+> **HIPAA Compliance:** The HIPAA Security Rule requires covered entities to conduct risk analysis and implement security measures. Snyk scans, combined with the SBOM and vulnerability-to-requirement mapping, provide documentary evidence of ongoing security due diligence. Store all evidence with retention policies of at least 6 years per HIPAA requirements.
 
 ---
 
 ## Evidence Pipeline Architecture
 
-All three tools (SonarQube, CodeRabbit, Snyk) feed into a dual-store evidence architecture.
+All three tools (SonarQube, CodeRabbit, Snyk) feed into a repository-first evidence architecture.
 
 ### GitHub Evidence (Developer Workflow)
 
@@ -1298,20 +1248,11 @@ All three tools (SonarQube, CodeRabbit, Snyk) feed into a dual-store evidence ar
 | Test Coverage | `docs/coverage-report.md` + `docs/test-evidence/` (committed) | **Permanent** (git history) | Developers, CI/CD |
 | SBOM | `docs/sbom/` (committed) + Releases | **Permanent** (git history) | Compliance team |
 
-### NotebookLM Evidence (Audit & Query)
-
-| Notebook | Contents | Query Examples |
-|----------|----------|----------------|
-| PMS: Quality & Security | SonarQube reports, CodeRabbit summaries, Snyk reports, trend analyses | "Show quality trends for the last 3 sprints" |
-| PMS: Requirements | SRS, RTM, specs, traceability, coverage reports | "Which requirements have failing tests?" |
-| PMS: HIPAA Compliance | HIPAA assessment, SBOM, security audit evidence, encryption verification | "Show all evidence for HIPAA Security Rule compliance" |
-| PMS: Test Evidence | Test reports, coverage dashboards, verification records | "What is the verification status of SYS-REQ-0003?" |
-
 ### Automated Evidence Sync (CI/CD Post-Step)
 
 ```yaml
 # .github/workflows/evidence-sync.yml
-name: Sync Evidence to NotebookLM
+name: Generate Evidence Summary
 on:
   workflow_run:
     workflows: ['SonarQube Quality Gate',
@@ -1320,7 +1261,7 @@ on:
     types: [completed]
 
 jobs:
-  sync-evidence:
+  generate-summary:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -1350,17 +1291,9 @@ jobs:
           - Requirement traceability and trend analysis
           - Permanent evidence per Compliance Evidence Storage Policy" || true
           git push || true
-
-      - name: Push to NotebookLM
-        run: |
-          # Use Claude Code to add the committed evidence summary via MCP
-          claude --print "Add docs/evidence-summary.md as a source to \
-            NotebookLM notebook $NLM_QS_ID using notebooklm-mcp:source_add"
-        env:
-          NLM_QS_ID: ${{ vars.NLM_QS_NOTEBOOK_ID }}
 ```
 
-> **🟢 Repository-First, Dual-Store Benefit:** The GitHub repository is the permanent, authoritative evidence store (satisfying HIPAA's 6-year retention requirement via git history). NotebookLM indexes committed evidence for grounded, natural-language querying across the entire project history. Together, they ensure evidence is both actionable for developers and auditable for compliance teams — with the repo as the system of record.
+> **Repository-First Benefit:** The GitHub repository is the permanent, authoritative evidence store (satisfying HIPAA's 6-year retention requirement via git history). The `docs/` directory provides easy access for both developers and AI agents. Together, they ensure evidence is both actionable for developers and auditable for compliance teams — with the repo as the system of record.
 
 ---
 
@@ -1370,19 +1303,19 @@ This tutorial covered seventeen steps across three parts for building a complete
 
 | Part | Steps | Tools | Purpose |
 |------|-------|-------|---------|
-| I | 1–9 | NotebookLM CLI | Knowledge management, research, debugging, security audits |
-| II | 10–14 | Spec Kit + Claude Code + NotebookLM | IEEE/DOD requirements, traceability matrices, test coverage |
-| III | 15–17 | SonarQube + CodeRabbit + Snyk | Code quality gates, AI reviews, continuous security monitoring |
+| I | 1-9 | docs/ directory | Knowledge management, research, debugging, security audits |
+| II | 10-14 | Spec Kit + Claude Code + docs/ | IEEE/DOD requirements, traceability matrices, test coverage |
+| III | 15-17 | SonarQube + CodeRabbit + Snyk | Code quality gates, AI reviews, continuous security monitoring |
 
 ### Key Takeaways
 
+- **`docs/` directory** provides a reliable, version-controlled knowledge base accessible by all agents and developers
 - **GitHub Spec Kit** enforces structure: no implementation without an approved specification
 - **Claude Code** automates implementation, test scaffolding, evidence generation, and remediation
-- **NotebookLM** provides grounded truth: every answer cites your actual project artifacts
 - **SonarQube** catches quality issues with enforceable gates before code merges
 - **CodeRabbit** provides AI-powered reviews that reference your requirement IDs
 - **Snyk** monitors dependencies, containers, and code for vulnerabilities continuously
-- The **repository-first evidence pipeline** commits all evidence to GitHub (permanent, versioned, tamper-evident), then indexes it in NotebookLM for querying — satisfying HIPAA's 6-year retention requirement
+- The **repository-first evidence pipeline** commits all evidence to GitHub (permanent, versioned, tamper-evident) — satisfying HIPAA's 6-year retention requirement
 - For **regulated industries**, this pipeline produces audit-ready documentation with full traceability and no reliance on ephemeral CI artifacts
 
 ### Next Steps
@@ -1390,9 +1323,9 @@ This tutorial covered seventeen steps across three parts for building a complete
 - Set up your CI/CD pipeline with all three quality/security workflows
 - Configure CodeRabbit with requirement-aware review instructions
 - Run your first Snyk scan and generate the initial SBOM
-- Establish the evidence-sync workflow to keep NotebookLM current
-- Create your compliance notebook and load regulatory guidance
+- Establish the evidence-sync workflow to keep `docs/evidence-summary.md` current
+- Create your compliance documentation in `docs/security/`
 
 ---
 
-For the foundational NotebookLM walkthrough, [watch the original video on YouTube](https://youtu.be/eFCHwtufjJc). For GitHub Spec Kit, visit [github.com/github/spec-kit](https://github.com/github/spec-kit). For Snyk, visit [snyk.io](https://snyk.io). For CodeRabbit, visit [coderabbit.ai](https://coderabbit.ai).
+For the foundational walkthrough, [watch the original video on YouTube](https://youtu.be/eFCHwtufjJc). For GitHub Spec Kit, visit [github.com/github/spec-kit](https://github.com/github/spec-kit). For Snyk, visit [snyk.io](https://snyk.io). For CodeRabbit, visit [coderabbit.ai](https://coderabbit.ai).

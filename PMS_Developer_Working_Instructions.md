@@ -2,7 +2,7 @@
 
 **Patient Management System — Development Process Guide**
 
-Version 1.0 | Last Updated: February 2026
+Version 1.1 | Last Updated: February 2026
 
 ---
 
@@ -21,10 +21,10 @@ Version 1.0 | Last Updated: February 2026
 
 ### Authoritative Evidence Store
 
-The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, and review summaries — **must be committed to the repository** before being pushed to any secondary system.
+The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, and review summaries — **must be committed to the repository**.
 
 - **GitHub repo** = permanent, versioned, tamper-evident (git history provides an immutable audit trail)
-- **NotebookLM** = secondary queryable layer (indexes evidence already committed to the repo)
+- **`docs/` directory** = queryable documentation layer (markdown files committed alongside the code)
 
 ### Evidence Commitment Rule
 
@@ -33,9 +33,7 @@ Every evidence-generating step must follow this sequence:
 1. **Generate** the evidence artifact (report, scan result, matrix, etc.)
 2. **`git add`** the artifact to staging
 3. **`git commit`** with a descriptive message referencing requirement IDs
-4. **Then** push to NotebookLM (which indexes the committed file)
-
-> **Never push evidence to NotebookLM without first committing it to the repository.** NotebookLM is a convenience layer for querying — the repo is the legal record.
+4. **`git push`** to the remote repository
 
 ### Evidence Directory Structure
 
@@ -72,7 +70,7 @@ Before starting, ensure your machine meets these requirements:
 - **Operating System:** macOS 13+, Ubuntu 22.04+, or Windows 11 with WSL2
 - **RAM:** Minimum 16 GB (recommended 32 GB for running SonarQube locally)
 - **Disk:** At least 50 GB free space
-- **Internet:** Stable connection (required for NotebookLM, Snyk, CodeRabbit)
+- **Internet:** Stable connection (required for Snyk, CodeRabbit)
 
 ## 1.2 Install Core Development Tools
 
@@ -151,43 +149,6 @@ npm install -g @github/specify
 specify check
 ```
 
-### NotebookLM CLI
-
-```bash
-npm install -g notebooklm-cli
-
-# Verify
-nlm-cli --help
-```
-
-### Install NotebookLM Skills into Claude Code
-
-```bash
-nlm-cli init --ai claude
-```
-
-This installs the NotebookLM Skills into Claude Code, enabling MCP-based notebook operations (creating notebooks, adding sources, generating learning materials). Notebook operations are performed through Claude Code's MCP tools, not directly from the terminal.
-
-### Authenticate with NotebookLM
-
-```bash
-nlm login
-# A browser window opens — sign in with your company Google Workspace account
-# Credentials are saved locally for future sessions
-```
-
-> **🔑 Access Request:** If you do not have access to the PMS NotebookLM notebooks, request access from the Tech Lead by providing your Google Workspace email. The following notebooks require read/write access:
->
-> | Notebook | ID | Purpose |
-> |----------|----|---------|
-> | PMS: Requirements (IEEE 830) | `<NLM_REQ_ID>` | System & subsystem requirements |
-> | PMS: Architecture & Design | `<NLM_ARCH_ID>` | ADRs, design docs, architecture |
-> | PMS: Test Evidence & Traceability | `<NLM_TEST_ID>` | Test reports, RTM, coverage |
-> | PMS: Quality & Security Evidence | `<NLM_QS_ID>` | SonarQube, CodeRabbit, Snyk reports |
-> | PMS: HIPAA & FDA Compliance | `<NLM_COMPLIANCE_ID>` | Regulatory evidence, SBOM |
->
-> **Note:** Notebook operations (creating notebooks, adding sources) are performed through Claude Code's MCP tools (`notebooklm-mcp:*`), not via CLI commands. Querying notebooks for context is done through the NotebookLM web interface at [notebooklm.google.com](https://notebooklm.google.com).
-
 ### SonarQube
 
 ```bash
@@ -254,7 +215,6 @@ npm run verify-setup
 # ✓ Docker running
 # ✓ Database connection
 # ✓ All CLI tools installed
-# ✓ NotebookLM Skills installed (nlm-cli)
 # ✓ Snyk authentication
 # ✓ SonarQube connectivity
 ```
@@ -285,15 +245,13 @@ npm run dev
 
 ### CLAUDE.md Awareness
 
-The repository root contains a `CLAUDE.md` file that instructs Claude Code how to work with this project. Read this file to understand the development workflow, requirement ID conventions, and NotebookLM notebook references. Do not modify `CLAUDE.md` without Tech Lead approval.
+The repository root contains a `CLAUDE.md` file that instructs Claude Code how to work with this project. Read this file to understand the development workflow, requirement ID conventions, and the `docs/` directory structure. Do not modify `CLAUDE.md` without Tech Lead approval.
 
 ## 1.6 Access Checklist
 
 Before you start working on features, confirm you have:
 
 - [ ] GitHub repository access (push to feature branches, create PRs)
-- [ ] NotebookLM Skills installed (`nlm-cli init --ai claude`) and authenticated (`nlm login`)
-- [ ] NotebookLM access to all five PMS notebooks (via [notebooklm.google.com](https://notebooklm.google.com))
 - [ ] SonarQube/SonarCloud access to the pms-healthcare project
 - [ ] CodeRabbit reviews appearing on your test PR
 - [ ] Snyk access to the pms-healthcare organization
@@ -301,6 +259,7 @@ Before you start working on features, confirm you have:
 - [ ] All tests passing (`npm test`)
 - [ ] Read the `CLAUDE.md` file completely
 - [ ] Read the `CONTRIBUTING.md` file for coding standards
+- [ ] Read the `docs/` directory structure and `docs/index.md`
 
 ---
 
@@ -316,23 +275,21 @@ Before you start working on features, confirm you have:
 
 ### Morning: Understand the Requirement
 
-1. **Query NotebookLM for context:**
+1. **Read the relevant docs for context:**
 
-Open the **PMS: Requirements** notebook at [notebooklm.google.com](https://notebooklm.google.com) and ask:
+Read the requirements documentation in `docs/` to understand:
 
-> "What are the detailed requirements for medication interaction checking? Include SYS-REQ-0006 and all related SUB-MM requirements."
+> What are the detailed requirements for medication interaction checking? Include SYS-REQ-0006 and all related SUB-MM requirements.
 
 2. **Review the traceability matrix** to understand what already exists:
 
-In the same notebook, ask:
-
-> "What is the current implementation status of SUB-MM-0001 and SUB-MM-0002 in the traceability matrix?"
+Check `docs/traceability-matrix.md` for the current implementation status of SUB-MM-0001 and SUB-MM-0002.
 
 3. **Check architecture decisions:**
 
-Open the **PMS: Architecture & Design** notebook and ask:
+Read the architecture documentation in `docs/architecture/` and `docs/adr/` to understand:
 
-> "What architectural decisions have been made about the clinical alerts pipeline and drug interaction checking?"
+> What architectural decisions have been made about the clinical alerts pipeline and drug interaction checking?
 
 ### Afternoon: Create the Specification
 
@@ -395,19 +352,6 @@ Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002
 Spec-Kit phase: Specify + Plan + Analyze"
 ```
 
-10. **Push spec to NotebookLM:**
-
-In Claude Code, ask it to add the spec and plan as sources to the appropriate notebooks:
-
-```
-"Add .specify/specs/medication-interaction-alerts.md as a source
-to the PMS: Requirements notebook (<NLM_REQ_ID>), and add
-.specify/plans/medication-interaction-alerts-plan.md as a source
-to the PMS: Architecture & Design notebook (<NLM_ARCH_ID>)."
-```
-
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool to upload these files.
-
 ### End of Day 1: Status Update
 
 Push your branch and create a draft PR:
@@ -419,7 +363,6 @@ gh pr create --draft \
   --body "## Specification Phase
 - Spec created and validated with /analyze
 - Technical plan generated
-- NotebookLM updated with spec and plan
 
 ## Requirements
 - SYS-REQ-0006: Real-time clinical alerts within 30 seconds
@@ -563,19 +506,9 @@ git commit -m "evidence: update RTM and coverage report for medication alerts
 - Updated traceability matrix with SUB-MM-0001, SUB-MM-0002 mappings
 - Generated requirement test coverage report
 Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002"
+
+git push
 ```
-
-5. **Push evidence to NotebookLM:**
-
-In Claude Code, ask it to add the committed evidence as sources:
-
-```
-"Add docs/coverage-report.md as a source to the PMS: Test Evidence
-notebook (<NLM_TEST_ID>), and add docs/traceability-matrix.md as a
-source to the PMS: Requirements notebook (<NLM_REQ_ID>)."
-```
-
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool to upload these files.
 
 ### Midday: Mark PR as Ready for Review
 
@@ -654,18 +587,9 @@ git commit -m "evidence: archive PR #<PR_NUMBER> review and quality results
 - CodeRabbit review summary with requirement mappings
 - SonarQube quality gate results
 Relates to: <REQUIREMENT_IDS>"
+
+git push
 ```
-
-14. **Push committed evidence to NotebookLM:**
-
-In Claude Code:
-
-```
-"Add docs/reviews/pr-<PR_NUMBER>-evidence-summary.md as a source
-to the PMS: Quality & Security notebook (<NLM_QS_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 14. **Update CLAUDE.md if any architectural decisions were made.**
 
@@ -717,9 +641,7 @@ gh pr view <PR_NUMBER>
 gh pr checks <PR_NUMBER>
 ```
 
-Query NotebookLM for context on the requirements involved by opening the **PMS: Requirements** notebook at [notebooklm.google.com](https://notebooklm.google.com) and asking:
-
-> "What are the requirements and acceptance criteria for \<FEATURE_NAME\>?"
+Read the relevant docs for context on the requirements involved. Check `docs/` for the requirements and acceptance criteria related to the feature under review.
 
 ### Review Checklist
 
@@ -776,17 +698,17 @@ git checkout feature/your-current-feature
 git rebase develop
 ```
 
-### Query NotebookLM Before Coding
+### Read the Docs Before Coding
 
-Before writing code, always check what already exists. Open the relevant notebooks at [notebooklm.google.com](https://notebooklm.google.com):
+Before writing code, always check what already exists. Read the relevant documentation in `docs/`:
 
-- In the **PMS: Architecture & Design** notebook, ask:
+- Check `docs/architecture/` and `docs/adr/` for:
 
-  > "What design patterns are used for \<SIMILAR_FEATURE\> and what architectural constraints apply?"
+  > What design patterns are used for \<SIMILAR_FEATURE\> and what architectural constraints apply?
 
-- In the **PMS: Quality & Security** notebook, ask:
+- Check `docs/security/` and `docs/quality-reports/` for:
 
-  > "Are there known issues or gotchas related to \<TECHNOLOGY_OR_MODULE\> in the PMS codebase?"
+  > Are there known issues or gotchas related to \<TECHNOLOGY_OR_MODULE\> in the PMS codebase?
 
 ### Implement Using the Spec-Driven Process
 
@@ -821,11 +743,9 @@ gh pr view <YOUR_PR_NUMBER> --comments
 
 Resume where you left off. If you encounter a bug or unexpected behavior:
 
-1. **Check the debugging notebook first:**
+1. **Check the docs first:**
 
-Open the **PMS: Quality & Security** notebook at [notebooklm.google.com](https://notebooklm.google.com) and ask:
-
-> "Has anyone encountered \<ERROR_MESSAGE_OR_ISSUE\> in the PMS project? What was the solution?"
+Read `docs/security/` and `docs/quality-reports/` for any previously documented issues related to the error.
 
 2. **If no solution found, solve it and document the solution:**
 
@@ -845,16 +765,9 @@ git commit -m "docs: add debugging note for <ISSUE>
 
 - Error message, root cause, and fix documented
 Relates to: <REQUIREMENT_ID_IF_APPLICABLE>"
-```
 
-Then push the committed file to NotebookLM:
-
+git push
 ```
-"Add docs/debugging/<ISSUE>.md as a source to the PMS: Quality &
-Security notebook (<NLM_QS_ID>)."
-```
-
-Claude Code will use `notebooklm-mcp:source_add` to upload the committed file.
 
 ---
 
@@ -948,21 +861,9 @@ git commit -m "evidence: end-of-day RTM and ADR updates
 - Updated traceability matrix with today's implementation progress
 - Added/updated ADRs for architectural decisions made today
 Relates to: <REQUIREMENT_IDS>"
+
+git push
 ```
-
-### Push Committed Evidence to NotebookLM
-
-In Claude Code, ask it to sync the committed artifacts:
-
-```
-"Add docs/traceability-matrix.md as a source to the PMS: Requirements
-notebook (<NLM_REQ_ID>)."
-
-"Add docs/adr/<NEW_DECISION>.md as a source to the PMS: Architecture
-& Design notebook (<NLM_ARCH_ID>)."
-```
-
-Claude Code will use the `notebooklm-mcp:source_add` MCP tool to upload the committed files.
 
 ### Update Your Sprint Status
 
@@ -985,25 +886,18 @@ Jot down for tomorrow's standup:
 | 8:30 AM | Triage notifications, check Snyk alerts | — |
 | 8:45 AM | Review teammates' PRs | P0 |
 | 9:30 AM | Address critical bugs / security remediations | P1 |
-| 10:00 AM | Feature work: query NotebookLM → implement → test | P2 |
+| 10:00 AM | Feature work: read docs/ → implement → test | P2 |
 | 12:00 PM | Lunch break | — |
 | 1:00 PM | Check CI results, continue feature work | P2 |
 | 3:00 PM | Run tests and local quality scans | — |
 | 4:00 PM | Follow up on PR reviews | P0 |
-| 4:30 PM | Commit all changes, push, update RTM, update NotebookLM | — |
+| 4:30 PM | Commit all changes, push, update RTM | — |
 
 ---
 
 ## Quick Reference: Common Commands
 
 ```bash
-# === NotebookLM ===
-nlm-cli --help                                         # Show CLI installer commands
-nlm-cli init --ai claude                               # Install skills into Claude Code
-nlm login                                              # Authenticate with Google account
-# Notebook operations (create, add sources) are done via Claude Code MCP tools
-# Querying notebooks is done at notebooklm.google.com
-
 # === GitHub Spec Kit ===
 /specify                    # Define specifications
 /plan                       # Generate technical plan
@@ -1031,4 +925,4 @@ gh pr merge --squash                                     # Merge via squash
 
 ---
 
-*For the complete development process tutorial, see the [NotebookLM Development Tutorial](./NotebookLM_Development_Tutorial.md).*
+*For the complete development process tutorial, see the [Developer Documentation](./docs/index.md).*
