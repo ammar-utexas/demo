@@ -2,16 +2,18 @@
 
 **Patient Management System — Development Process Guide**
 
-Version 1.1 | Last Updated: February 2026
+Version 2.0 | Last Updated: February 2026
 
 ---
 
 ## Table of Contents
 
 - [Compliance Evidence Storage Policy](#compliance-evidence-storage-policy)
-- [Section 1: First-Time Setup](#section-1-first-time-setup)
-- [Section 2: Implementing a Feature](#section-2-implementing-a-feature-over-multiple-days)
-- [Section 3: A Day in the Life](#section-3-a-day-in-the-life-of-a-pms-developer)
+- [Section 1: Project Structure & First-Time Setup](#section-1-project-structure--first-time-setup)
+- [Section 2: The Four-Phase Development Process](#section-2-the-four-phase-development-process)
+- [Section 3: Implementing a Feature (Worked Example)](#section-3-implementing-a-feature-worked-example)
+- [Section 4: A Day in the Life](#section-4-a-day-in-the-life-of-a-pms-developer)
+- [Quick Reference](#quick-reference)
 
 ---
 
@@ -23,8 +25,8 @@ Version 1.1 | Last Updated: February 2026
 
 The **GitHub repository** is the authoritative, permanent source of truth for all compliance evidence. Every piece of evidence — test reports, quality scans, security results, traceability matrices, coverage reports, and review summaries — **must be committed to the repository**.
 
-- **GitHub repo** = permanent, versioned, tamper-evident (git history provides an immutable audit trail)
-- **`docs/` directory** = queryable documentation layer (markdown files committed alongside the code)
+- **GitHub repos** = permanent, versioned, tamper-evident (git history provides an immutable audit trail)
+- **`docs/` submodule** = shared documentation layer (markdown files accessible from all repos)
 
 ### Evidence Commitment Rule
 
@@ -35,263 +37,427 @@ Every evidence-generating step must follow this sequence:
 3. **`git commit`** with a descriptive message referencing requirement IDs
 4. **`git push`** to the remote repository
 
-### Evidence Directory Structure
-
-All compliance evidence resides under `docs/` in the repository:
-
-```
-docs/
-├── analyze/                  # /analyze consistency reports
-├── quality-reports/          # SonarQube quality gate results
-├── security/                 # Snyk scan results and security reports
-├── reviews/                  # CodeRabbit and PR review evidence
-├── test-evidence/            # Test execution reports
-├── sbom/                     # Software Bill of Materials (CycloneDX, SPDX)
-├── adr/                      # Architecture Decision Records
-├── traceability-matrix.md    # Requirements Traceability Matrix
-├── coverage-report.md        # Requirement test coverage report
-└── evidence-summary.md       # Unified evidence summary (CI-generated)
-```
-
 ### Retention
 
 HIPAA requires a minimum **6-year retention period** for compliance documentation. GitHub's permanent git history satisfies this requirement. GitHub Actions artifacts (90-day retention) are **not** a substitute for committed evidence files.
 
 ---
 
-# Section 1: First-Time Setup
+# Section 1: Project Structure & First-Time Setup
 
-*Complete these steps once when joining the PMS team or setting up a new machine.*
+## 1.1 Multi-Repository Architecture
 
-## 1.1 System Prerequisites
+The PMS is split across three implementation repositories plus a shared documentation repository:
 
-Before starting, ensure your machine meets these requirements:
+```
+GitHub Organization
+├── demo (docs)            # Shared documentation, specs, and requirements
+├── pms-backend            # Python/FastAPI REST API
+├── pms-frontend           # Next.js/TypeScript web UI
+└── pms-android            # Kotlin/Jetpack Compose mobile app
+```
+
+Each implementation repo includes the `demo` repo as a Git submodule at `docs/`, so all three repos share the same specifications, requirements, and traceability matrix.
+
+### Key Directories in `docs/` (the shared submodule)
+
+```
+docs/
+├── specs/                           # Specifications & requirements
+│   ├── system-spec.md               # System-level specification
+│   ├── requirements/
+│   │   ├── SYS-REQ.md              # System requirements (SYS-REQ-0001–0010)
+│   │   ├── SUB-PR.md               # Patient Records subsystem requirements
+│   │   ├── SUB-CW.md               # Clinical Workflow subsystem requirements
+│   │   ├── SUB-MM.md               # Medication Management subsystem requirements
+│   │   ├── SUB-RA.md               # Reporting & Analytics subsystem requirements
+│   │   └── traceability-matrix.md  # RTM: forward + backward traceability
+│   └── testing-strategy.md          # Test levels, naming, run records
+├── architecture/                    # Architecture Decision Records (ADRs)
+├── features/                        # Implementation details
+├── api/                             # API contracts
+├── config/                          # Setup guides, dependencies
+├── test-evidence/                   # Test run records (RUN-YYYY-MM-DD-NNN.md)
+└── index.md                         # Table of contents
+```
+
+## 1.2 System Prerequisites
 
 - **Operating System:** macOS 13+, Ubuntu 22.04+, or Windows 11 with WSL2
-- **RAM:** Minimum 16 GB (recommended 32 GB for running SonarQube locally)
+- **RAM:** Minimum 16 GB
 - **Disk:** At least 50 GB free space
-- **Internet:** Stable connection (required for Snyk, CodeRabbit)
 
-## 1.2 Install Core Development Tools
+## 1.3 Install Core Development Tools
 
-### Node.js and npm
+### Python (pms-backend)
+
+```bash
+# Install Python 3.12+ (recommended via pyenv)
+pyenv install 3.12
+pyenv global 3.12
+python --version   # Should show 3.12.x
+```
+
+### Node.js (pms-frontend)
 
 ```bash
 # Install Node.js 24 LTS (recommended via nvm)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
 nvm install 24
 nvm use 24
 node --version   # Should show v24.x.x
-npm --version    # Should show 11.x.x
 ```
 
-### Git
+### Android Development (pms-android)
 
 ```bash
-# macOS
-brew install git
+# Install Android Studio (includes SDK, emulator, Gradle)
+# macOS: brew install --cask android-studio
+# Or download from https://developer.android.com/studio
+```
 
-# Ubuntu
-sudo apt update && sudo apt install git
+### Common Tools
 
-# Configure your identity
+```bash
+# Git
+brew install git   # macOS
 git config --global user.name "Your Name"
 git config --global user.email "your.email@company.com"
-```
 
-### GitHub CLI
-
-```bash
-# macOS
+# GitHub CLI
 brew install gh
-
-# Ubuntu
-sudo apt install gh
-
-# Authenticate
 gh auth login
-# Select: GitHub.com → HTTPS → Login with a web browser
-```
 
-### Docker
+# Docker
+brew install --cask docker   # macOS
 
-```bash
-# macOS
-brew install --cask docker
-# Launch Docker Desktop from Applications
-
-# Ubuntu
-sudo apt install docker.io docker-compose
-sudo usermod -aG docker $USER
-# Log out and back in for group membership to take effect
-```
-
-## 1.3 Install Development Pipeline Tools
-
-### Claude Code CLI
-
-```bash
-# Install Claude Code
+# Claude Code CLI
 npm install -g @anthropic-ai/claude-code
 
-# Verify
-claude --version
-# Launch Claude Code and follow the authentication prompt on first run
-```
-
-### GitHub Spec Kit
-
-```bash
+# GitHub Spec Kit
 npm install -g @github/specify
+```
+
+## 1.4 Clone All Repositories
+
+```bash
+# Clone the docs repo (also used standalone for spec work)
+gh repo clone ammar-utexas/demo
+cd demo && cd ..
+
+# Clone each implementation repo (docs submodule included)
+gh repo clone ammar-utexas/pms-backend
+cd pms-backend && git submodule update --init --recursive && cd ..
+
+gh repo clone ammar-utexas/pms-frontend
+cd pms-frontend && git submodule update --init --recursive && cd ..
+
+gh repo clone ammar-utexas/pms-android
+cd pms-android && git submodule update --init --recursive && cd ..
+```
+
+## 1.5 Set Up Each Project
+
+### pms-backend
+
+```bash
+cd pms-backend
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env
+# Edit .env with your local database credentials
 
 # Verify
-specify check
+pytest -v                                    # All tests pass
+python -m uvicorn pms.main:app --reload      # http://localhost:8000/docs
 ```
 
-### SonarQube
+### pms-frontend
 
 ```bash
-# For SonarCloud (hosted):
-# 1. Go to https://sonarcloud.io and sign in with your GitHub account
-# 2. Request access to the "pms-healthcare" project from your Tech Lead
-# 3. Generate a personal token: My Account → Security → Generate Token
-# 4. Save the token — you'll need it for local scans
-
-# For local scanning:
-npm install -g sonarqube-scanner
-
-# Set environment variables (add to ~/.bashrc or ~/.zshrc)
-export SONAR_TOKEN="your-personal-token"
-export SONAR_HOST_URL="https://sonarcloud.io"  # or your org's SonarQube URL
-```
-
-### CodeRabbit
-
-```bash
-# Install CLI
-curl -fsSL https://cli.coderabbit.ai/install.sh | sh
-
-# CodeRabbit GitHub App should already be installed on the PMS repo.
-# If you don't see CodeRabbit reviews on your PRs, contact the Tech Lead.
-```
-
-### Snyk
-
-```bash
-npm install -g snyk
-
-# Authenticate
-snyk auth
-# Follow the browser prompt to sign in
-
-# Verify you have access to the PMS organization
-snyk test --org=pms-healthcare
-```
-
-## 1.4 Clone and Set Up the Repository
-
-```bash
-# Clone the PMS repository
-gh repo clone your-org/patient-management-system
-cd patient-management-system
-
-# Install dependencies
+cd pms-frontend
 npm install
-
-# Copy environment template
 cp .env.example .env.local
-# Edit .env.local with your local database credentials and API keys
+# Edit .env.local with NEXT_PUBLIC_API_URL=http://localhost:8000
+
+# Verify
+npm run test:run     # All tests pass
+npm run dev          # http://localhost:3000
 ```
 
-### Verify the Setup
+### pms-android
 
 ```bash
-# Run the verification script
-npm run verify-setup
-
-# This checks:
-# ✓ Node.js version
-# ✓ Docker running
-# ✓ Database connection
-# ✓ All CLI tools installed
-# ✓ Snyk authentication
-# ✓ SonarQube connectivity
+cd pms-android
+# Open in Android Studio, sync Gradle, run on emulator
+./gradlew test       # Unit tests
 ```
-
-### Run Tests to Confirm Everything Works
-
-```bash
-# Run the full test suite
-npm test
-
-# Run with coverage (used by SonarQube)
-npm test -- --coverage
-
-# Start the development server
-npm run dev
-# Application should be available at http://localhost:3000
-```
-
-## 1.5 Configure Your Editor / IDE
-
-### VS Code (Recommended Extensions)
-
-- **ESLint** — Code linting
-- **Prettier** — Code formatting
-- **SonarLint** — Real-time SonarQube feedback
-- **Snyk Security** — Real-time vulnerability alerts
-- **GitLens** — Enhanced Git integration
-
-### CLAUDE.md Awareness
-
-The repository root contains a `CLAUDE.md` file that instructs Claude Code how to work with this project. Read this file to understand the development workflow, requirement ID conventions, and the `docs/` directory structure. Do not modify `CLAUDE.md` without Tech Lead approval.
 
 ## 1.6 Access Checklist
 
-Before you start working on features, confirm you have:
-
-- [ ] GitHub repository access (push to feature branches, create PRs)
-- [ ] SonarQube/SonarCloud access to the pms-healthcare project
-- [ ] CodeRabbit reviews appearing on your test PR
-- [ ] Snyk access to the pms-healthcare organization
-- [ ] Local development environment running (`npm run dev`)
-- [ ] All tests passing (`npm test`)
-- [ ] Read the `CLAUDE.md` file completely
-- [ ] Read the `CONTRIBUTING.md` file for coding standards
-- [ ] Read the `docs/` directory structure and `docs/index.md`
+- [ ] GitHub repository access to all four repos
+- [ ] Local development environment running for backend + frontend
+- [ ] All tests passing in pms-backend (`pytest`) and pms-frontend (`npm run test:run`)
+- [ ] Read `CLAUDE.md` in each repo
+- [ ] Read `docs/specs/system-spec.md` for system context
+- [ ] Read `docs/specs/testing-strategy.md` for test conventions
+- [ ] Read `docs/index.md` for full documentation map
 
 ---
 
-# Section 2: Implementing a Feature Over Multiple Days
+# Section 2: The Four-Phase Development Process
 
-*This section walks through the complete lifecycle of implementing a feature using the PMS Spec-Driven Development process.*
+The PMS follows a specification-first development process. Every feature flows through four phases before it is considered complete.
 
-**Example Feature:** *Add real-time medication interaction alerts that notify prescribers when a new prescription conflicts with the patient's active medications (relates to SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002).*
+```
+┌─────────────────────────────────────────────────────────┐
+│  Phase 1: SPECIFY                                       │
+│  Define system & subsystem requirements                 │
+│  Output: SYS-REQ.md, SUB-*.md                          │
+├─────────────────────────────────────────────────────────┤
+│  Phase 2: VERIFY CONSISTENCY                            │
+│  Check traceability, run /analyze                       │
+│  Output: traceability-matrix.md, /analyze report        │
+├─────────────────────────────────────────────────────────┤
+│  Phase 3: IMPLEMENT                                     │
+│  Use speckit to implement subsystem requirements        │
+│  Output: Source code with @requirement annotations      │
+├─────────────────────────────────────────────────────────┤
+│  Phase 4: TEST & TRACE                                  │
+│  Write tests, run them, record results, update RTM      │
+│  Output: Test files, RUN-*.md records, updated RTM      │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Phase 1: Specify
+
+**Goal:** Define what the system must do before writing any code.
+
+1. **System-level requirements** are defined in `docs/specs/requirements/SYS-REQ.md`. These are high-level, cross-cutting requirements (authentication, encryption, audit, RBAC, performance, etc.).
+
+2. **Subsystem-level requirements** are defined in `docs/specs/requirements/SUB-*.md`. Each subsystem (PR, CW, MM, RA) has its own requirements file that decomposes the system requirements into testable, implementable units.
+
+3. Each subsystem requirement must:
+   - Have a unique ID (e.g., `SUB-MM-0001`)
+   - Reference its parent system requirement (if applicable)
+   - Specify a verification method (Test, Inspection, Demo)
+   - Be unambiguous and testable
+
+### Using speckit to specify
+
+```bash
+claude
+/specify
+# "Define subsystem requirements for patient search and pagination.
+# Parent: SYS-REQ-0007 (Performance).
+# Must support search by last name, DOB, or ID (SUB-PR-0007).
+# Must return paginated results, default 20 per page (SUB-PR-0008)."
+```
+
+## Phase 2: Verify Consistency
+
+**Goal:** Ensure all requirements are traceable and the matrix is complete.
+
+1. **Update the traceability matrix** in `docs/specs/requirements/traceability-matrix.md`:
+   - Forward traceability: SYS-REQ → SUB-* → module → test case → status
+   - Backward traceability: test case → requirement(s) → last result → run ID
+
+2. **Run /analyze** to check consistency:
+
+```bash
+claude
+/analyze
+# "Verify that all requirements in docs/specs/requirements/ are covered
+# by test cases in the traceability matrix. Flag any requirements with
+# no tests or with failing tests."
+```
+
+3. **Save the /analyze output** as evidence:
+
+```bash
+git add docs/analyze/
+git commit -m "evidence: consistency verification for <feature>"
+git push
+```
+
+## Phase 3: Implement
+
+**Goal:** Write the code that satisfies the subsystem requirements.
+
+1. **Create a feature branch:**
+
+```bash
+git checkout -b feature/<description>
+```
+
+2. **Use speckit to plan and generate tasks:**
+
+```bash
+claude
+/plan
+# "Create a technical implementation plan for SUB-PR-0007 and SUB-PR-0008
+# (patient search and pagination)."
+
+/speckit.tasks
+# This breaks the plan into small, testable implementation tasks
+```
+
+3. **Implement with Claude Code**, ensuring:
+   - Every source module references the requirement it satisfies
+   - Audit logging is included for data access (SYS-REQ-0003)
+   - PHI fields are encrypted (SYS-REQ-0002)
+   - RBAC checks are in place (SYS-REQ-0005)
+
+4. **Update the Implementation Mapping** table in the relevant `SUB-*.md` file:
+
+```markdown
+| SUB-PR-0007 | `routers/patients.py:search` | `app/patients/page.tsx` | `ui/patients/` | TST-PR-0007 |
+```
+
+## Phase 4: Test & Trace
+
+**Goal:** Every requirement has a test. Every test run is recorded. The RTM is always current.
+
+### Write Tests
+
+Every test must include requirement annotations:
+
+**Python (pms-backend):**
+```python
+# @requirement SUB-PR-0007
+# @verification-method Test
+
+def test_patient_search_by_last_name(client):
+    """TST-PR-0007: Patient search returns results matching last name."""
+    ...
+```
+
+**TypeScript (pms-frontend):**
+```typescript
+// @requirement SUB-PR-0007
+// @verification-method Test
+
+it("TST-FE-0004: patient search filters by last name", async () => {
+  ...
+});
+```
+
+**Kotlin (pms-android):**
+```kotlin
+/**
+ * @requirement SUB-PR-0007
+ * @verification-method Test
+ */
+@Test
+fun `TST-AND-0003 patient search filters by last name`() { ... }
+```
+
+### Run Tests and Record Results
+
+```bash
+# pms-backend
+cd pms-backend
+pytest -v
+
+# pms-frontend
+cd pms-frontend
+npm run test:run
+
+# pms-android
+cd pms-android
+./gradlew test
+```
+
+### Create a Test Run Record
+
+After each test execution, create a run record in `docs/test-evidence/`:
+
+```markdown
+# Test Run: RUN-YYYY-MM-DD-NNN
+
+| Field | Value |
+|---|---|
+| Date | YYYY-MM-DD HH:MM UTC |
+| Repository | pms-backend |
+| Commit | <SHA> |
+| Branch | feature/<description> |
+| Runner | local |
+
+## Results
+
+| Test Case | Requirement | Result | Duration |
+|---|---|---|---|
+| TST-PR-0007 | SUB-PR-0007 | PASS | 0.03s |
+
+## Summary
+
+- Total: 1
+- Passed: 1
+- Failed: 0
+- Skipped: 0
+```
+
+### Update the Traceability Matrix
+
+1. Add new test cases to the **Backward Traceability** table.
+2. Update **Last Result** and **Run ID** columns for each test case.
+3. Add a row to the **Test Run Log**.
+4. Recalculate the **Coverage Summary**.
+
+### Commit All Evidence
+
+```bash
+git add docs/specs/ docs/test-evidence/
+git commit -m "evidence: test run RUN-YYYY-MM-DD-NNN
+
+- Test results for SUB-PR-0007, SUB-PR-0008
+- Updated traceability matrix and coverage summary"
+git push
+```
+
+## Process Summary
+
+| Phase | Input | Activities | Output | Tools |
+|---|---|---|---|---|
+| 1. Specify | Business need | Define SYS-REQ, decompose to SUB-* | Requirements docs | `/specify` |
+| 2. Verify | Requirements | Check traceability, run /analyze | Updated RTM, /analyze report | `/analyze` |
+| 3. Implement | Verified requirements | Plan, generate tasks, write code | Source code with annotations | `/plan`, `/speckit.tasks` |
+| 4. Test & Trace | Implementation | Write tests, run, record results | Test files, run records, updated RTM | `pytest`, `vitest`, `gradlew test` |
 
 ---
 
-## Day 1: Specification & Planning
+# Section 3: Implementing a Feature (Worked Example)
 
-### Morning: Understand the Requirement
+**Example:** *Add drug interaction alerts that notify prescribers when a new prescription conflicts with the patient's active medications (SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002).*
 
-1. **Read the relevant docs for context:**
+---
 
-Read the requirements documentation in `docs/` to understand:
+## Day 1: Specify & Verify
 
-> What are the detailed requirements for medication interaction checking? Include SYS-REQ-0006 and all related SUB-MM requirements.
+### Morning: Understand the Requirements
 
-2. **Review the traceability matrix** to understand what already exists:
+1. **Read the system-level requirement:**
 
-Check `docs/traceability-matrix.md` for the current implementation status of SUB-MM-0001 and SUB-MM-0002.
+```bash
+# Read docs/specs/requirements/SYS-REQ.md
+# Find SYS-REQ-0006: "Generate real-time clinical alerts..."
+```
 
-3. **Check architecture decisions:**
+2. **Read the subsystem requirements:**
 
-Read the architecture documentation in `docs/architecture/` and `docs/adr/` to understand:
+```bash
+# Read docs/specs/requirements/SUB-MM.md
+# Find SUB-MM-0001: "Drug interaction check within 5 seconds"
+# Find SUB-MM-0002: "Classify interaction severity"
+```
 
-> What architectural decisions have been made about the clinical alerts pipeline and drug interaction checking?
+3. **Check the traceability matrix** for current status:
 
-### Afternoon: Create the Specification
+```bash
+# Read docs/specs/requirements/traceability-matrix.md
+# Check coverage for SUB-MM-0001 and SUB-MM-0002
+```
+
+### Afternoon: Create Specification & Verify Consistency
 
 4. **Create a feature branch:**
 
@@ -299,311 +465,167 @@ Read the architecture documentation in `docs/architecture/` and `docs/adr/` to u
 git checkout -b feature/medication-interaction-alerts
 ```
 
-5. **Run /specify in Claude Code:**
+5. **Run /specify to create the specification:**
 
 ```bash
 claude
-# In Claude Code:
 /specify
-# Prompt: "Create a specification for real-time medication
-# interaction alerts. Must check new prescriptions against
-# active medications within 5 seconds (SUB-MM-0001), classify
-# severity as contraindicated/major/moderate/minor (SUB-MM-0002),
-# and notify the prescriber via an in-app alert with one-click
-# override capability. Must comply with SYS-REQ-0003 (audit trail)
-# and SYS-REQ-0002 (encryption)."
+# "Create a specification for real-time medication interaction alerts.
+# Must check new prescriptions against active medications within 5 seconds
+# (SUB-MM-0001), classify severity as contraindicated/major/moderate/minor
+# (SUB-MM-0002). Must comply with SYS-REQ-0003 (audit trail) and
+# SYS-REQ-0002 (encryption)."
 ```
 
-6. **Review the generated spec** in `.specify/specs/` and refine as needed.
-
-7. **Run /plan to generate the technical plan:**
-
-```bash
-/plan
-# Prompt: "Create a technical implementation plan for the
-# medication interaction alerts specification."
-```
-
-8. **Run /analyze to validate consistency and save the output:**
+6. **Run /analyze to verify consistency:**
 
 ```bash
 /analyze
-# This checks that specs, plans, and tasks are aligned
-# Fix any issues flagged by the analyzer
+# "Verify that SUB-MM-0001 and SUB-MM-0002 are in the traceability matrix
+# and have corresponding test case IDs assigned."
 ```
 
-Save the `/analyze` output as evidence:
-
-```bash
-# Save the /analyze report to the evidence directory
-# (Claude Code can generate this file from the /analyze output)
-claude
-# "Save the /analyze output to docs/analyze/medication-interaction-alerts-analyze.md"
-```
-
-9. **Commit the specification, plan, and analysis evidence:**
+7. **Commit specification and analysis evidence:**
 
 ```bash
 git add .specify/ docs/analyze/
-git commit -m "spec: add medication interaction alerts specification
+git commit -m "spec: medication interaction alerts specification
 
-- Specification, technical plan, and /analyze consistency report
-Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002
-Spec-Kit phase: Specify + Plan + Analyze"
+Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002"
+git push -u origin feature/medication-interaction-alerts
 ```
 
-### End of Day 1: Status Update
+---
 
-Push your branch and create a draft PR:
+## Day 2: Implement
+
+### Morning: Plan and Code
+
+1. **Generate tasks from the plan:**
 
 ```bash
-git push -u origin feature/medication-interaction-alerts
-gh pr create --draft \
-  --title "feat: medication interaction alerts (SYS-REQ-0006)" \
-  --body "## Specification Phase
-- Spec created and validated with /analyze
-- Technical plan generated
+claude
+/plan
+# "Create a technical implementation plan for the medication
+# interaction alerts specification."
 
-## Requirements
-- SYS-REQ-0006: Real-time clinical alerts within 30 seconds
+/speckit.tasks
+# Breaks the plan into small, testable implementation tasks
+```
+
+2. **Implement in pms-backend:**
+
+```bash
+claude
+# "Implement the DrugInteractionChecker service per SUB-MM-0001
+# and SUB-MM-0002. Add @requirement annotations. Include audit
+# logging (SYS-REQ-0003)."
+```
+
+3. **Update the Implementation Mapping** in `docs/specs/requirements/SUB-MM.md`:
+
+```markdown
+| SUB-MM-0001 | `services/interaction_checker.py` | — | — | TST-MM-0001 |
+| SUB-MM-0002 | `services/interaction_checker.py` | — | — | TST-MM-0002 |
+```
+
+### Afternoon: Continue Implementation
+
+4. **Implement frontend components** in pms-frontend (if applicable).
+5. **Implement Android screens** in pms-android (if applicable).
+6. **Commit progress:**
+
+```bash
+git add src/ tests/ docs/specs/
+git commit -m "feat(medications): implement drug interaction checker
+
+- Interaction check within 5 seconds (SUB-MM-0001)
+- Severity classification (SUB-MM-0002)
+- Audit logging on all checks (SYS-REQ-0003)"
+git push
+```
+
+---
+
+## Day 3: Test & Trace
+
+### Morning: Write and Run Tests
+
+1. **Write tests with requirement annotations:**
+
+```python
+# tests/test_medications.py
+
+# @requirement SUB-MM-0001
+# @verification-method Test
+
+def test_interaction_check_within_5_seconds(client):
+    """TST-MM-0001: Drug interaction check completes within 5 seconds."""
+    start = time.time()
+    response = client.get("/medications/interactions", params={"drugs": ["warfarin", "aspirin"]})
+    assert time.time() - start < 5.0
+    assert response.status_code == 200
+
+# @requirement SUB-MM-0002
+# @verification-method Test
+
+def test_interaction_severity_classification(client):
+    """TST-MM-0002: Drug interactions are classified by severity."""
+    response = client.get("/medications/interactions", params={"drugs": ["warfarin", "aspirin"]})
+    data = response.json()
+    assert data[0]["severity"] in ["contraindicated", "major", "moderate", "minor"]
+```
+
+2. **Run the tests:**
+
+```bash
+pytest tests/test_medications.py -v
+```
+
+3. **Create the test run record** in `docs/test-evidence/RUN-YYYY-MM-DD-NNN.md`.
+
+4. **Update the traceability matrix:**
+   - Add TST-MM-0001 and TST-MM-0002 to the backward traceability table
+   - Update Last Result and Run ID columns
+   - Add a row to the Test Run Log
+   - Recalculate the Coverage Summary
+
+5. **Commit all evidence:**
+
+```bash
+git add tests/ docs/specs/ docs/test-evidence/
+git commit -m "evidence: test run RUN-YYYY-MM-DD-NNN
+
+- TST-MM-0001: PASS (SUB-MM-0001)
+- TST-MM-0002: PASS (SUB-MM-0002)
+- Updated traceability matrix and coverage summary"
+git push
+```
+
+### Afternoon: PR & Review
+
+6. **Create the pull request:**
+
+```bash
+gh pr create --title "feat: medication interaction alerts (SYS-REQ-0006)" --body "## Summary
+- Drug interaction checker with severity classification
+- Tests with full requirement traceability
+
+## Requirements Covered
 - SUB-MM-0001: Interaction check within 5 seconds
 - SUB-MM-0002: Severity classification
 
-## Status: Day 1/3 — Specification Complete"
+## Evidence
+- Test run: RUN-YYYY-MM-DD-NNN
+- Traceability matrix updated
+- /analyze consistency verified"
 ```
 
 ---
 
-## Day 2: Implementation
+# Section 4: A Day in the Life of a PMS Developer
 
-### Morning: Core Implementation
-
-1. **Pull latest and sync:**
-
-```bash
-git checkout feature/medication-interaction-alerts
-git pull origin develop --rebase
-```
-
-2. **Generate tasks from the plan:**
-
-```bash
-claude
-/speckit.tasks
-# This breaks the plan into small, testable implementation tasks
-```
-
-3. **Implement with Claude Code:**
-
-```bash
-claude
-# "Implement task 1: Create the DrugInteractionChecker service
-# per the specification in .specify/specs/medication-interaction-alerts.md.
-# Ensure all functions include audit logging (SYS-REQ-0003) and
-# encrypt PHI fields (SYS-REQ-0002). Add @requirement annotations
-# in JSDoc comments."
-```
-
-4. **Write tests alongside implementation:**
-
-```bash
-# "Write tests for the DrugInteractionChecker service.
-# Each test must include @requirement annotations mapping to
-# SUB-MM-0001 and SUB-MM-0002. Include performance tests
-# verifying the 5-second SLA."
-```
-
-5. **Run tests locally:**
-
-```bash
-npm test -- --testPathPattern=medications
-npm test -- --coverage
-```
-
-### Afternoon: Continue Implementation and Local Scans
-
-6. **Continue implementing remaining tasks** from `/speckit.tasks`.
-
-7. **Run CodeRabbit locally before pushing:**
-
-```bash
-coderabbit review --type uncommitted --plain
-# Review suggestions and fix critical issues
-```
-
-8. **Run Snyk locally to catch vulnerabilities early:**
-
-```bash
-snyk test
-snyk code test
-# Fix any critical or high severity issues before pushing
-```
-
-9. **Run SonarQube locally (optional but recommended):**
-
-```bash
-sonar-scanner
-# Check for quality gate issues
-```
-
-10. **Commit progress with requirement references:**
-
-```bash
-git add src/medications/ test/medications/
-git commit -m "feat(medications): implement drug interaction checker
-
-- DrugInteractionChecker service with severity classification
-- Real-time check completes within 5 seconds (SUB-MM-0001)
-- Severity levels: contraindicated, major, moderate, minor (SUB-MM-0002)
-- Full audit logging on all interaction checks (SYS-REQ-0003)
-- PHI encryption for prescription data (SYS-REQ-0002)
-
-Requirement coverage: SUB-MM-0001, SUB-MM-0002, SUB-MM-0003, SUB-MM-0004"
-
-git push
-```
-
-### End of Day 2: Status Update
-
-Update the draft PR description with implementation progress.
-
----
-
-## Day 3: Testing, Review & Evidence
-
-### Morning: Complete Testing and Evidence
-
-1. **Run the full test suite with coverage:**
-
-```bash
-npm test -- --coverage --reporter=json > test-results.json
-```
-
-2. **Update the traceability matrix:**
-
-```bash
-claude
-# "Update docs/traceability-matrix.md to include the medication
-# interaction alerts. Map SUB-MM-0001 and SUB-MM-0002 to the new
-# source modules and test cases. Mark verification status."
-```
-
-3. **Generate coverage report:**
-
-```bash
-claude
-# "Cross-reference test-results.json with docs/traceability-matrix.md.
-# Generate docs/coverage-report.md showing requirement test coverage
-# for all SUB-MM requirements."
-```
-
-4. **Commit evidence to the repository:**
-
-```bash
-git add docs/traceability-matrix.md docs/coverage-report.md test-results.json
-git commit -m "evidence: update RTM and coverage report for medication alerts
-
-- Updated traceability matrix with SUB-MM-0001, SUB-MM-0002 mappings
-- Generated requirement test coverage report
-Relates to: SYS-REQ-0006, SUB-MM-0001, SUB-MM-0002"
-
-git push
-```
-
-### Midday: Mark PR as Ready for Review
-
-5. **Run final local checks:**
-
-```bash
-npm test -- --coverage
-snyk test
-coderabbit review --plain
-```
-
-6. **Mark the PR as ready:**
-
-```bash
-gh pr ready
-```
-
-7. **The CI pipeline will automatically run:**
-   - SonarQube quality gate analysis
-   - CodeRabbit AI-powered review
-   - Snyk dependency and code scanning
-   - Unit and integration tests
-
-### Afternoon: Address Review Feedback
-
-8. **Review CodeRabbit comments** on the PR and address each finding.
-
-9. **Check SonarQube quality gate status** in the PR checks.
-
-10. **Review Snyk alerts** in the GitHub Security tab.
-
-11. **Make fixes and push:**
-
-```bash
-git add .
-git commit -m "fix(medications): address review feedback
-
-- Fixed audit log format per CodeRabbit suggestion (SYS-REQ-0003)
-- Added missing input validation per SonarQube finding
-- Updated dependency per Snyk advisory"
-
-git push
-```
-
-12. **Once approved, merge via squash merge:**
-
-```bash
-gh pr merge --squash
-```
-
-### Post-Merge: Archive Evidence
-
-13. **Archive and commit PR review evidence:**
-
-```bash
-# Get the merged PR review data
-gh pr view <PR_NUMBER> --comments --json comments \
-  > docs/reviews/pr-<PR_NUMBER>-review.json
-```
-
-In Claude Code:
-
-```
-"Summarize the CodeRabbit review and SonarQube results for
-PR #<PR_NUMBER>. Map findings to requirement IDs. Generate
-docs/reviews/pr-<PR_NUMBER>-evidence-summary.md."
-```
-
-Commit the evidence to the repository:
-
-```bash
-git add docs/reviews/pr-<PR_NUMBER>-review.json \
-       docs/reviews/pr-<PR_NUMBER>-evidence-summary.md
-git commit -m "evidence: archive PR #<PR_NUMBER> review and quality results
-
-- CodeRabbit review summary with requirement mappings
-- SonarQube quality gate results
-Relates to: <REQUIREMENT_IDS>"
-
-git push
-```
-
-14. **Update CLAUDE.md if any architectural decisions were made.**
-
----
-
-# Section 3: A Day in the Life of a PMS Developer
-
-*A typical development day following the PMS process, from morning priorities to end-of-day commits.*
-
----
-
-## 8:30 AM — Start of Day: Triage & Priorities
-
-### Check Notifications and Assignments
+## 8:30 AM — Triage & Priorities
 
 ```bash
 # Check for PR review requests
@@ -611,318 +633,132 @@ gh pr list --search "review-requested:@me"
 
 # Check assigned issues
 gh issue list --assignee @me --state open
-
-# Check Snyk alerts (new vulnerabilities overnight)
-snyk test --json | jq '.vulnerabilities | length'
 ```
 
-### Review the Board
+**Priority order:**
+1. **P0** — Blocking PRs (unblock teammates first)
+2. **P1** — Critical bugs or security issues
+3. **P2** — Feature work (current sprint)
+4. **P3** — Technical debt, documentation
 
-Check the sprint board for your assigned tasks, noting priorities:
-
-1. **P0 — Blocking PRs** that need your review (other developers are waiting)
-2. **P1 — Critical bug fixes** or security remediations
-3. **P2 — Feature work** from your current sprint assignment
-4. **P3 — Technical debt** and documentation improvements
-
----
-
-## 8:45 AM — Review Other Developers' PRs (Priority #1)
-
-Reviewing PRs first unblocks your teammates. For each PR:
-
-### Quick Context Check
-
-```bash
-# View PR details
-gh pr view <PR_NUMBER>
-
-# Check if CI passed
-gh pr checks <PR_NUMBER>
-```
-
-Read the relevant docs for context on the requirements involved. Check `docs/` for the requirements and acceptance criteria related to the feature under review.
-
-### Review Checklist
+## 8:45 AM — Review PRs
 
 For each PR, verify:
 
-- [ ] **Specification alignment** — Does the code match the spec in `.specify/specs/`?
-- [ ] **Requirement annotations** — Are `@requirement` tags present in tests and code?
-- [ ] **HIPAA compliance** — Is PHI encrypted? Are audit logs in place?
-- [ ] **Test coverage** — Are all requirements covered by tests?
-- [ ] **SonarQube gate** — Did it pass? Any new issues introduced?
-- [ ] **CodeRabbit findings** — Were critical findings addressed?
-- [ ] **Snyk results** — Any new vulnerabilities? Are they acceptable?
+- [ ] **Requirement annotations** — `@requirement` tags present in tests and code
+- [ ] **Traceability** — New test cases added to the RTM
+- [ ] **Test run record** — Evidence committed for test execution
+- [ ] **HIPAA compliance** — PHI encrypted, audit logs in place
+- [ ] **Implementation Mapping** — `SUB-*.md` updated with source modules
 
-### Provide Feedback
+## 10:00 AM — Feature Work
 
-```bash
-# Approve if everything looks good
-gh pr review <PR_NUMBER> --approve -b "LGTM. Requirement coverage verified for SUB-CW-003. HIPAA audit logging confirmed."
-
-# Or request changes with specific references
-gh pr review <PR_NUMBER> --request-changes -b "Missing audit logging on the DELETE endpoint (SYS-REQ-0003). Also, SUB-CW-003 requires input validation on the referral code field — see the spec in .specify/specs/clinical-workflow-referrals.md."
-```
-
----
-
-## 9:30 AM — Address Any Critical Issues (Priority #2)
-
-### Check for Urgent Snyk Alerts
+### Sync All Repos
 
 ```bash
-# Check for critical vulnerabilities
-snyk test --severity-threshold=critical
-
-# If critical vulns found, create a hotfix branch
-git checkout -b hotfix/snyk-critical-<CVE_ID>
+# Update docs submodule in your working repo
+cd pms-backend
+git submodule update --remote docs
 ```
 
-### Check SonarQube for Regressions
+### Follow the Four-Phase Process
 
-Review the SonarQube dashboard for any quality gate failures on the develop branch. If failures exist, prioritize fixing them.
+1. **Read** the relevant requirements in `docs/specs/requirements/`
+2. **Verify** the traceability matrix is current
+3. **Implement** using `/plan` → `/speckit.tasks` → Claude Code
+4. **Test** with requirement annotations, record results, update RTM
 
----
-
-## 10:00 AM — Feature Work (Priority #3)
-
-### Sync and Start
+## 3:00 PM — Testing & Quality
 
 ```bash
-# Pull latest develop
-git checkout develop && git pull
+# Run all backend tests
+cd pms-backend && pytest -v --cov=pms
 
-# Switch to your feature branch
-git checkout feature/your-current-feature
-git rebase develop
-```
+# Run all frontend tests
+cd pms-frontend && npm run test:run
 
-### Read the Docs Before Coding
-
-Before writing code, always check what already exists. Read the relevant documentation in `docs/`:
-
-- Check `docs/architecture/` and `docs/adr/` for:
-
-  > What design patterns are used for \<SIMILAR_FEATURE\> and what architectural constraints apply?
-
-- Check `docs/security/` and `docs/quality-reports/` for:
-
-  > Are there known issues or gotchas related to \<TECHNOLOGY_OR_MODULE\> in the PMS codebase?
-
-### Implement Using the Spec-Driven Process
-
-Follow the Day 2 implementation process from Section 2. Key reminders:
-
-- Always reference requirement IDs in code comments and commit messages
-- Write tests alongside implementation, not after
-- Run local scans (CodeRabbit, Snyk) before pushing
-- Commit frequently with meaningful messages
-
----
-
-## 12:00 PM — Lunch Break
-
-Step away from the screen. The CI pipeline works while you rest.
-
----
-
-## 1:00 PM — Continue Feature Work
-
-### Check CI Results from Morning Push
-
-```bash
-# Check if your morning push triggered any failures
-gh pr checks <YOUR_PR_NUMBER>
-
-# If CodeRabbit posted a review, address it
-gh pr view <YOUR_PR_NUMBER> --comments
-```
-
-### Continue Implementation
-
-Resume where you left off. If you encounter a bug or unexpected behavior:
-
-1. **Check the docs first:**
-
-Read `docs/security/` and `docs/quality-reports/` for any previously documented issues related to the error.
-
-2. **If no solution found, solve it and document the solution:**
-
-In Claude Code:
-
-```
-"Document the bug I just fixed: <DESCRIPTION>.
-Generate a debugging note for docs/debugging/<ISSUE>.md
-that includes the error message, root cause, and fix."
-```
-
-Commit the debugging documentation:
-
-```bash
-git add docs/debugging/<ISSUE>.md
-git commit -m "docs: add debugging note for <ISSUE>
-
-- Error message, root cause, and fix documented
-Relates to: <REQUIREMENT_ID_IF_APPLICABLE>"
-
-git push
-```
-
----
-
-## 3:00 PM — Testing & Quality Check
-
-### Run Your Tests
-
-```bash
-# Run tests for the modules you changed
-npm test -- --testPathPattern=<YOUR_MODULE>
-
-# Run full suite if your changes may have broader impact
-npm test -- --coverage
-```
-
-### Local Quality Scans
-
-```bash
-# Quick CodeRabbit check on uncommitted changes
-coderabbit review --type uncommitted --plain
-
-# Snyk check for any new dependencies you added
+# Run quality scans
 snyk test
-
-# If you added a new npm package, verify it's safe:
-snyk test --json | jq '.vulnerabilities[] | select(.severity=="critical" or .severity=="high")'
+coderabbit review --type uncommitted --plain
 ```
-
----
-
-## 4:00 PM — Follow Up on Reviews
-
-### Check on PRs You Reviewed This Morning
-
-```bash
-# See if authors addressed your feedback
-gh pr list --search "reviewed-by:@me is:open"
-```
-
-### Re-review and Approve if Fixed
-
-If the author addressed your feedback, re-review and approve promptly. Don't be the bottleneck.
-
----
 
 ## 4:30 PM — End-of-Day Wrap-Up
 
-### Commit All Work in Progress
-
-**Never leave uncommitted changes overnight.** Even if a feature is incomplete, commit your progress:
-
-```bash
-# Stage your changes
-git add src/medications/ test/medications/ docs/
-
-# Commit with a clear WIP message including requirement context
-git commit -m "wip(medications): interaction alert UI component
-
-- Completed: alert notification panel (SUB-MM-0001)
-- In progress: override workflow with reason capture
-- Next: wire up to WebSocket for real-time delivery
-
-Requirement progress: SUB-MM-0001 (80%), SUB-MM-0002 (60%)"
-```
-
-### Push to Remote
+1. **Commit all work** (even WIP) with requirement references
+2. **Push to remote**
+3. **Update the RTM** if any requirement status changed
+4. **Commit evidence** (test runs, /analyze reports, RTM updates)
 
 ```bash
-git push
-```
+git add docs/specs/ docs/test-evidence/
+git commit -m "evidence: end-of-day RTM and test updates
 
-### Update the Traceability Matrix (if implementation changed)
-
-If you completed implementation of any requirement today:
-
-```bash
-claude
-# "Update docs/traceability-matrix.md to reflect that
-# SUB-MM-0001 now has source module src/medications/interaction-checker.ts
-# and test case TC-MED-001. Mark status as 'In Verification'."
-```
-
-### Commit Updated Evidence
-
-If the traceability matrix or any ADRs were updated today, commit them:
-
-```bash
-git add docs/traceability-matrix.md docs/adr/
-git commit -m "evidence: end-of-day RTM and ADR updates
-
-- Updated traceability matrix with today's implementation progress
-- Added/updated ADRs for architectural decisions made today
+- Updated traceability matrix with today's progress
 Relates to: <REQUIREMENT_IDS>"
-
 git push
 ```
 
-### Update Your Sprint Status
-
-Leave a brief status update on your Jira ticket or sprint board noting what you accomplished and what's next.
-
-### Quick Standup Prep
-
-Jot down for tomorrow's standup:
-
-- **Done today:** What you completed (with requirement IDs)
-- **Doing tomorrow:** What you'll work on next
-- **Blockers:** Anything preventing progress
-
 ---
 
-## Daily Checklist Summary
+## Quick Reference
 
-| Time | Activity | Priority |
-|------|----------|----------|
-| 8:30 AM | Triage notifications, check Snyk alerts | — |
-| 8:45 AM | Review teammates' PRs | P0 |
-| 9:30 AM | Address critical bugs / security remediations | P1 |
-| 10:00 AM | Feature work: read docs/ → implement → test | P2 |
-| 12:00 PM | Lunch break | — |
-| 1:00 PM | Check CI results, continue feature work | P2 |
-| 3:00 PM | Run tests and local quality scans | — |
-| 4:00 PM | Follow up on PR reviews | P0 |
-| 4:30 PM | Commit all changes, push, update RTM | — |
-
----
-
-## Quick Reference: Common Commands
+### Test Commands
 
 ```bash
-# === GitHub Spec Kit ===
+# pms-backend
+pytest -v                                    # Run all tests
+pytest --cov=pms --cov-report=html           # With coverage
+pytest tests/test_patients.py -v             # Specific subsystem
+
+# pms-frontend
+npm run test:run                             # Run all tests
+npx vitest run --coverage                    # With coverage
+npx vitest run __tests__/auth.test.ts        # Specific test
+
+# pms-android
+./gradlew test                               # Unit tests
+./gradlew connectedAndroidTest               # Instrumented tests
+```
+
+### Speckit Commands (in Claude Code)
+
+```bash
 /specify                    # Define specifications
 /plan                       # Generate technical plan
 /analyze                    # Validate consistency
 /speckit.tasks              # Break into implementation tasks
-
-# === Code Quality ===
-coderabbit review --plain                   # Local AI review
-coderabbit review --type uncommitted        # Review uncommitted only
-sonar-scanner                               # Local SonarQube scan
-
-# === Security ===
-snyk test                                   # Dependency scan
-snyk code test                              # SAST scan
-snyk test --severity-threshold=critical     # Critical only
-snyk sbom --format cyclonedx                # Generate SBOM
-
-# === Git Workflow ===
-gh pr create --draft --title "feat: ..." --body "..."   # Create draft PR
-gh pr ready                                              # Mark ready for review
-gh pr checks <NUMBER>                                    # Check CI status
-gh pr review <NUMBER> --approve -b "..."                 # Approve PR
-gh pr merge --squash                                     # Merge via squash
 ```
+
+### Git Workflow
+
+```bash
+# Create feature branch
+git checkout -b feature/<description>
+
+# Update docs submodule
+git submodule update --remote docs
+
+# Commit with requirement references
+git commit -m "feat(<subsystem>): <description>
+
+Relates to: SUB-XX-NNNN, SYS-REQ-NNNN"
+
+# Create PR
+gh pr create --title "feat: <title>" --body "..."
+```
+
+### Requirement ID Conventions
+
+| Pattern | Scope | Example |
+|---|---|---|
+| `SYS-REQ-NNNN` | System-level requirement | SYS-REQ-0001 (MFA) |
+| `SUB-PR-NNNN` | Patient Records subsystem | SUB-PR-0003 (CRUD) |
+| `SUB-CW-NNNN` | Clinical Workflow subsystem | SUB-CW-0003 (Encounters) |
+| `SUB-MM-NNNN` | Medication Management subsystem | SUB-MM-0001 (Interactions) |
+| `SUB-RA-NNNN` | Reporting & Analytics subsystem | SUB-RA-0001 (Dashboards) |
+| `TST-{subsystem}-NNNN` | Test case ID | TST-MM-0001 |
+| `RUN-YYYY-MM-DD-NNN` | Test run record | RUN-2026-02-15-001 |
 
 ---
 
-*For the complete development process tutorial, see the [Developer Documentation](./docs/index.md).*
+*For the complete development pipeline tutorial, see the [Development Pipeline Tutorial](./Development_Pipeline_Tutorial.md). For project documentation, see [docs/index.md](./docs/index.md).*

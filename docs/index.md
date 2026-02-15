@@ -27,3 +27,14 @@ _No bug fixes documented yet._
 
 - [Project Setup Guide](config/project-setup.md) — How to clone, install, and run all three projects
 - [Dependencies Overview](config/dependencies.md) — All libraries and why they were chosen
+
+## Specifications & Requirements
+
+- [System Specification](specs/system-spec.md) — System-level scope, context, and subsystem decomposition
+- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 10 system-level requirements
+- [Patient Records (SUB-PR)](specs/requirements/SUB-PR.md) — 8 subsystem requirements
+- [Clinical Workflow (SUB-CW)](specs/requirements/SUB-CW.md) — 8 subsystem requirements
+- [Medication Management (SUB-MM)](specs/requirements/SUB-MM.md) — 9 subsystem requirements
+- [Reporting & Analytics (SUB-RA)](specs/requirements/SUB-RA.md) — 7 subsystem requirements
+- [Traceability Matrix (RTM)](specs/requirements/traceability-matrix.md) — Forward & backward traceability, test run log, coverage summary
+- [Testing Strategy](specs/testing-strategy.md) — Test levels, naming conventions, run record format
