@@ -845,14 +845,14 @@ jobs:
         run: npm test -- --coverage
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v2
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
 
       - name: Quality Gate Check
         id: quality-gate
-        uses: SonarSource/sonarqube-quality-gate-action@master
+        uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
