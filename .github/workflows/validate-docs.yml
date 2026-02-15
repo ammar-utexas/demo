@@ -61,9 +61,10 @@ jobs:
 
       - name: Check requirement IDs are unique
         run: |
-          # Extract requirement IDs only from the first column of requirements tables
-          # (lines starting with "| SUB-" or "| SYS-REQ-"), not from implementation mapping tables
+          # Extract requirement IDs from requirement tables only, excluding implementation
+          # mapping tables (which contain TST- test case references in the last column)
           ids=$(grep -hE '^\| (SYS-REQ|SUB-[A-Z]{2})-[0-9]{4} \|' docs/specs/requirements/SYS-REQ.md docs/specs/requirements/SUB-*.md \
+            | grep -v 'TST-' \
             | sed 's/^| *//' | cut -d'|' -f1 | sed 's/ *$//' | sort)
           dupes=$(echo "$ids" | uniq -d)
           if [ -n "$dupes" ]; then
