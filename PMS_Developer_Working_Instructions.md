@@ -77,13 +77,13 @@ Before starting, ensure your machine meets these requirements:
 ### Node.js and npm
 
 ```bash
-# Install Node.js 20 LTS (recommended via nvm)
+# Install Node.js 24 LTS (recommended via nvm)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 source ~/.bashrc
-nvm install 20
-nvm use 20
-node --version   # Should show v20.x.x
-npm --version    # Should show 10.x.x
+nvm install 24
+nvm use 24
+node --version   # Should show v24.x.x
+npm --version    # Should show 11.x.x
 ```
 
 ### Git
