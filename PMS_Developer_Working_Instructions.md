@@ -2,7 +2,7 @@
 
 **Patient Management System — Development Process Guide**
 
-Version 2.0 | Last Updated: February 2026
+Version 2.1 | Last Updated: February 2026
 
 ---
 
@@ -14,6 +14,7 @@ Version 2.0 | Last Updated: February 2026
 - [Section 3: Implementing a Feature (Worked Example)](#section-3-implementing-a-feature-worked-example)
 - [Section 4: A Day in the Life](#section-4-a-day-in-the-life-of-a-pms-developer)
 - [Quick Reference](#quick-reference)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -155,7 +156,52 @@ gh repo clone ammar-utexas/pms-android
 cd pms-android && git submodule update --init --recursive && cd ..
 ```
 
+> **Known Issue: Submodule URL Mismatch**
+>
+> The `.gitmodules` files in each implementation repo reference the docs submodule using a custom SSH host alias (`git@github.com-utexas:ammar-utexas/demo.git`). If your SSH config does not include a `github.com-utexas` host entry, `git submodule update --init --recursive` will fail with:
+>
+> ```
+> ssh: Could not resolve hostname github.com-utexas: nodename nor servname provided, or not known
+> ```
+>
+> **Fix:** Override the submodule URL locally in each repo before initializing:
+>
+> ```bash
+> # Run this in each implementation repo (pms-backend, pms-frontend, pms-android)
+> git config submodule.docs.url git@github.com:utexas-demo/demo.git
+> git submodule update --init --recursive
+> ```
+>
+> If you use multiple GitHub accounts with SSH host aliases (see [Troubleshooting: SSH Multi-Account Setup](#ssh-multi-account-setup)), replace `github.com` with your alias (e.g., `github.com-julmak`).
+
 ## 1.5 Set Up Each Project
+
+### Start PostgreSQL via Docker
+
+The backend requires a PostgreSQL database. Start one before setting up the backend:
+
+```bash
+# Ensure Docker Desktop is running first (macOS: open -a Docker)
+docker run -d \
+  --name pms-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=pms \
+  -p 5432:5432 \
+  postgres:16
+
+# Wait for PostgreSQL to be ready
+docker exec pms-postgres pg_isready -U postgres
+
+# Create the test database (required by pytest — see tests/conftest.py)
+docker exec pms-postgres psql -U postgres -c "CREATE DATABASE pms_test;"
+```
+
+> **Important:** The test suite connects to a separate `pms_test` database (hardcoded in `tests/conftest.py`), not the main `pms` database. If you skip this step, all backend tests will fail with:
+>
+> ```
+> asyncpg.exceptions.InvalidCatalogNameError: database "pms_test" does not exist
+> ```
 
 ### pms-backend
 
@@ -170,6 +216,27 @@ cp .env.example .env
 pytest -v                                    # All tests pass
 python -m uvicorn pms.main:app --reload      # http://localhost:8000/docs
 ```
+
+> **Known Issue: pydantic-settings `extra` Fields Error**
+>
+> With newer versions of pydantic-settings (v2.13+), both `Settings` and `FeatureFlags` classes read from the same `.env` file but reject each other's variables. You will see errors like:
+>
+> ```
+> pydantic_core._pydantic_core.ValidationError: 5 validation errors for FeatureFlags
+> database_url
+>   Extra inputs are not permitted
+> ```
+>
+> **Fix:** Add `"extra": "ignore"` to the `model_config` in both files:
+>
+> - `src/pms/config.py` — change `model_config` to:
+>   ```python
+>   model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
+>   ```
+> - `src/pms/feature_flags.py` — change `model_config` to:
+>   ```python
+>   model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
+>   ```
 
 ### pms-frontend
 
@@ -762,3 +829,79 @@ gh pr create --title "feat: <title>" --body "..."
 ---
 
 *For the complete development pipeline tutorial, see the [Development Pipeline Tutorial](./Development_Pipeline_Tutorial.md). For project documentation, see [docs/index.md](./docs/index.md).*
+
+---
+
+## Troubleshooting
+
+### SSH Multi-Account Setup
+
+If you use multiple GitHub accounts (e.g., a personal and a work account), you need separate SSH keys and host aliases in `~/.ssh/config` so Git knows which key to use for each account.
+
+**1. Generate a new SSH key for the target account:**
+
+```bash
+ssh-keygen -t ed25519 -C "your.email@example.com" -f ~/.ssh/id_ed25519_yourname
+```
+
+**2. Add a host alias to `~/.ssh/config`:**
+
+```
+Host github.com-yourname
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_yourname
+    IdentitiesOnly yes
+```
+
+**3. Add the public key to GitHub:**
+
+- Copy the contents of `~/.ssh/id_ed25519_yourname.pub`
+- Go to https://github.com/settings/keys → **New SSH key** → paste and save
+
+**4. Test the connection:**
+
+```bash
+ssh -T git@github.com-yourname
+# Expected: "Hi yourname! You've successfully authenticated..."
+```
+
+**5. Update all repo remotes to use your alias:**
+
+```bash
+cd pms-backend  && git remote set-url origin git@github.com-yourname:utexas-demo/pms-backend.git
+cd pms-frontend && git remote set-url origin git@github.com-yourname:utexas-demo/pms-frontend.git
+cd pms-android  && git remote set-url origin git@github.com-yourname:utexas-demo/pms-android.git
+cd demo         && git remote set-url origin git@github.com-yourname:utexas-demo/demo.git
+```
+
+**6. Update the docs submodule URL in each implementation repo:**
+
+```bash
+# Run in each of: pms-backend, pms-frontend, pms-android
+git config submodule.docs.url git@github.com-yourname:utexas-demo/demo.git
+```
+
+### Docker / PostgreSQL Issues
+
+| Problem | Solution |
+|---|---|
+| `docker: Cannot connect to the Docker daemon` | Start Docker Desktop: `open -a Docker` (macOS) |
+| `port 5432 already in use` | Another PostgreSQL is running. Stop it: `docker stop pms-postgres` or check `lsof -i :5432` |
+| `database "pms_test" does not exist` | Create it: `docker exec pms-postgres psql -U postgres -c "CREATE DATABASE pms_test;"` |
+| Tests pass but dev server fails to connect to DB | Ensure Docker container is running: `docker ps --filter "name=pms-postgres"` |
+
+### pydantic-settings Validation Errors
+
+If you see `Extra inputs are not permitted` errors when running `pytest` or starting the backend, add `"extra": "ignore"` to `model_config` in both `src/pms/config.py` and `src/pms/feature_flags.py`. See the note in [Section 1.5](#15-set-up-each-project) for details.
+
+### Submodule Initialization Fails
+
+If `git submodule update --init --recursive` fails with a hostname resolution error, the `.gitmodules` file uses a custom SSH alias. Override the URL locally:
+
+```bash
+git config submodule.docs.url git@github.com:utexas-demo/demo.git
+git submodule update --init --recursive
+```
+
+See the note in [Section 1.4](#14-clone-all-repositories) for details.
