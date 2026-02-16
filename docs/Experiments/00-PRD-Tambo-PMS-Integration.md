@@ -3,16 +3,16 @@
 **Document ID:** PRD-PMS-TAMBO-001
 **Version:** 1.0
 **Date:** February 16, 2026
-**Author:** Ammar (CTO, Medify Health)
+**Author:** Ammar (CEO, MPS Inc.)
 **Status:** Draft
 
 ---
 
 ## 1. Executive Summary
 
-This PRD defines the integration of Tambo AI — an open-source generative UI SDK for React — into the Medify Health Practice Metrics Reporting System (PMS). The goal is to replace static weekly PDF reports with a conversational analytics interface where practice administrators, health coaches, and account managers can query PMS data using natural language and receive dynamically rendered React components (charts, tables, dashboards) in response.
+This PRD defines the integration of Tambo AI — an open-source generative UI SDK for React — into the MPS Health Practice Metrics Reporting System (PMS). The goal is to replace static weekly PDF reports with a conversational analytics interface where practice administrators, health coaches, and account managers can query PMS data using natural language and receive dynamically rendered React components (charts, tables, dashboards) in response.
 
-Tambo will be **self-hosted** on Medify infrastructure to maintain HIPAA compliance and full control over PHI data flow. No patient data will leave our environment.
+Tambo will be **self-hosted** on MPS infrastructure to maintain HIPAA compliance and full control over PHI data flow. No patient data will leave our environment.
 
 ---
 
@@ -35,7 +35,7 @@ Integrate Tambo AI as a **conversational analytics sidebar** within the PMS dash
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                     Medify Frontend (React)                   │
+│                     MPS Frontend (React)                   │
 │                                                               │
 │  ┌─────────────────────┐    ┌──────────────────────────────┐ │
 │  │   Existing PMS      │    │   Tambo Conversational       │ │
@@ -56,7 +56,7 @@ Integrate Tambo AI as a **conversational analytics sidebar** within the PMS dash
                                   │                             │
                     ┌─────────────▼──────────────┐              │
                     │  Tambo Self-Hosted Backend  │              │
-                    │  (Docker on Medify Infra)   │              │
+                    │  (Docker on MPS Infra)   │              │
                     │                             │              │
                     │  - NestJS API (port 3001)   │              │
                     │  - Next.js Dashboard (3000) │              │
@@ -65,7 +65,7 @@ Integrate Tambo AI as a **conversational analytics sidebar** within the PMS dash
                     └─────────────┬──────────────┘              │
                                   │                             │
                     ┌─────────────▼──────────────┐              │
-                    │  Medify Backend             │              │
+                    │  MPS Backend             │              │
                     │  (Spring Boot APIs)         │              │
                     │                             │              │
                     │  - /api/dw/patient-status   │              │
@@ -78,9 +78,9 @@ Integrate Tambo AI as a **conversational analytics sidebar** within the PMS dash
 
 ### 3.2 Deployment Model
 
-- **Self-hosted Tambo backend** running in Docker containers on Medify development/staging infrastructure
+- **Self-hosted Tambo backend** running in Docker containers on MPS development/staging infrastructure
 - **LLM provider:** Anthropic Claude API (API key managed via environment variables, no PHI sent to LLM — only schema definitions and user queries)
-- **Data flow:** Tambo agent calls Medify Spring Boot APIs internally; all PHI stays within our network boundary
+- **Data flow:** Tambo agent calls MPS Spring Boot APIs internally; all PHI stays within our network boundary
 
 ---
 
@@ -262,9 +262,9 @@ z.object({
 
 ## 6. Tambo Tool Definitions
 
-Tools are functions the agent calls to fetch data from Medify's Spring Boot backend.
+Tools are functions the agent calls to fetch data from MPS's Spring Boot backend.
 
-| Tool Name | Description | Medify API Endpoint |
+| Tool Name | Description | MPS API Endpoint |
 |-----------|-------------|---------------------|
 | `queryPatientStatus` | Fetch enrollment metrics by organization and date range | `GET /api/dw/patient-status` |
 | `queryEvents` | Fetch encounters/appointments with filters | `GET /api/dw/events` |
@@ -283,7 +283,7 @@ Tools are functions the agent calls to fetch data from Medify's Spring Boot back
 | **Practice Administrator** | Own practice data only | "Show my enrollment this week" |
 | **Health Coach** | Assigned patients and encounters | "My no-shows today," "Engagement scores for my patients" |
 | **Account Manager** | All assigned practices | "Compare my practices," "Which practice needs attention?" |
-| **Medify Admin** | All organizations | "System-wide enrollment trends," "Top performing practices" |
+| **MPS Admin** | All organizations | "System-wide enrollment trends," "Top performing practices" |
 
 Access control is enforced at the Spring Boot API layer (existing RBAC), not within Tambo. The `userToken` passed to `TamboProvider` carries the authenticated user's JWT, which the API validates.
 
@@ -292,7 +292,7 @@ Access control is enforced at the Spring Boot API layer (existing RBAC), not wit
 ## 8. Non-Functional Requirements
 
 ### 8.1 Security and Compliance
-- All Tambo infrastructure self-hosted within Medify's network
+- All Tambo infrastructure self-hosted within MPS's network
 - No PHI transmitted to LLM providers (only component schemas and natural language queries)
 - LLM API key stored in environment variables, never exposed to client
 - All API calls from Tambo tools go through authenticated Spring Boot endpoints
@@ -306,7 +306,7 @@ Access control is enforced at the Spring Boot API layer (existing RBAC), not wit
 ### 8.3 Infrastructure
 - Docker-based deployment (PostgreSQL + NestJS API + Next.js dashboard)
 - Node.js 22+ required
-- Compatible with existing Medify CI/CD pipeline
+- Compatible with existing MPS CI/CD pipeline
 
 ---
 
@@ -359,7 +359,7 @@ Access control is enforced at the Spring Boot API layer (existing RBAC), not wit
 - Tambo AI SDK (`@tambo-ai/react`) — React SDK for frontend
 - Tambo Cloud backend (self-hosted via Docker) — conversation state and agent orchestration
 - Anthropic Claude API key — LLM provider for agent reasoning
-- Existing Medify Spring Boot APIs — data source
+- Existing MPS Spring Boot APIs — data source
 - Existing PMS Data Warehouse collections — DW_PatientStatus, DW_Events, DW_Engagement, DW_Devices
 
 ---
@@ -367,6 +367,6 @@ Access control is enforced at the Spring Boot API layer (existing RBAC), not wit
 ## 13. Appendix: Related Documents
 
 - PMS Data Warehouse Requirements (DW Collections Schema)
-- Medify API Swagger Documentation
+- MPS API Swagger Documentation
 - Tambo AI Documentation: https://docs.tambo.co
 - Tambo GitHub Repository: https://github.com/tambo-ai/tambo

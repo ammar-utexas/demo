@@ -1,6 +1,6 @@
 # Tambo AI Self-Hosted Setup Guide for PMS Integration
 
-**For:** Medify Health Engineering Team
+**For:** MPS Inc. Engineering Team
 **Version:** 1.0
 **Date:** February 16, 2026
 **Prerequisites Level:** Intermediate (React, Docker, Spring Boot familiarity assumed)
@@ -24,7 +24,7 @@
 
 ## 1. Overview
 
-This guide walks you through setting up a **self-hosted Tambo AI backend** on your local development machine and integrating it with the Medify PMS dashboard. By the end, you will have:
+This guide walks you through setting up a **self-hosted Tambo AI backend** on your local development machine and integrating it with the MPS PMS dashboard. By the end, you will have:
 
 - A locally running Tambo backend (NestJS API + PostgreSQL) inside Docker
 - A React frontend with Tambo's generative UI rendering PMS components
@@ -40,7 +40,7 @@ Your Development Machine
 │   ├── Tambo Dashboard  (Next.js)       → localhost:3000
 │   └── PostgreSQL       (Tambo state)   → localhost:5432
 │
-├── Medify API           (Spring Boot)   → localhost:8080 (your existing backend)
+├── MPS API           (Spring Boot)   → localhost:8080 (your existing backend)
 │
 └── PMS Frontend         (React + Tambo SDK)  → localhost:3030
 ```
@@ -79,16 +79,16 @@ You will need an **Anthropic API key** for the LLM provider. Tambo supports othe
 2. Create an API key
 3. Save it securely — you will add it to the Tambo environment file in Step 3
 
-### 2.4 Verify Medify Backend is Running
+### 2.4 Verify MPS Backend is Running
 
-Make sure your local Medify Spring Boot API is running and accessible:
+Make sure your local MPS Spring Boot API is running and accessible:
 
 ```bash
 curl http://localhost:8080/actuator/health
 # Expected: {"status":"UP"}
 ```
 
-If not running, start it per the standard Medify developer setup.
+If not running, start it per the standard MPS developer setup.
 
 ---
 
@@ -231,7 +231,7 @@ open http://localhost:3000
 
 1. Open `http://localhost:3000/dashboard` in your browser
 2. Sign up or log in with local credentials
-3. Create a new project (name it "Medify PMS")
+3. Create a new project (name it "MPS PMS")
 4. Navigate to the project settings and generate an API key
 5. Copy the key and add it to `apps/web/.env.local`:
 
@@ -265,7 +265,7 @@ Now we create the React frontend that integrates Tambo into PMS. You have two op
 If the PMS frontend already exists as a React app:
 
 ```bash
-cd ~/projects/medify-frontend
+cd ~/projects/pms-frontend
 
 # Install the Tambo React SDK
 npm install @tambo-ai/react zod
@@ -595,11 +595,11 @@ Tools let the Tambo agent fetch real data from your Spring Boot backend. Create 
 import { TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
 
-// Base URL for your local Medify Spring Boot API
+// Base URL for your local MPS Spring Boot API
 const MEDIFY_API = process.env.NEXT_PUBLIC_MEDIFY_API_URL || "http://localhost:8080";
 
 // Helper: authenticated fetch using the user's JWT
-async function medifyFetch(path: string, token?: string) {
+async function pmsFetch(path: string, token?: string) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -608,7 +608,7 @@ async function medifyFetch(path: string, token?: string) {
   }
   const response = await fetch(`${MEDIFY_API}${path}`, { headers });
   if (!response.ok) {
-    throw new Error(`Medify API error: ${response.status} ${response.statusText}`);
+    throw new Error(`MPS API error: ${response.status} ${response.statusText}`);
   }
   return response.json();
 }
@@ -622,7 +622,7 @@ export const pmsTools: TamboTool[] = [
       "ineligible, and pending patients along with enrollment percentage.",
     tool: async (params: { organizationId: string; startDate: string; endDate: string }) => {
       const { organizationId, startDate, endDate } = params;
-      return medifyFetch(
+      return pmsFetch(
         `/api/dw/patient-status?orgId=${organizationId}&start=${startDate}&end=${endDate}`
       );
     },
@@ -666,7 +666,7 @@ export const pmsTools: TamboTool[] = [
       if (params.outcome) query.set("outcome", params.outcome);
       if (params.healthCoachId) query.set("coachId", params.healthCoachId);
 
-      return medifyFetch(`/api/dw/events?${query.toString()}`);
+      return pmsFetch(`/api/dw/events?${query.toString()}`);
     },
     inputSchema: z.object({
       organizationId: z.string().describe("The organization/practice ID"),
@@ -704,7 +704,7 @@ export const pmsTools: TamboTool[] = [
       "Returns the list of organizations/practices available to the current user. " +
       "Use this to resolve practice names to IDs before calling other tools.",
     tool: async () => {
-      return medifyFetch("/api/organizations");
+      return pmsFetch("/api/organizations");
     },
     inputSchema: z.object({}),
     outputSchema: z.array(z.object({
@@ -734,7 +734,7 @@ import { ReactNode } from "react";
 
 interface PMSTamboProviderProps {
   children: ReactNode;
-  userToken?: string;       // JWT from Medify auth
+  userToken?: string;       // JWT from MPS auth
   userKey?: string;          // Fallback user identifier
   organizationId?: string;   // Current org context
 }
@@ -887,7 +887,7 @@ import AnalyticsSidebar from "@/components/tambo-pms/analytics-sidebar";
 
 export default function DashboardPage() {
   // Get these from your auth context
-  const userToken = "...";        // JWT from Medify auth
+  const userToken = "...";        // JWT from MPS auth
   const organizationId = "...";   // Current org from route/context
 
   return (
@@ -930,7 +930,7 @@ curl http://localhost:3001/health
 curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 # ✓ Returns 200
 
-# 4. Medify Spring Boot API
+# 4. MPS Spring Boot API
 curl http://localhost:8080/actuator/health
 # ✓ Returns {"status":"UP"}
 
@@ -1013,7 +1013,7 @@ Update your `.env.local` accordingly if using Docker ports.
 # Start everything
 docker compose --env-file docker.env up postgres -d   # Database
 npm run dev:cloud                                       # Tambo backend
-cd ~/projects/medify-frontend && npm run dev            # PMS frontend
+cd ~/projects/pms-frontend && npm run dev            # PMS frontend
 
 # Stop everything
 # Ctrl+C on dev:cloud
@@ -1043,7 +1043,7 @@ npm test              # Run tests
 | `http://localhost:3000` | Tambo Dashboard (project management, API keys) |
 | `http://localhost:3001` | Tambo API (NestJS, Swagger docs at /api) |
 | `http://localhost:3030` | PMS Frontend with Tambo sidebar |
-| `http://localhost:8080` | Medify Spring Boot API |
+| `http://localhost:8080` | MPS Spring Boot API |
 | `https://local.drizzle.studio` | Database visual browser |
 
 ---
@@ -1056,7 +1056,7 @@ Once the Phase 1 setup is verified and working:
 2. **Add more tools:** `queryEngagement`, `queryDevices`, `comparePractices`
 3. **Implement context helpers:** Auto-detect current organization from URL params
 4. **Add suggestion prompts:** Role-based starter queries for each user type
-5. **Production deployment:** Move Docker setup to Medify staging/production infrastructure
+5. **Production deployment:** Move Docker setup to MPS staging/production infrastructure
 
 Refer to the full PRD (PRD-PMS-TAMBO-001) for Phase 2 and Phase 3 requirements.
 

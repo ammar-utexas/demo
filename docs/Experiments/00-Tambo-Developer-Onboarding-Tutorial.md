@@ -1,6 +1,6 @@
 # Tambo AI Developer Onboarding Tutorial
 
-**Welcome to the Medify PMS Conversational Analytics Team**
+**Welcome to the MPS PMS Conversational Analytics Team**
 
 This tutorial will take you from zero to building your first Tambo-powered component. By the end, you will understand how Tambo works, have a running local environment, and have built and tested a custom PMS component end-to-end.
 
@@ -95,7 +95,7 @@ The AI reads your descriptions and schemas, decides what to call, and Tambo stre
                     └──────────────┬──────────────┘
                                    │
                     ┌──────────────▼──────────────┐
-                    │   Medify Spring Boot API     │
+                    │   MPS Spring Boot API     │
                     │   Your tools call these      │
                     │   endpoints to get data      │
                     └─────────────────────────────┘
@@ -134,8 +134,8 @@ If any of these fail, install the missing tool before continuing. Ask the team l
 ```bash
 # Clone the PMS frontend repo (which already includes Tambo integration)
 cd ~/projects
-git clone git@github.com:medify-health/medify-frontend.git
-cd medify-frontend
+git clone git@github.com:utexas-demo/pms-frontend.git
+cd pms-frontend
 
 # Switch to the tambo-integration branch
 git checkout feature/tambo-pms-integration
@@ -170,14 +170,14 @@ npm run dev:cloud
 #   ✓ Web ready on http://localhost:3000
 ```
 
-**Terminal 3 — Medify Spring Boot API**
+**Terminal 3 — MPS Spring Boot API**
 
 ```bash
-cd ~/projects/medify-api
+cd ~/projects/pms-backend
 ./mvnw spring-boot:run
 
 # Wait for:
-#   Started MedifyApiApplication in X seconds
+#   Started MPSApiApplication in X seconds
 #   Listening on http://localhost:8080
 ```
 
@@ -186,7 +186,7 @@ cd ~/projects/medify-api
 Copy the example env file and fill in your values:
 
 ```bash
-cd ~/projects/medify-frontend
+cd ~/projects/pms-frontend
 cp .env.local.example .env.local
 ```
 
@@ -197,7 +197,7 @@ Edit `.env.local`:
 NEXT_PUBLIC_TAMBO_API_KEY=ask_team_lead_for_shared_dev_key
 NEXT_PUBLIC_TAMBO_API_URL=http://localhost:3001
 
-# Medify backend
+# MPS backend
 NEXT_PUBLIC_MEDIFY_API_URL=http://localhost:8080
 ```
 
@@ -205,14 +205,14 @@ If you need to generate your own Tambo API key:
 
 1. Open http://localhost:3000/dashboard
 2. Log in (or create an account on the local instance)
-3. Open the "Medify PMS" project
+3. Open the "MPS PMS" project
 4. Go to Settings → API Keys → Generate
 5. Paste the key into your `.env.local`
 
 ### 2.5 Start the Frontend
 
 ```bash
-cd ~/projects/medify-frontend
+cd ~/projects/pms-frontend
 npm run dev
 
 # Opens at http://localhost:3030
@@ -397,7 +397,7 @@ Open `src/lib/pms-tools.ts` and add:
     "the total number of appointments scheduled that day for rate calculation.",
   tool: async (params: { organizationId: string; date: string }) => {
     const { organizationId, date } = params;
-    const response = await medifyFetch(
+    const response = await pmsFetch(
       `/api/dw/events?orgId=${organizationId}&date=${date}&outcome=NO_SHOW`
     );
 
@@ -674,8 +674,8 @@ Print this or keep it open while developing.
 # Start everything (run in separate terminals)
 docker compose --env-file docker.env up postgres -d    # DB
 npm run dev:cloud                                       # Tambo backend
-cd medify-api && ./mvnw spring-boot:run                # Spring Boot
-cd medify-frontend && npm run dev                      # Frontend
+cd pms-backend && ./mvnw spring-boot:run                # Spring Boot
+cd pms-frontend && npm run dev                      # Frontend
 ```
 
 ### Key Files to Edit
@@ -696,7 +696,7 @@ cd medify-frontend && npm run dev                      # Frontend
 | PMS Frontend | http://localhost:3030 |
 | Tambo Dashboard | http://localhost:3000 |
 | Tambo API | http://localhost:3001 |
-| Medify API | http://localhost:8080 |
+| MPS API | http://localhost:8080 |
 | Drizzle Studio (DB browser) | https://local.drizzle.studio |
 
 ### Tambo React Hooks
