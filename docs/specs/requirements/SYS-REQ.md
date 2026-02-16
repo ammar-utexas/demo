@@ -1,7 +1,7 @@
 # System-Level Requirements (SYS-REQ)
 
 **Document ID:** PMS-SYS-REQ-001
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-02-16
 **Parent:** [System Specification](../system-spec.md)
 
@@ -11,11 +11,11 @@
 
 | Req ID | Description | Priority | Verification | Status |
 |---|---|---|---|---|
-| SYS-REQ-0001 | Authenticate all users via MFA before granting access to patient data | Critical | Test / Demo | Placeholder |
-| SYS-REQ-0002 | Encrypt all patient data at rest using AES-256 and in transit using TLS 1.3 | Critical | Inspection / Test | Placeholder |
-| SYS-REQ-0003 | Maintain a complete audit trail of all data access and modifications with user ID, timestamp, action, and resource | Critical | Test | Placeholder |
+| SYS-REQ-0001 | Authenticate all users via MFA before granting access to patient data | Critical | Test / Demo | Partial |
+| SYS-REQ-0002 | Encrypt all patient data at rest using AES-256 and in transit using TLS 1.3 | Critical | Inspection / Test | Partial |
+| SYS-REQ-0003 | Maintain a complete audit trail of all data access and modifications with user ID, timestamp, action, and resource | Critical | Test | Partial |
 | SYS-REQ-0004 | Support HL7 FHIR R4 for patient data exchange with external EHR systems | High | Test / Demo | Not Started |
-| SYS-REQ-0005 | Enforce role-based access control with minimum four roles: physician, nurse, administrator, billing | Critical | Test | Placeholder |
+| SYS-REQ-0005 | Enforce role-based access control with minimum four roles: physician, nurse, administrator, billing | Critical | Test | Partial |
 | SYS-REQ-0006 | Generate real-time clinical alerts for critical lab values and drug interactions within 30 seconds | High | Test | Placeholder |
 | SYS-REQ-0007 | Support 500+ concurrent users with API response times under 2 seconds | High | Load Test | Not Started |
 | SYS-REQ-0008 | Provide a web-based interface accessible from modern browsers (Chrome, Firefox, Safari, Edge) | High | Demo | Scaffolded |
@@ -35,6 +35,8 @@
 2. Failed MFA attempts must be logged (SYS-REQ-0003).
 3. Session tokens expire after the configured timeout (default: 30 minutes).
 
+**Current Implementation:** JWT bearer authentication enforced on all patient endpoints via `require_role` → `require_auth` dependency chain. TOTP (MFA) not yet implemented — current login issues JWT from username + password only.
+
 **Decomposes To:** SUB-PR-0001, SUB-CW-0001, SUB-MM-0006, SUB-RA-0004
 
 ---
@@ -47,6 +49,8 @@
 1. All PHI fields (SSN, medical records) encrypted at rest using AES-256.
 2. All API traffic uses TLS 1.3.
 3. Encryption keys managed separately from application code.
+
+**Current Implementation:** Patient SSN is encrypted at rest via Fernet (AES-128-CBC) using `cryptography.fernet`. Production migration to AES-256-GCM (via `cryptography.hazmat.primitives.ciphers.aead.AESGCM` with a 32-byte KMS-derived key) is required before deployment to satisfy the AES-256 criterion above.
 
 **Decomposes To:** SUB-PR-0004, SUB-MM-0003
 
@@ -61,6 +65,8 @@
 2. Audit entries include: user_id, action, resource_type, resource_id, timestamp, IP address.
 3. Audit logs are immutable (append-only) and retained for 6+ years.
 
+**Current Implementation:** All 5 patient router methods call `audit_service.log_action` with user_id, action, resource_type, resource_id, and IP address. Encounter, medication, and report endpoint audit logging not yet implemented.
+
 **Decomposes To:** SUB-PR-0005, SUB-CW-0004, SUB-MM-0004, SUB-RA-0003
 
 ---
@@ -74,6 +80,8 @@
 2. Each API endpoint enforces role requirements.
 3. Role assignments modifiable only by administrators.
 4. Unauthorized access attempts logged and rejected with 403.
+
+**Current Implementation:** `require_role` dependency enforced on all 5 patient endpoints with per-endpoint role lists (admin/physician/nurse for read & create, admin/physician for update, admin only for deactivate). Encounter, medication, and report endpoint RBAC not yet implemented.
 
 **Decomposes To:** SUB-PR-0002, SUB-CW-0002, SUB-MM-0007, SUB-RA-0005
 
