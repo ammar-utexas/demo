@@ -1,8 +1,8 @@
 # System Specification: Patient Management System (PMS)
 
 **Document ID:** PMS-SYS-SPEC-001
-**Version:** 1.0
-**Date:** 2026-02-15
+**Version:** 1.1
+**Date:** 2026-02-16
 **Status:** Approved
 
 ---
@@ -52,7 +52,7 @@ All components share a documentation submodule (`ammar-utexas/demo`) containing 
 
 | Code | Subsystem | Scope | Primary Actor |
 |---|---|---|---|
-| SUB-PR | Patient Records | Demographics, medical history, documents, consent, encrypted PHI | All roles |
+| SUB-PR | Patient Records | Demographics, medical history, documents, consent, encrypted PHI, AI vision (wound assessment, patient ID verification, document OCR) | All roles |
 | SUB-CW | Clinical Workflow | Scheduling, encounters, status tracking, clinical notes, referrals | Physicians, Nurses |
 | SUB-MM | Medication Management | Prescriptions, drug interactions, formulary, dispensing | Physicians, Pharmacists |
 | SUB-RA | Reporting & Analytics | Clinical dashboards, compliance reports, audit log queries | Administrators, Compliance |

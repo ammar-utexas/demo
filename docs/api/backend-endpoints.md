@@ -2,6 +2,7 @@
 
 **Base URL:** `http://localhost:8000`
 **Docs:** `http://localhost:8000/docs` (Swagger UI)
+**Last Updated:** 2026-02-16
 
 ## Authentication
 
@@ -84,7 +85,7 @@ Note: SSN is encrypted at rest (SYS-REQ-0002) and never returned in responses.
 {
   "id": "uuid",
   "patient_id": "uuid",
-  "encounter_type": "office_visit | telehealth",
+  "encounter_type": "office_visit | telehealth | emergency | follow_up",
   "status": "scheduled | in_progress | completed | cancelled",
   "reason": "string | null",
   "notes": "string | null",
@@ -162,6 +163,60 @@ All report endpoints currently return stub data:
 
 ---
 
+## Vision (SUB-PR-0009, SUB-PR-0010, SUB-PR-0011)
+
+All vision endpoints require authentication and are gated behind feature flags. When a feature flag is disabled, the endpoint returns `501 Not Implemented`. All endpoints currently return stub data until TensorRT models are deployed.
+
+| Method | Path | Description | Auth | Feature Flag |
+|--------|------|-------------|------|-------------|
+| POST | `/vision/wound-assessment` | AI wound severity assessment | Yes | `FEATURE_SUB_PR_0009_WOUND_ASSESSMENT` |
+| POST | `/vision/patient-id-verify` | Patient identity verification via photo | Yes | `FEATURE_SUB_PR_0010_PATIENT_ID_VERIFY` |
+| POST | `/vision/document-ocr` | Document text extraction via OCR | Yes | `FEATURE_SUB_PR_0011_DOCUMENT_OCR` |
+
+### POST `/vision/wound-assessment`
+
+**Request:** `multipart/form-data` with `file` (image upload)
+
+**Response (200):**
+```json
+{
+  "severity": "mild | moderate | severe | critical",
+  "area_percentage": 12.5,
+  "description": "string",
+  "confidence": 0.87
+}
+```
+
+### POST `/vision/patient-id-verify`
+
+**Request:** `multipart/form-data` with `file` (image upload) + query param `patient_id` (UUID)
+
+**Response (200):**
+```json
+{
+  "match": true,
+  "confidence": 0.94
+}
+```
+
+### POST `/vision/document-ocr`
+
+**Request:** `multipart/form-data` with `file` (image upload)
+
+**Response (200):**
+```json
+{
+  "extracted_text": "string",
+  "fields": {
+    "patient_name": "string",
+    "date_of_birth": "string",
+    "insurance_id": "string"
+  }
+}
+```
+
+---
+
 ## Health
 
 | Method | Path | Description | Auth |
@@ -178,3 +233,5 @@ All report endpoints currently return stub data:
 - **IDs**: All entity IDs are UUIDs.
 - **Timestamps**: ISO 8601 with timezone (`2024-01-15T10:30:00+00:00`).
 - **Errors**: Standard FastAPI error responses (`{"detail": "message"}`).
+- **Feature flags**: Vision endpoints return `501` when their flag is disabled.
+- **Stub endpoints**: Most endpoints return placeholder data. See [Initial Project Scaffolds](../features/initial-project-scaffolds.md) for details.

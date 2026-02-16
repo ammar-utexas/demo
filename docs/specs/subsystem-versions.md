@@ -15,12 +15,12 @@
 
 | Subsystem | Current Version | Requirements Complete | Requirements Total | Last Updated |
 |---|---|---|---|---|
-| Patient Records (SUB-PR) | SUB-PR-v0.0 | 0 | 8 | 2026-02-15 |
-| Clinical Workflow (SUB-CW) | SUB-CW-v0.0 | 0 | 8 | 2026-02-15 |
-| Medication Management (SUB-MM) | SUB-MM-v0.0 | 0 | 9 | 2026-02-15 |
-| Reporting & Analytics (SUB-RA) | SUB-RA-v0.0 | 0 | 7 | 2026-02-15 |
+| Patient Records (SUB-PR) | SUB-PR-v0.0 | 0 | 11 | 2026-02-16 |
+| Clinical Workflow (SUB-CW) | SUB-CW-v0.0 | 0 | 8 | 2026-02-16 |
+| Medication Management (SUB-MM) | SUB-MM-v0.0 | 0 | 9 | 2026-02-16 |
+| Reporting & Analytics (SUB-RA) | SUB-RA-v0.0 | 0 | 7 | 2026-02-16 |
 
-**Note:** All requirements are currently in "Placeholder" or "Not Started" status. Subsystem versions will begin incrementing as requirements are implemented and verified through the testing strategy defined in [Testing Strategy](testing-strategy.md).
+**Note:** All requirements are currently in "Placeholder" or "Not Started" status. SUB-PR was updated from 8 to 11 requirements after adding vision capabilities (SUB-PR-0009 through SUB-PR-0011). Subsystem versions will begin incrementing as requirements are implemented and verified through the testing strategy defined in [Testing Strategy](testing-strategy.md).
 
 ## Version History
 
@@ -29,6 +29,7 @@
 | Version | Date | Requirements Completed | Notes |
 |---|---|---|---|
 | SUB-PR-v0.0 | 2026-02-15 | — | Initial scaffold; CRUD stubs, encryption service, audit middleware in place |
+| — | 2026-02-16 | — | Added vision endpoints (SUB-PR-0009, 0010, 0011) with stubs; total reqs now 11 |
 
 ### SUB-CW (Clinical Workflow)
 

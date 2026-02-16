@@ -1,8 +1,8 @@
 # System-Level Requirements (SYS-REQ)
 
 **Document ID:** PMS-SYS-REQ-001
-**Version:** 1.0
-**Date:** 2026-02-15
+**Version:** 1.1
+**Date:** 2026-02-16
 **Parent:** [System Specification](../system-spec.md)
 
 ---

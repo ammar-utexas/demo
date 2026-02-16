@@ -1,8 +1,8 @@
 # Subsystem Requirements: Patient Records (SUB-PR)
 
 **Document ID:** PMS-SUB-PR-001
-**Version:** 1.0
-**Date:** 2026-02-15
+**Version:** 1.1
+**Date:** 2026-02-16
 **Parent:** [System Requirements](SYS-REQ.md)
 
 ---
