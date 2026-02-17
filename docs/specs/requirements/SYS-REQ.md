@@ -1,8 +1,8 @@
 # System-Level Requirements (SYS-REQ)
 
 **Document ID:** PMS-SYS-REQ-001
-**Version:** 1.3
-**Date:** 2026-02-16
+**Version:** 1.4
+**Date:** 2026-02-17
 **Parent:** [System Specification](../system-spec.md)
 
 ---
@@ -15,7 +15,7 @@
 | SYS-REQ-0002 | Encrypt all patient data at rest using AES-256 and in transit using TLS 1.3 | Critical | Inspection / Test | Partial |
 | SYS-REQ-0003 | Maintain a complete audit trail of all data access and modifications with user ID, timestamp, action, and resource | Critical | Test | Partial |
 | SYS-REQ-0004 | Support HL7 FHIR R4 for patient data exchange with external EHR systems | High | Test / Demo | Not Started |
-| SYS-REQ-0005 | Enforce role-based access control with minimum four roles: physician, nurse, administrator, billing | Critical | Test | Partial |
+| SYS-REQ-0005 | Enforce role-based access control with minimum five roles: physician, nurse, administrator, billing, pharmacist | Critical | Test | Partial |
 | SYS-REQ-0006 | Generate real-time clinical alerts for critical lab values and drug interactions within 30 seconds | High | Test | Placeholder |
 | SYS-REQ-0007 | Support 500+ concurrent users with API response times under 2 seconds | High | Load Test | Not Started |
 | SYS-REQ-0008 | Provide a web-based interface accessible from modern browsers (Chrome, Firefox, Safari, Edge) | High | Demo | Scaffolded |
@@ -76,12 +76,15 @@
 **Rationale:** HIPAA Security Rule §164.312(a)(1) requires access controls.
 
 **Acceptance Criteria:**
-1. Four roles defined: physician, nurse, administrator, billing.
+1. Five roles defined: physician, nurse, administrator, billing, pharmacist.
 2. Each API endpoint enforces role requirements.
 3. Role assignments modifiable only by administrators.
 4. Unauthorized access attempts logged and rejected with 403.
+5. A consolidated RBAC matrix maps every endpoint to its allowed roles across all subsystems.
 
 **Current Implementation:** `require_role` dependency enforced on all 5 patient endpoints with per-endpoint role lists (admin/physician/nurse for read & create, admin/physician for update, admin only for deactivate). Encounter, medication, and report endpoint RBAC not yet implemented.
+
+> **Governance note (PC-BE-04):** The pharmacist role is required by SUB-MM-0007 (medication dispensing). The original 4-role model has been expanded to 5 roles to eliminate the cross-subsystem role inconsistency.
 
 **Decomposes To:** SUB-PR-0002 (→ BE), SUB-CW-0002 (→ BE), SUB-MM-0007 (→ BE), SUB-RA-0005 (→ BE)
 
