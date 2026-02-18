@@ -1,9 +1,9 @@
 # Requirements Traceability Matrix (RTM)
 
 **Document ID:** PMS-RTM-001
-**Version:** 1.4
-**Date:** 2026-02-16
-**Last Updated:** 2026-02-16
+**Version:** 1.5
+**Date:** 2026-02-18
+**Last Updated:** 2026-02-18
 
 ---
 
@@ -11,16 +11,17 @@
 
 | System Req | Subsystem Reqs | Backend Module(s) | Test Case(s) | Verification Status |
 |---|---|---|---|---|
-| SYS-REQ-0001 (MFA) | SUB-PR-0001, SUB-CW-0001, SUB-MM-0006, SUB-RA-0004 | `middleware/auth.py`, `services/auth_service.py` | TST-PR-0001, TST-CW-0001, TST-MM-0006, TST-RA-0004, TST-AUTH-0001 | Partial (JWT auth enforced on patient endpoints; MFA not yet implemented) |
+| SYS-REQ-0001 (MFA) | SUB-PR-0001, SUB-CW-0001, SUB-MM-0006, SUB-RA-0004, SUB-PM-0001 | `middleware/auth.py`, `services/auth_service.py` | TST-PR-0001, TST-CW-0001, TST-MM-0006, TST-RA-0004, TST-PM-0001, TST-AUTH-0001 | Partial (JWT auth enforced on patient endpoints; MFA not yet implemented) |
 | SYS-REQ-0002 (Encryption) | SUB-PR-0004, SUB-MM-0003 | `services/encryption_service.py`, `services/patient_service.py` | TST-PR-0004, TST-MM-0003, TST-SYS-0002 | Partial (patient SSN encryption implemented) |
-| SYS-REQ-0003 (Audit) | SUB-PR-0005, SUB-CW-0004, SUB-MM-0004, SUB-RA-0003 | `services/audit_service.py`, `middleware/audit.py`, `routers/patients.py` | TST-PR-0005, TST-CW-0004, TST-MM-0004, TST-RA-0003, TST-SYS-0003 | Partial (patient endpoint audit logging implemented) |
+| SYS-REQ-0003 (Audit) | SUB-PR-0005, SUB-CW-0004, SUB-MM-0004, SUB-RA-0003, SUB-PM-0005 | `services/audit_service.py`, `middleware/audit.py`, `routers/patients.py` | TST-PR-0005, TST-CW-0004, TST-MM-0004, TST-RA-0003, TST-PM-0005, TST-SYS-0003 | Partial (patient endpoint audit logging implemented) |
 | SYS-REQ-0004 (FHIR) | SUB-MM-0005 | — | TST-MM-0005, TST-SYS-0004 | Not Started |
-| SYS-REQ-0005 (RBAC) | SUB-PR-0002, SUB-CW-0002, SUB-MM-0007, SUB-RA-0005 | `middleware/auth.py:require_role`, `routers/patients.py` | TST-PR-0002, TST-CW-0002, TST-MM-0007, TST-RA-0005, TST-SYS-0005 | Partial (patient endpoints enforce role-based access) |
+| SYS-REQ-0005 (RBAC) | SUB-PR-0002, SUB-CW-0002, SUB-MM-0007, SUB-RA-0005, SUB-PM-0002 | `middleware/auth.py:require_role`, `routers/patients.py` | TST-PR-0002, TST-CW-0002, TST-MM-0007, TST-RA-0005, TST-PM-0002, TST-SYS-0005 | Partial (patient endpoints enforce role-based access) |
 | SYS-REQ-0006 (Alerts) | SUB-MM-0001, SUB-MM-0002, SUB-CW-0005 | `services/interaction_checker.py` | TST-MM-0001, TST-MM-0002, TST-CW-0005, TST-SYS-0006 | Partial (stub endpoint only) |
 | SYS-REQ-0007 (Performance) | — | — | TST-SYS-0007 | Not Started |
 | SYS-REQ-0008 (Web UI) | — | — | TST-SYS-0008 | Scaffolded |
 | SYS-REQ-0009 (Android) | — | — | TST-SYS-0009 | Scaffolded |
 | SYS-REQ-0010 (Docker) | — | `Dockerfile` (all repos) | TST-SYS-0010 | Scaffolded |
+| SYS-REQ-0011 (Prompts) | SUB-PM-0003, SUB-PM-0004, SUB-PM-0006, SUB-PM-0007 | — | TST-PM-0003, TST-PM-0004, TST-PM-0006, TST-PM-0007, TST-SYS-0011 | Not Started |
 
 ---
 
@@ -84,6 +85,19 @@
 | TST-FE-0003 | InteractionWarning type matches schema | pms-frontend | — | SUB-MM-0002 | PASS | RUN-2026-02-15-002 |
 | TST-AND-0001 | PatientEntity roundtrip mapping | pms-android | — | SUB-PR-0003 | — | — |
 | TST-AND-0002 | Model serialization (TokenRequest, InteractionWarning) | pms-android | — | SYS-REQ-0001, SUB-MM-0002 | — | — |
+| TST-PM-0001-BE | Verify prompt endpoints require auth token | pms-backend | — (not implemented) | SUB-PM-0001, SYS-REQ-0001 | — | — |
+| TST-PM-0001-WEB | Verify prompt pages enforce auth guard | pms-frontend | — (not implemented) | SUB-PM-0001, SYS-REQ-0001 | — | — |
+| TST-PM-0002-BE | Verify RBAC enforcement on prompt endpoints (admin CRUD, admin+physician read) | pms-backend | — (not implemented) | SUB-PM-0002, SYS-REQ-0005 | — | — |
+| TST-PM-0003-BE | Prompt CRUD operations and name uniqueness (409 on duplicate) | pms-backend | — (not implemented) | SUB-PM-0003, SYS-REQ-0011 | — | — |
+| TST-PM-0003-WEB | Prompt CRUD forms render and submit correctly | pms-frontend | — (not implemented) | SUB-PM-0003, SYS-REQ-0011 | — | — |
+| TST-PM-0004-BE | Auto-versioning creates immutable version on text save | pms-backend | — (not implemented) | SUB-PM-0004, SYS-REQ-0011 | — | — |
+| TST-PM-0004-WEB | Version indicator displays current version in prompt editor | pms-frontend | — (not implemented) | SUB-PM-0004, SYS-REQ-0011 | — | — |
+| TST-PM-0005-BE | Audit log entries created on all prompt operations | pms-backend | — (not implemented) | SUB-PM-0005, SYS-REQ-0003 | — | — |
+| TST-PM-0006-BE | Paginated version history returns correct page with total count | pms-backend | — (not implemented) | SUB-PM-0006, SYS-REQ-0011 | — | — |
+| TST-PM-0006-WEB | Version history list displays with pagination controls | pms-frontend | — (not implemented) | SUB-PM-0006, SYS-REQ-0011 | — | — |
+| TST-PM-0007-BE | Version comparison endpoint returns LLM-generated diff summary | pms-backend | — (not implemented) | SUB-PM-0007, SYS-REQ-0011 | — | — |
+| TST-PM-0007-WEB | Comparison UI renders version selector and diff display | pms-frontend | — (not implemented) | SUB-PM-0007, SYS-REQ-0011 | — | — |
+| TST-PM-0007-AI | Anthropic Claude API integration returns valid comparison | pms-backend | — (not implemented) | SUB-PM-0007, SYS-REQ-0011 | — | — |
 
 ### System Tests (End-to-End)
 
@@ -98,6 +112,7 @@
 | TST-SYS-0008 | Web frontend renders all pages without errors | SYS-REQ-0008 | — | — |
 | TST-SYS-0009 | Android app renders all screens without crashes | SYS-REQ-0009 | — | — |
 | TST-SYS-0010 | All Dockerfiles build and containers start | SYS-REQ-0010 | — | — |
+| TST-SYS-0011 | End-to-end prompt management: create, version, compare | SYS-REQ-0011 | — | — |
 
 ---
 
@@ -172,15 +187,27 @@ Compact view of platform requirement status per domain requirement. Domain statu
 | SUB-RA-0006 | Placeholder | Placeholder | Not Started | Not Started | — |
 | SUB-RA-0007 | Not Started | Not Started | — | — | — |
 
+### SUB-PM — Prompt Management (13 platform reqs)
+
+| Domain Req | Domain Status | BE | WEB | AND | AI |
+|---|---|---|---|---|---|
+| SUB-PM-0001 | Not Started | Not Started | Not Started | — | — |
+| SUB-PM-0002 | Not Started | Not Started | — | — | — |
+| SUB-PM-0003 | Not Started | Not Started | Not Started | — | — |
+| SUB-PM-0004 | Not Started | Not Started | Not Started | — | — |
+| SUB-PM-0005 | Not Started | Not Started | — | — | — |
+| SUB-PM-0006 | Not Started | Not Started | Not Started | — | — |
+| SUB-PM-0007 | Not Started | Not Started | Not Started | — | Not Started |
+
 ### Coverage Summary by Platform
 
 | Platform | Total Reqs | Verified | Implemented | Partial | Scaffolded | Placeholder | Not Started |
 |---|---|---|---|---|---|---|---|
-| BE | 35 | 3 | 2 | 0 | 0 | 16 | 14 |
-| WEB | 14 | 0 | 0 | 0 | 5 | 0 | 9 |
+| BE | 42 | 3 | 2 | 0 | 0 | 16 | 21 |
+| WEB | 19 | 0 | 0 | 0 | 5 | 0 | 14 |
 | AND | 17 | 0 | 0 | 0 | 4 | 0 | 13 |
-| AI | 3 | 0 | 0 | 0 | 0 | 0 | 3 |
-| **Total** | **69** | **3** | **2** | **0** | **9** | **16** | **39** |
+| AI | 4 | 0 | 0 | 0 | 0 | 0 | 4 |
+| **Total** | **82** | **3** | **2** | **0** | **9** | **16** | **52** |
 
 ### Test ID Migration Note
 
@@ -205,12 +232,15 @@ Existing test IDs are preserved as-is in the backward traceability section. The 
 
 | Subsystem | Domain Reqs | Platform Reqs | With Tests | Passing | Failing | No Tests | Domain Coverage |
 |---|---|---|---|---|---|---|---|
-| Patient Records (PR) | 11 | 25 | 6 | 6 | 0 | 5 | 54.5% |
+| Patient Records (PR) | 12 | 25 | 6 | 6 | 0 | 6 | 50.0% |
 | Clinical Workflow (CW) | 8 | 14 | 1 | 1 | 0 | 7 | 12.5% |
 | Medication Mgmt (MM) | 9 | 13 | 2 | 2 | 0 | 7 | 22.2% |
 | Reporting (RA) | 7 | 17 | 0 | 0 | 0 | 7 | 0.0% |
-| System (SYS) | 10 | — | 1 | 1 | 0 | 9 | 10.0% |
-| **TOTAL** | **45** | **69** | **10** | **10** | **0** | **35** | **22.2%** |
+| Prompt Mgmt (PM) | 7 | 13 | 0 | 0 | 0 | 7 | 0.0% |
+| System (SYS) | 11 | — | 1 | 1 | 0 | 10 | 9.1% |
+| **TOTAL** | **54** | **82** | **10** | **10** | **0** | **44** | **18.5%** |
+
+> **Note on v1.5 updates (SUB-PM subsystem):** Added Prompt Management (SUB-PM) subsystem with 7 domain requirements and 13 platform requirements (BE=7, WEB=5, AI=1). SYS-REQ-0011 added for centralized prompt management. Forward traceability updated for SYS-REQ-0001, 0003, 0005, and 0011. 13 backward traceability test stubs added (TST-PM-*). Platform Traceability Summary includes SUB-PM section. Coverage Summary by Platform updated: BE 35→42, WEB 14→19, AI 3→4, Total 69→82. PR domain req count corrected from 11→12 (SUB-PR-0012 was added in v1.4 but count was not updated). Overall domain coverage: 22.2%→18.5%.
 
 > **Note on v1.4 updates (three-tier decomposition):** Added Platform Traceability Summary section with 69 platform requirements across 4 platforms (BE=35, WEB=14, AND=17, AI=3). Coverage Summary by Platform added. Domain statuses updated with strict rollup — SUB-PR-0001 (Implemented → Partial), SUB-PR-0002 (Implemented → Partial), SUB-PR-0003 (Verified → Partial). Test ID migration note maps legacy TST-FE-* and TST-AND-* IDs to new platform-scoped convention. Existing backward traceability rows preserved without renaming.
 

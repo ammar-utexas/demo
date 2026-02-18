@@ -1,15 +1,15 @@
 # Requirements Governance & Conflict Analysis
 
 **Document ID:** PMS-GOV-001
-**Version:** 1.2
-**Date:** 2026-02-17
+**Version:** 1.3
+**Date:** 2026-02-18
 **Parent:** [System Specification](system-spec.md)
 
 ---
 
 ## 1. Purpose
 
-This document defines the governance procedures for evolving the PMS three-tier requirements decomposition (System → Domain → Platform) and provides a systematic conflict and race condition analysis across all 36 domain requirements and 69 platform requirements.
+This document defines the governance procedures for evolving the PMS three-tier requirements decomposition (System → Domain → Platform) and provides a systematic conflict and race condition analysis across all 43 domain requirements and 82 platform requirements.
 
 ---
 
@@ -106,7 +106,15 @@ Conflicts where two or more requirements within the same domain subsystem impose
 |---|---|---|---|---|---|
 | DC-RA-01 | **Audit log access role gap** — SUB-RA-0003 provides an audit log query interface (required by SYS-REQ-0003 for HIPAA compliance). SUB-RA-0005 restricts report access to administrator and billing roles. Compliance officers need audit log access but the system defines no compliance officer role (SYS-REQ-0005 specifies only 4 roles: physician, nurse, administrator, billing). | SUB-RA-0003 vs SUB-RA-0005 | High | Either (a) extend the role model to include a "compliance" role with audit-read-only access, which requires updating SYS-REQ-0005, or (b) grant administrators audit log access and designate compliance duties to the administrator role. Option (b) is recommended for v1.0 with option (a) deferred to a future RBAC enhancement. | **Resolved** — Option (b) adopted. SUB-RA-0003 and SUB-RA-0005 updated to grant administrator role audit log access. Compliance role deferred. |
 
-**Total intra-domain conflicts: 11 (all resolved)**
+### SUB-PM — Prompt Management (3 conflicts)
+
+| ID | Conflict | Requirements | Severity | Resolution | Status |
+|---|---|---|---|---|---|
+| DC-PM-01 | **Prompt name uniqueness TOCTOU** — SUB-PM-0003 requires unique prompt names. The service layer may check uniqueness with a SELECT before INSERT. Between the check and the insert, another concurrent request may create a prompt with the same name. The pre-check passes for both, but the second insert violates the unique constraint. | SUB-PM-0003 | Low | The database unique constraint on `name` is the authoritative enforcement. The service-layer pre-check is a UX optimization (fast feedback), not a safety mechanism. The service must catch `IntegrityError` on insert and translate it to HTTP 409. This mirrors the SUB-PR-0006 / DC-PR-04 pattern. | **Resolved** — SUB-PM-0003 specifies IntegrityError → 409 as authoritative enforcement. |
+| DC-PM-02 | **Concurrent version creation** — SUB-PM-0004 requires auto-incrementing version numbers for each prompt. Two concurrent save operations may both read `MAX(version) = N` and both attempt to create version `N+1`, causing a duplicate or overwrite. | SUB-PM-0004 | High | Use `SELECT MAX(version) FROM prompt_versions WHERE prompt_id = ? FOR UPDATE` to serialize concurrent version creation at the database row level. The `FOR UPDATE` lock ensures only one transaction reads and increments at a time. This mirrors the RC-BE-01 / RC-BE-02 pattern. | **Resolved** — SUB-PM-0004 and SUB-PM-0004-BE specify `FOR UPDATE` serialization. |
+| DC-PM-03 | **Cross-prompt comparison** — SUB-PM-0007 provides LLM-powered version comparison. A malicious or buggy request could attempt to compare versions across different prompts by supplying version IDs from different prompt records, potentially leaking prompt content across authorization boundaries. | SUB-PM-0007 | Medium | The comparison endpoint must validate that both requested versions belong to the same prompt ID specified in the URL path. Reject with 400 Bad Request if either version does not belong to the path-scoped prompt. | **Resolved** — SUB-PM-0007-BE specifies path-scoped endpoint validation for both versions. |
+
+**Total intra-domain conflicts: 14 (all resolved)**
 
 ---
 
@@ -114,7 +122,7 @@ Conflicts where two or more requirements within the same domain subsystem impose
 
 Conflicts where platform-specific requirements across different subsystems or platforms impose contradictory obligations on a shared component, API, or resource.
 
-### Backend (BE) — 5 conflicts
+### Backend (BE) — 7 conflicts
 
 | ID | Conflict | Requirements | Severity | Resolution | Status |
 |---|---|---|---|---|---|
@@ -123,13 +131,16 @@ Conflicts where platform-specific requirements across different subsystems or pl
 | PC-BE-03 | **Inconsistent audit logging** — SUB-PR-0005-BE is implemented (all 5 router methods call `audit_service.log_action`). SUB-CW-0004-BE, SUB-MM-0004-BE are placeholders. When encounter and medication audit logging is implemented, the audit schema, field names, and action strings must match the pattern established by patient audit logging — but no formal audit event catalog exists. | SUB-PR-0005-BE vs SUB-CW-0004-BE vs SUB-MM-0004-BE | Medium | Create an audit event catalog defining: action strings (CREATE, READ, UPDATE, DELETE, DEACTIVATE), resource_type values (patient, encounter, prescription), and required fields. Existing patient audit calls already set the pattern; formalize it before implementing encounter/medication audit logging. | **Resolved** — SUB-CW-0004-BE and SUB-MM-0004-BE updated to reference the audit event catalog with standardized action strings and resource_type values. |
 | PC-BE-04 | **Role matrix inconsistency across subsystems** — SUB-PR-0002-BE grants access to admin/physician/nurse (with admin/physician for updates). SUB-RA-0005-BE restricts to administrator/billing. SUB-MM-0007-BE introduces pharmacist (not in SYS-REQ-0005's role list). The system defines 4 roles but the subsystems collectively reference 5 (physician, nurse, administrator, billing, pharmacist). | SUB-PR-0002-BE vs SUB-MM-0007-BE vs SUB-RA-0005-BE | High | Update SYS-REQ-0005 to define 5 roles (add pharmacist), or clarify that pharmacist is a specialization of an existing role. Create a consolidated RBAC matrix document mapping every endpoint to allowed roles. | **Resolved** — SYS-REQ-0005 updated to define 5 roles (pharmacist added). Consolidated RBAC matrix added as acceptance criterion. |
 | PC-BE-05 | **Interaction check SLA under CRUD load** — SUB-MM-0001-BE requires a 5-second response for interaction checks. During peak load, concurrent CRUD operations (SUB-PR-0003-BE, SUB-CW-0003-BE) compete for the same database connection pool. No priority mechanism exists for safety-critical queries. | SUB-MM-0001-BE vs SUB-PR-0003-BE, SUB-CW-0003-BE | Medium | Implement a dedicated connection pool (or priority queue) for medication-safety queries. Alternatively, set the database connection pool size large enough that CRUD load does not block interaction checks. Add SLA monitoring for the interaction check endpoint. | **Resolved** — SUB-MM-0001-BE updated to require dedicated connection pool or priority queue for medication-safety queries. |
+| PC-BE-06 | **Shared auth middleware (prompt endpoints)** — SUB-PM-0001-BE enforces JWT auth through the same `middleware/auth.py` shared by SUB-PR-0001-BE, SUB-CW-0001-BE, SUB-MM-0006-BE, and SUB-RA-0004-BE. A change to the auth middleware affects all subsystems simultaneously. | SUB-PM-0001-BE vs SUB-PR-0001-BE, SUB-CW-0001-BE, SUB-MM-0006-BE, SUB-RA-0004-BE | Low | Follows PC-BE-02 precedent — shared auth middleware is acceptable for the monolithic backend (DRY principle). Mitigate regression risk by maintaining TST-AUTH-0001 as a cross-cutting system test. No requirements change needed. | **Resolved** — Accepted as designed, following PC-BE-02 precedent. |
+| PC-BE-07 | **Audit catalog extension** — SUB-PM-0005-BE introduces new audit action strings (PROMPT_CREATE, PROMPT_READ, PROMPT_UPDATE, PROMPT_DELETE, VERSION_CREATE, VERSION_COMPARE) and resource type `prompt`. These must be added to the audit event catalog established by PC-BE-03 without conflicting with existing action strings. | SUB-PM-0005-BE vs SUB-PR-0005-BE, SUB-CW-0004-BE, SUB-MM-0004-BE | Medium | Add the new action strings and resource type to the audit event catalog. The PROMPT_* and VERSION_* prefixes are unique and do not collide with existing CREATE/READ/UPDATE/DELETE/DEACTIVATE action strings used by other subsystems. | **Resolved** — SUB-PM-0005-BE specifies the new action strings. Audit event catalog updated. |
 
-### Web Frontend (WEB) — 2 conflicts
+### Web Frontend (WEB) — 3 conflicts
 
 | ID | Conflict | Requirements | Severity | Resolution | Status |
 |---|---|---|---|---|---|
 | PC-WEB-01 | **Shared auth guard module** — SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, and SUB-RA-0004-WEB all reference `lib/auth.ts` for auth guards. Different subsystems may need different guard behaviors (e.g., reports require admin/billing role check in the guard, while patient pages allow nurse access). A single auth guard implementation risks either over-permitting or under-permitting. | SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, SUB-RA-0004-WEB | Medium | `lib/auth.ts` should provide a parameterized guard (e.g., `requireRole(['admin', 'physician'])`) rather than a single hardcoded check. Each page passes its allowed roles. The guard is shared; the role lists are subsystem-specific. | **Resolved** — SUB-PR-0001-WEB updated to specify parameterized auth guard with subsystem-specific role lists. |
 | PC-WEB-02 | **Inconsistent patient data between list and dashboard** — SUB-PR-0008-WEB shows paginated patient lists with current data. SUB-RA-0001-WEB shows patient volume dashboards with aggregated data. If the dashboard caches aggregated counts while the patient list shows real-time data, the numbers may disagree within the same user session. | SUB-PR-0008-WEB vs SUB-RA-0001-WEB | Low | Add a cache TTL and "last refreshed" timestamp to the dashboard. Accept eventual consistency (reporting data may lag real-time data by up to the cache TTL). Document this in SUB-RA-0001-WEB acceptance criteria. | **Resolved** — SUB-RA-0001-WEB updated with cache TTL and "last refreshed" timestamp requirement. |
+| PC-WEB-03 | **Shared auth guard (prompt pages)** — SUB-PM-0001-WEB uses the parameterized `requireRole` guard from `lib/auth.ts` shared by SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, and SUB-RA-0004-WEB. Different prompt pages may need role combinations (admin-only for mutation pages, admin+physician for read pages). | SUB-PM-0001-WEB vs SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, SUB-RA-0004-WEB | Low | Follows PC-WEB-01 precedent — the parameterized guard supports subsystem-specific role lists. Prompt pages pass `['admin']` for mutation routes and `['admin', 'physician']` for read routes. No code change to the guard itself is needed. | **Resolved** — Accepted as designed, following PC-WEB-01 precedent. SUB-PM-0001-WEB specifies role lists per route. |
 
 ### Android (AND) — 2 conflicts
 
@@ -138,7 +149,7 @@ Conflicts where platform-specific requirements across different subsystems or pl
 | PC-AND-01 | **Camera resource contention** — SUB-PR-0009-AND (wound assessment), SUB-PR-0010-AND (patient ID verification), and SUB-PR-0011-AND (document OCR) all require camera access. Android's CameraX allows only one active camera session. Rapid switching between features without proper lifecycle management will cause `CameraAccessException` or ANR. | SUB-PR-0009-AND, SUB-PR-0010-AND, SUB-PR-0011-AND | High | Implement a `CameraSessionManager` singleton that serializes camera access. Each vision feature requests and releases the camera through this manager. Use Kotlin coroutines with a `Mutex` to prevent concurrent access. | **Resolved** — SUB-PR-0012 added for CameraSessionManager. SUB-PR-0009/0010/0011-AND all reference CameraSessionManager. |
 | PC-AND-02 | **Shared auth interceptor coupling** — SUB-PR-0001-AND, SUB-CW-0001-AND, SUB-MM-0006-AND, and SUB-RA-0004-AND all share `AuthInterceptor.kt`. The interceptor handles token refresh, but if multiple concurrent API calls trigger refresh simultaneously, duplicate refresh requests are sent. | SUB-PR-0001-AND, SUB-CW-0001-AND, SUB-MM-0006-AND, SUB-RA-0004-AND | Medium | Implement token refresh synchronization in `AuthInterceptor.kt`: use a `Mutex` to serialize refresh attempts. The first caller performs the refresh; subsequent callers wait and reuse the new token. OkHttp's `Authenticator` interface supports this pattern natively. | **Resolved** — SUB-PR-0001-AND updated with Mutex-based token refresh synchronization requirement. |
 
-**Total cross-platform conflicts: 9 (all resolved)**
+**Total cross-platform conflicts: 12 (all resolved)**
 
 ---
 
@@ -146,7 +157,7 @@ Conflicts where platform-specific requirements across different subsystems or pl
 
 Race conditions identified per platform where concurrent operations can produce incorrect, inconsistent, or unsafe states.
 
-### Backend (BE) — 8 race conditions
+### Backend (BE) — 10 race conditions
 
 | ID | Race Condition | Requirements | Severity | Mitigation | Status |
 |---|---|---|---|---|---|
@@ -158,6 +169,8 @@ Race conditions identified per platform where concurrent operations can produce 
 | RC-BE-06 | **Patient deactivation during active encounter** — An administrator deactivates a patient (SUB-PR-0003-BE) while a physician has an in_progress encounter for that patient (SUB-CW-0003-BE). The encounter references a now-inactive patient. Should the encounter be auto-cancelled? Should deactivation be blocked? | SUB-PR-0003-BE vs SUB-CW-0003-BE | High | Block patient deactivation if the patient has any encounter in non-terminal status (scheduled or in_progress). Return 409 with a message listing the blocking encounter IDs. The administrator must first complete or cancel the open encounters, then deactivate. | **Resolved** — SUB-PR-0003 and SUB-PR-0003-BE updated to require blocking deactivation when non-terminal encounters exist (return 409). |
 | RC-BE-07 | **Prescription status change during interaction check** — A pharmacist cancels a prescription (SUB-MM-0008-BE) while an interaction check (SUB-MM-0001-BE) is running against the patient's active medications. The interaction check may include or exclude the cancelled prescription depending on when the cancellation commits. | SUB-MM-0001-BE vs SUB-MM-0008-BE | Medium | The interaction check should read active medications within a single database transaction with `REPEATABLE READ` isolation. This provides a consistent snapshot regardless of concurrent status changes. The check result reflects the state at check-start time. | **Resolved** — SUB-MM-0001-BE updated to require `REPEATABLE READ` isolation for interaction checks. |
 | RC-BE-08 | **Concurrent refill decrement** — Two pharmacy terminals simultaneously process a refill for the same prescription (SUB-MM-0009-BE). Both read `refills_remaining = 1`, both decrement to 0, and both dispense. The patient receives one extra fill. | SUB-MM-0009-BE | Critical | Use an atomic update: `UPDATE prescriptions SET refills_remaining = refills_remaining - 1 WHERE id = ? AND refills_remaining > 0`. Check the affected row count — if 0, the refill was already claimed. Do not read-then-write in application code. | **Resolved** — SUB-MM-0009 and SUB-MM-0009-BE updated to require atomic update with row-count check. |
+| RC-BE-09 | **Concurrent prompt update (version conflict)** — Two administrators simultaneously edit the same prompt. Both read the current text, make different changes, and submit. SUB-PM-0004's auto-versioning means both edits produce new versions (N+1 and N+2) rather than overwriting each other. However, without `FOR UPDATE` serialization, both could read `MAX(version) = N` and attempt to create version `N+1`, causing a unique constraint violation. | SUB-PM-0004-BE | Medium | The `SELECT MAX(version) ... FOR UPDATE` serialization specified in SUB-PM-0004-BE prevents this race. The first transaction acquires the lock and creates version N+1; the second transaction waits, reads N+1, and creates version N+2. Both edits are preserved as separate versions. | **Resolved** — SUB-PM-0004-BE specifies `FOR UPDATE` serialization. Auto-versioning preserves both edits. |
+| RC-BE-10 | **LLM comparison timeout under load** — Multiple administrators simultaneously request prompt version comparisons (SUB-PM-0007-BE). Each request calls the Anthropic Claude API. Under load, API responses may exceed the expected latency, consuming server threads/connections and degrading other endpoints. | SUB-PM-0007-BE | Medium | Apply a 30-second timeout on the LLM API call. Implement rate limiting on the comparison endpoint (e.g., 10 requests per minute per user). Return 504 Gateway Timeout if the LLM call exceeds 30 seconds. Return 429 Too Many Requests if rate limit is exceeded. | **Resolved** — SUB-PM-0007-BE specifies 30-second timeout and rate limiting. |
 
 ### Web Frontend (WEB) — 2 race conditions
 
@@ -173,20 +186,20 @@ Race conditions identified per platform where concurrent operations can produce 
 | RC-AND-01 | **Camera lifecycle race** — The user rapidly switches between wound assessment (SUB-PR-0009-AND), patient ID verification (SUB-PR-0010-AND), and document OCR (SUB-PR-0011-AND). CameraX's `unbind` from the previous feature may not complete before `bind` for the next feature. This causes `IllegalStateException` or a black camera preview. | SUB-PR-0009-AND, SUB-PR-0010-AND, SUB-PR-0011-AND | High | Use a `CameraSessionManager` with a state machine: `IDLE → BINDING → ACTIVE → UNBINDING → IDLE`. All camera operations go through this manager. Transitions are serialized via a coroutine `Mutex`. Feature switching requests queue behind the current unbind operation. | **Resolved** — SUB-PR-0012 defines CameraSessionManager. SUB-PR-0009/0010/0011-AND all reference it. |
 | RC-AND-02 | **Offline-sync conflict** — The Android app supports offline data entry (SUB-PR-0003-AND, SUB-CW-0003-AND). While offline, a clinician creates or modifies records. When connectivity restores, the sync pushes local changes to the backend, which may conflict with changes made by other users during the offline period. | SUB-PR-0003-AND, SUB-CW-0003-AND | High | Implement last-write-wins with conflict detection: each sync request includes the `version` or `updated_at` from when the record was last fetched. The backend returns 409 for conflicts. The Android app maintains a conflict queue and presents a resolution UI showing local vs server versions. | **Resolved** — SUB-PR-0003-AND and SUB-CW-0003-AND updated with offline-sync conflict resolution requirements. |
 
-**Total race conditions: 12 (all resolved)**
+**Total race conditions: 14 (all resolved)**
 
 ---
 
 ## 6. Summary
 
-All 32 conflicts and race conditions have been resolved at the requirements level as of v1.2 (2026-02-17). The requirements documents (SYS-REQ.md, SUB-PR.md, SUB-CW.md, SUB-MM.md, SUB-RA.md) have been updated to incorporate each resolution. Implementation of the updated requirements is tracked by the individual requirement statuses in each SUB-*.md file.
+All 40 conflicts and race conditions have been resolved at the requirements level as of v1.3 (2026-02-18). The requirements documents (SYS-REQ.md, SUB-PR.md, SUB-CW.md, SUB-MM.md, SUB-RA.md, SUB-PM.md) have been updated to incorporate each resolution. Implementation of the updated requirements is tracked by the individual requirement statuses in each SUB-*.md file.
 
 | Category | Count | Critical | High | Medium | Low | Resolved |
 |---|---|---|---|---|---|---|
-| Intra-domain conflicts | 11 | 0 | 4 | 5 | 2 | **11/11** |
-| Cross-platform conflicts | 9 | 0 | 3 | 5 | 1 | **9/9** |
-| Race conditions | 12 | 2 | 6 | 3 | 1 | **12/12** |
-| **Total** | **32** | **2** | **13** | **13** | **4** | **32/32** |
+| Intra-domain conflicts | 14 | 0 | 5 | 7 | 2 | **14/14** |
+| Cross-platform conflicts | 12 | 0 | 3 | 6 | 3 | **12/12** |
+| Race conditions | 14 | 2 | 6 | 5 | 1 | **14/14** |
+| **Total** | **40** | **2** | **14** | **18** | **6** | **40/40** |
 
 ### Implementation Priority (requirements resolved, code implementation pending)
 
@@ -213,11 +226,12 @@ Quick lookup: which requirement IDs are involved in conflicts or race conditions
 
 | Requirement | Conflict/Race IDs |
 |---|---|
-| SYS-REQ-0001 | PC-BE-02, PC-WEB-01, PC-AND-02, RC-WEB-01 |
+| SYS-REQ-0001 | PC-BE-02, PC-BE-06, PC-WEB-01, PC-WEB-03, PC-AND-02, RC-WEB-01 |
 | SYS-REQ-0002 | DC-PR-01, PC-BE-01 |
-| SYS-REQ-0003 | PC-BE-03, DC-RA-01, RC-BE-04 |
+| SYS-REQ-0003 | PC-BE-03, PC-BE-07, DC-RA-01, RC-BE-04 |
 | SYS-REQ-0005 | PC-BE-04, DC-RA-01 |
 | SYS-REQ-0006 | DC-MM-01, PC-BE-05, RC-BE-03 |
+| SYS-REQ-0011 | DC-PM-01, DC-PM-02, DC-PM-03, RC-BE-09, RC-BE-10 |
 | SUB-PR-0003 | DC-PR-02, DC-PR-04, RC-BE-01, RC-BE-06, RC-WEB-02, RC-AND-02 |
 | SUB-PR-0004 | DC-PR-01, PC-BE-01 |
 | SUB-PR-0006 | DC-PR-04, RC-BE-05 |
@@ -232,5 +246,10 @@ Quick lookup: which requirement IDs are involved in conflicts or race conditions
 | SUB-MM-0007 | DC-MM-03 |
 | SUB-MM-0008 | DC-MM-02, DC-MM-03, RC-BE-03, RC-BE-07 |
 | SUB-MM-0009 | DC-MM-02, RC-BE-08 |
+| SUB-PM-0001 | PC-BE-06, PC-WEB-03 |
+| SUB-PM-0003 | DC-PM-01 |
+| SUB-PM-0004 | DC-PM-02, RC-BE-09 |
+| SUB-PM-0005 | PC-BE-07 |
+| SUB-PM-0007 | DC-PM-03, RC-BE-10 |
 | SUB-RA-0003 | DC-RA-01, RC-BE-04 |
 | SUB-RA-0005 | DC-RA-01, PC-BE-04 |
