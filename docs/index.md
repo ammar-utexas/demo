@@ -73,6 +73,33 @@ _No bug fixes documented yet._
 
 ---
 
+## Documentation Views
+
+### By Domain
+Browse documentation organized by business/functional domain — [full index](domain/index.md)
+
+- [Property Management](domain/property-management.md) — Clinical workflows, patient records, medications, reporting
+- [Security & Compliance](domain/security-compliance.md) — HIPAA, encryption, auth, audit, scanning
+- [Vision & AI](domain/vision-ai.md) — Computer vision, AI inference, edge models
+- [Agentic AI](domain/agentic-ai.md) — OpenClaw autonomous workflow automation
+- [Frontend UI/UX](domain/frontend-ui.md) — UI design tools, component libraries, design systems
+- [Release Management](domain/release-management.md) — Versioning, deployment, compatibility, feature flags
+- [Testing & QA](domain/testing-qa.md) — Test strategy, traceability, coverage
+- [Configuration & DevOps](domain/configuration-devops.md) — Dependencies, environments, setup, CI/CD
+- [Project Management](domain/project-management.md) — Repository structure, knowledge management
+
+### By Platform
+Browse documentation organized by deployment platform — [full index](platform/index.md)
+
+- [Backend/Server](platform/backend-server.md) — FastAPI, Python, SQLAlchemy, PostgreSQL
+- [Web Frontend](platform/web-frontend.md) — Next.js 15, React 19, TypeScript, Tailwind CSS
+- [Android](platform/android.md) — Kotlin, Jetpack Compose, Hilt, Retrofit, Room
+- [Jetson/Edge](platform/jetson-edge.md) — NVIDIA Jetson Thor, TensorRT, JetPack 7.x
+- [Infrastructure/CI-CD](platform/infrastructure-cicd.md) — Docker, GitHub Actions, SonarCloud, Snyk
+- [Cross-Platform](platform/cross-platform.md) — Docs spanning all platforms
+
+---
+
 ## Specifications & Requirements
 
 The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 10 system requirements, 36 domain requirements, and 69 platform requirements across 4 platforms.
