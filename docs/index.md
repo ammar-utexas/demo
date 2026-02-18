@@ -13,6 +13,7 @@ This directory is the single source of truth for all project context, decisions,
 ## Features
 
 - [Initial Project Scaffolds](features/initial-project-scaffolds.md) — Backend, frontend, and Android app scaffolding
+- [Lab Specimen Management](features/lab-specimen-management.md) — Lab specimen tracking and management (draft)
 
 ## Bug Fixes
 
