@@ -8,14 +8,14 @@ Documentation that spans all platforms or applies system-wide.
 |----------|---------|
 | [System Spec](../specs/system-spec.md) | System scope, 3 deployable components, 4 subsystems, user roles, HIPAA constraints |
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | 10 system-level requirements with acceptance criteria |
-| [Requirements Governance](../specs/requirements-governance.md) | Governance procedures, conflict analysis across platforms |
+| [Requirements Governance](../quality/processes/requirements-governance.md) | Governance procedures, conflict analysis across platforms |
 
 ## Traceability & Testing
 
 | Document | Summary |
 |----------|---------|
-| [Traceability Matrix](../specs/requirements/traceability-matrix.md) | 69 platform reqs across 4 platforms, 157 passing tests, 22.2% coverage |
-| [Testing Strategy](../specs/testing-strategy.md) | Platform-scoped test naming, testing pyramid, per-repo commands |
+| [Traceability Matrix](../testing/traceability-matrix.md) | 69 platform reqs across 4 platforms, 157 passing tests, 22.2% coverage |
+| [Testing Strategy](../testing/testing-strategy.md) | Platform-scoped test naming, testing pyramid, per-repo commands |
 | [Subsystem Versions](../specs/subsystem-versions.md) | Per-subsystem version tracking across all platforms |
 
 ## Architecture & Structure

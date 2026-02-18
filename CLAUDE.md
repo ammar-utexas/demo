@@ -9,10 +9,25 @@ This project uses **markdown files in the `docs/` directory** as the central kno
 ```
 docs/
 ├── architecture/        # Architectural Decision Records (ADRs)
-├── features/            # Implementation details for completed features
-├── bugs/                # Root cause analyses for non-trivial bugs
 ├── api/                 # API contracts, schemas, and interface docs
+├── bugs/                # Root cause analyses for non-trivial bugs
 ├── config/              # Dependencies, environment setup, and configuration
+├── domain/              # Documentation views organized by business domain
+├── experiments/         # POC evaluations and tool integration trials
+├── features/            # Product requirements / PRDs and implementation details
+├── platform/            # Documentation views organized by deployment platform
+├── quality/             # Quality Management System (ISO 13485)
+│   ├── audits/          # Audit records
+│   ├── capa/            # Corrective and preventive actions
+│   ├── processes/       # Development processes, governance, working instructions
+│   ├── risk-management/ # Risk analyses
+│   └── standards/       # Regulatory standards (e.g., ISO 13485)
+├── specs/               # System and subsystem specifications
+│   ├── requirements/    # SYS-REQ, SUB-PR/CW/MM/RA/PM requirement docs
+│   └── ...              # System spec, subsystem versions, compatibility matrix
+├── testing/             # Test strategy, traceability matrix, evidence
+│   ├── evidence/        # Test run records
+│   └── ...              # testing-strategy.md, traceability-matrix.md
 └── index.md             # Table of contents linking to all docs
 ```
 
@@ -41,6 +56,26 @@ docs/
 **Dependencies and Configuration** (`docs/config/`)
 - Record decisions about dependencies (why chosen, alternatives rejected).
 - Document environment-specific configuration and setup steps.
+
+**Quality Management** (`docs/quality/`)
+- Store audit records, CAPA reports, and development process documentation.
+- Keep governance procedures and conflict analyses in `quality/processes/`.
+- Store risk management artifacts in `quality/risk-management/`.
+- Regulatory standards (e.g., ISO 13485) go in `quality/standards/`.
+
+**Specifications & Requirements** (`docs/specs/`)
+- System specification and subsystem requirement documents live here.
+- All requirement files (SYS-REQ, SUB-*) go in `specs/requirements/`.
+- Subsystem versions and release compatibility matrices stay at the specs level.
+
+**Testing & Traceability** (`docs/testing/`)
+- Store the testing strategy and traceability matrix here.
+- Test run evidence (RUN-*.md records) goes in `testing/evidence/`.
+- Update the traceability matrix whenever requirement or test status changes.
+
+**Experiments & POC Evaluations** (`docs/experiments/`)
+- Document proof-of-concept evaluations and tool integration trials.
+- Use numbered prefixes for grouping related experiments (e.g., `00-Tambo-*`, `05-OpenClaw-*`).
 
 ### When to Update Docs
 

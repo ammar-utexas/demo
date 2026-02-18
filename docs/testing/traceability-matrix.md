@@ -265,4 +265,4 @@ Existing test IDs are preserved as-is in the backward traceability section. The 
 2. After writing a test, add the test case row to the "Backward Traceability" section above. Include the `Test Function` name.
 3. After each test run, add a row to the "Test Run Log" and update "Last Result" and "Run ID" columns.
 4. Re-generate the "Coverage Summary" by counting requirements with/without passing tests.
-5. Commit all changes: `git add docs/specs/ && git commit -m "evidence: update RTM" && git push`.
+5. Commit all changes: `git add docs/specs/ docs/testing/ && git commit -m "evidence: update RTM" && git push`.

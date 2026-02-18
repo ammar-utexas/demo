@@ -8,7 +8,7 @@ HIPAA compliance, encryption, authentication, authorization, audit trails, and s
 |----------|---------|
 | [System Spec](../specs/system-spec.md) | HIPAA regulatory constraints, quality attributes |
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | MFA (SYS-01), AES-256 encryption (SYS-02), audit trails (SYS-03), RBAC (SYS-05) |
-| [Requirements Governance](../specs/requirements-governance.md) | 2 critical race conditions identified in security-related workflows |
+| [Requirements Governance](../quality/processes/requirements-governance.md) | 2 critical race conditions identified in security-related workflows |
 
 ## Architecture & Implementation
 
@@ -30,6 +30,6 @@ HIPAA compliance, encryption, authentication, authorization, audit trails, and s
 
 | Document | Summary |
 |----------|---------|
-| [POC Gap Analysis](../Experiments/04-POC-Gap-Analysis.md) | 5 critical HIPAA gaps identified in POC evaluation |
-| [OpenClaw Setup Guide](../Experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | HIPAA-hardened sandboxed agent deployment |
-| [OpenClaw Developer Tutorial](../Experiments/05-OpenClaw-Developer-Tutorial.md) | Security reminders and approval tiers for autonomous agents |
+| [POC Gap Analysis](../experiments/04-POC-Gap-Analysis.md) | 5 critical HIPAA gaps identified in POC evaluation |
+| [OpenClaw Setup Guide](../experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | HIPAA-hardened sandboxed agent deployment |
+| [OpenClaw Developer Tutorial](../experiments/05-OpenClaw-Developer-Tutorial.md) | Security reminders and approval tiers for autonomous agents |

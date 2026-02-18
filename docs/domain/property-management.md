@@ -8,7 +8,7 @@ Core clinical and patient management functionality — the primary business doma
 |----------|---------|
 | [System Spec](../specs/system-spec.md) | System scope, subsystem decomposition, user roles, regulatory constraints |
 | [System Requirements (SYS-REQ)](../specs/requirements/SYS-REQ.md) | 10 system-level requirements with acceptance criteria and status |
-| [Requirements Governance](../specs/requirements-governance.md) | Governance procedures, conflict analysis (11 intra-domain, 9 cross-platform) |
+| [Requirements Governance](../quality/processes/requirements-governance.md) | Governance procedures, conflict analysis (11 intra-domain, 9 cross-platform) |
 | [Subsystem Versions](../specs/subsystem-versions.md) | Per-subsystem version tracking and platform progress |
 
 ## Subsystem Requirements
@@ -26,7 +26,7 @@ Core clinical and patient management functionality — the primary business doma
 |----------|---------|
 | [Backend Endpoints](../api/backend-endpoints.md) | Full REST API reference (auth, patients, encounters, meds, prescriptions, reports, vision) |
 | [Initial Project Scaffolds](../features/initial-project-scaffolds.md) | Scaffolding of all three repos with stub implementations |
-| [Traceability Matrix](../specs/requirements/traceability-matrix.md) | RTM with forward/backward traceability and 157 passing tests |
+| [Traceability Matrix](../testing/traceability-matrix.md) | RTM with forward/backward traceability and 157 passing tests |
 
 ## Architecture Decisions
 
@@ -40,8 +40,8 @@ Core clinical and patient management functionality — the primary business doma
 
 | Document | Summary |
 |----------|---------|
-| [Tambo PMS Integration PRD](../Experiments/00-PRD-Tambo-PMS-Integration.md) | Conversational analytics sidebar with generative UI |
-| [Tambo Developer Tutorial](../Experiments/00-Tambo-Developer-Onboarding-Tutorial.md) | Building Tambo components and tools |
-| [OpenClaw PMS Integration PRD](../Experiments/05-PRD-OpenClaw-PMS-Integration.md) | Autonomous workflow automation agent with 8 PMS skills |
-| [POC Gap Analysis](../Experiments/04-POC-Gap-Analysis.md) | kind-clinical-data POC vs. system requirements (15% coverage) |
-| [v0 Developer Tutorial](../Experiments/02-v0-Developer-Tutorial.md) | v0 prompts for generating PMS UI pages |
+| [Tambo PMS Integration PRD](../experiments/00-PRD-Tambo-PMS-Integration.md) | Conversational analytics sidebar with generative UI |
+| [Tambo Developer Tutorial](../experiments/00-Tambo-Developer-Onboarding-Tutorial.md) | Building Tambo components and tools |
+| [OpenClaw PMS Integration PRD](../experiments/05-PRD-OpenClaw-PMS-Integration.md) | Autonomous workflow automation agent with 8 PMS skills |
+| [POC Gap Analysis](../experiments/04-POC-Gap-Analysis.md) | kind-clinical-data POC vs. system requirements (15% coverage) |
+| [v0 Developer Tutorial](../experiments/02-v0-Developer-Tutorial.md) | v0 prompts for generating PMS UI pages |

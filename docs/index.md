@@ -47,29 +47,29 @@ _No bug fixes documented yet._
 ## Experiments & Tool Evaluations
 
 ### Tambo AI (Conversational Analytics)
-- [PRD: Tambo PMS Integration](Experiments/00-PRD-Tambo-PMS-Integration.md) — Conversational analytics sidebar with generative UI components
-- [Tambo Setup Guide](Experiments/00-Tambo-PMS-Developer-Setup-Guide.md) — Self-hosted backend, component registration, tool definitions
-- [Tambo Developer Tutorial](Experiments/00-Tambo-Developer-Onboarding-Tutorial.md) — Hands-on onboarding: build your first component and tool
+- [PRD: Tambo PMS Integration](experiments/00-PRD-Tambo-PMS-Integration.md) — Conversational analytics sidebar with generative UI components
+- [Tambo Setup Guide](experiments/00-Tambo-PMS-Developer-Setup-Guide.md) — Self-hosted backend, component registration, tool definitions
+- [Tambo Developer Tutorial](experiments/00-Tambo-Developer-Onboarding-Tutorial.md) — Hands-on onboarding: build your first component and tool
 
 ### Storybook (Component Documentation)
-- [Storybook Getting Started](Experiments/01-Storybook-Getting-Started.md) — Installation and basic setup
-- [Storybook Developer Tutorial](Experiments/01-Storybook-Developer-Tutorial.md) — Writing stories, addons, and CI integration
+- [Storybook Getting Started](experiments/01-Storybook-Getting-Started.md) — Installation and basic setup
+- [Storybook Developer Tutorial](experiments/01-Storybook-Developer-Tutorial.md) — Writing stories, addons, and CI integration
 
 ### v0 (AI Code Generation)
-- [v0 Getting Started](Experiments/02-v0-Getting-Started.md) — Setup and basic usage
-- [v0 Developer Tutorial](Experiments/02-v0-Developer-Tutorial.md) — Prompt engineering for component generation
+- [v0 Getting Started](experiments/02-v0-Getting-Started.md) — Setup and basic usage
+- [v0 Developer Tutorial](experiments/02-v0-Developer-Tutorial.md) — Prompt engineering for component generation
 
 ### Banani (AI Design-to-Code)
-- [Banani Getting Started](Experiments/03-Banani-Getting-Started.md) — Setup and basic usage
-- [Banani Developer Tutorial](Experiments/03-Banani-Developer-Tutorial.md) — Design-to-code workflow with Figma integration
+- [Banani Getting Started](experiments/03-Banani-Getting-Started.md) — Setup and basic usage
+- [Banani Developer Tutorial](experiments/03-Banani-Developer-Tutorial.md) — Design-to-code workflow with Figma integration
 
 ### POC Analysis
-- [POC Gap Analysis](Experiments/04-POC-Gap-Analysis.md) — Gap analysis of kind-clinical-data POC against system requirements
+- [POC Gap Analysis](experiments/04-POC-Gap-Analysis.md) — Gap analysis of kind-clinical-data POC against system requirements
 
 ### OpenClaw (Agentic AI Workflow Automation)
-- [PRD: OpenClaw PMS Integration](Experiments/05-PRD-OpenClaw-PMS-Integration.md) — Autonomous workflow automation: prior auth, care coordination, clinical documentation
-- [OpenClaw Setup Guide](Experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) — HIPAA-hardened Docker deployment, custom PMS skills, frontend integration
-- [OpenClaw Developer Tutorial](Experiments/05-OpenClaw-Developer-Tutorial.md) — Hands-on onboarding: build your first skill with approval tiers
+- [PRD: OpenClaw PMS Integration](experiments/05-PRD-OpenClaw-PMS-Integration.md) — Autonomous workflow automation: prior auth, care coordination, clinical documentation
+- [OpenClaw Setup Guide](experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) — HIPAA-hardened Docker deployment, custom PMS skills, frontend integration
+- [OpenClaw Developer Tutorial](experiments/05-OpenClaw-Developer-Tutorial.md) — Hands-on onboarding: build your first skill with approval tiers
 
 ---
 
@@ -111,6 +111,15 @@ The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → D
 - [Medication Management (SUB-MM)](specs/requirements/SUB-MM.md) — 9 domain requirements, 13 platform requirements (BE=9, WEB=2, AND=2)
 - [Reporting & Analytics (SUB-RA)](specs/requirements/SUB-RA.md) — 7 domain requirements, 17 platform requirements (BE=7, WEB=5, AND=5)
 - [Prompt Management (SUB-PM)](specs/requirements/SUB-PM.md) — 7 domain requirements, 13 platform requirements (BE=7, WEB=5, AI=1)
-- [Traceability Matrix (RTM)](specs/requirements/traceability-matrix.md) — Forward & backward traceability, platform traceability summary, test run log, coverage summary
-- [Testing Strategy](specs/testing-strategy.md) — Test levels, platform-scoped naming conventions, run record format
-- [Requirements Governance & Conflict Analysis](specs/requirements-governance.md) — Governance procedures, 14 domain conflicts, 12 platform conflicts, 14 race conditions
+
+## Testing & Traceability
+
+- [Testing Strategy](testing/testing-strategy.md) — Test levels, platform-scoped naming conventions, run record format
+- [Traceability Matrix (RTM)](testing/traceability-matrix.md) — Forward & backward traceability, platform traceability summary, test run log, coverage summary
+
+## Quality Management
+
+- [Requirements Governance & Conflict Analysis](quality/processes/requirements-governance.md) — Governance procedures, 14 domain conflicts, 12 platform conflicts, 14 race conditions
+- [PMS Developer Working Instructions](quality/processes/PMS_Developer_Working_Instructions.md) — Development process guide
+- [Development Pipeline Tutorial](quality/processes/Development_Pipeline_Tutorial.md) — CI/CD pipeline tutorial
+- [ISO 13485:2016 Standard](quality/standards/iso-13485-2016.pdf) — Medical device QMS standard

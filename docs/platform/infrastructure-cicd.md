@@ -29,6 +29,6 @@
 
 | Document | Summary |
 |----------|---------|
-| [Tambo Setup Guide](../Experiments/00-Tambo-PMS-Developer-Setup-Guide.md) | NestJS + PostgreSQL Docker self-hosting |
-| [OpenClaw Setup Guide](../Experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | HIPAA-hardened Docker deployment with sandboxed execution |
-| [OpenClaw PMS Integration PRD](../Experiments/05-PRD-OpenClaw-PMS-Integration.md) | Scheduled background workflow infrastructure |
+| [Tambo Setup Guide](../experiments/00-Tambo-PMS-Developer-Setup-Guide.md) | NestJS + PostgreSQL Docker self-hosting |
+| [OpenClaw Setup Guide](../experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | HIPAA-hardened Docker deployment with sandboxed execution |
+| [OpenClaw PMS Integration PRD](../experiments/05-PRD-OpenClaw-PMS-Integration.md) | Scheduled background workflow infrastructure |

@@ -43,6 +43,6 @@ Dependencies, environment setup, CI/CD pipelines, deployment configuration, and 
 
 | Document | Summary |
 |----------|---------|
-| [Tambo Setup Guide](../Experiments/00-Tambo-PMS-Developer-Setup-Guide.md) | NestJS + PostgreSQL Docker self-hosting for Tambo |
-| [Storybook Getting Started](../Experiments/01-Storybook-Getting-Started.md) | Storybook 8 installation in Next.js 15 project |
-| [OpenClaw Setup Guide](../Experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | Docker-based agent deployment with sandboxed execution |
+| [Tambo Setup Guide](../experiments/00-Tambo-PMS-Developer-Setup-Guide.md) | NestJS + PostgreSQL Docker self-hosting for Tambo |
+| [Storybook Getting Started](../experiments/01-Storybook-Getting-Started.md) | Storybook 8 installation in Next.js 15 project |
+| [OpenClaw Setup Guide](../experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | Docker-based agent deployment with sandboxed execution |

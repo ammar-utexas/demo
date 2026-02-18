@@ -37,5 +37,5 @@
 
 | Document | Summary |
 |----------|---------|
-| [Banani Developer Tutorial](../Experiments/03-Banani-Developer-Tutorial.md) | Prompts for designing PMS Android screens |
-| [Banani Getting Started](../Experiments/03-Banani-Getting-Started.md) | Mobile-specific design-to-code pipeline |
+| [Banani Developer Tutorial](../experiments/03-Banani-Developer-Tutorial.md) | Prompts for designing PMS Android screens |
+| [Banani Getting Started](../experiments/03-Banani-Getting-Started.md) | Mobile-specific design-to-code pipeline |

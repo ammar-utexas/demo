@@ -17,7 +17,7 @@ This matrix records which combinations of repository versions have been tested t
 ## How to Update
 
 1. After deploying a version combination to Staging, run the full system test suite (TST-SYS-0001 through TST-SYS-0010)
-2. Record the test run ID using the format from [Testing Strategy](testing-strategy.md): `RUN-YYYY-MM-DD-NNN`
+2. Record the test run ID using the format from [Testing Strategy](../testing/testing-strategy.md): `RUN-YYYY-MM-DD-NNN`
 3. Add a row to the table above with all version numbers and the test run ID
 4. Set status to:
    - **Certified** — All system tests passed

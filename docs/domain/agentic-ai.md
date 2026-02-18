@@ -6,9 +6,9 @@ Autonomous workflow automation via the OpenClaw agent framework — covering pat
 
 | Document | Summary |
 |----------|---------|
-| [OpenClaw PMS Integration PRD](../Experiments/05-PRD-OpenClaw-PMS-Integration.md) | PRD for autonomous agent with 8 PMS skills, human-in-the-loop approval tiers, and scheduled workflows |
-| [OpenClaw Developer Tutorial](../Experiments/05-OpenClaw-Developer-Tutorial.md) | Hands-on tutorial for building OpenClaw PMS skills, approval tier system, and debugging |
-| [OpenClaw Setup Guide](../Experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | HIPAA-hardened self-hosted deployment in Docker with sandboxed execution and web UI sidebar |
+| [OpenClaw PMS Integration PRD](../experiments/05-PRD-OpenClaw-PMS-Integration.md) | PRD for autonomous agent with 8 PMS skills, human-in-the-loop approval tiers, and scheduled workflows |
+| [OpenClaw Developer Tutorial](../experiments/05-OpenClaw-Developer-Tutorial.md) | Hands-on tutorial for building OpenClaw PMS skills, approval tier system, and debugging |
+| [OpenClaw Setup Guide](../experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | HIPAA-hardened self-hosted deployment in Docker with sandboxed execution and web UI sidebar |
 
 ## Related
 

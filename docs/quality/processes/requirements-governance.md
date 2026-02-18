@@ -3,7 +3,7 @@
 **Document ID:** PMS-GOV-001
 **Version:** 1.3
 **Date:** 2026-02-18
-**Parent:** [System Specification](system-spec.md)
+**Parent:** [System Specification](../../specs/system-spec.md)
 
 ---
 

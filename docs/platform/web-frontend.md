@@ -38,29 +38,29 @@
 ### Tambo (Conversational AI Sidebar)
 | Document | Summary |
 |----------|---------|
-| [Tambo PMS Integration PRD](../Experiments/00-PRD-Tambo-PMS-Integration.md) | Conversational analytics sidebar with 6 generative UI components |
-| [Tambo Developer Tutorial](../Experiments/00-Tambo-Developer-Onboarding-Tutorial.md) | Building Tambo components and tools |
-| [Tambo Setup Guide](../Experiments/00-Tambo-PMS-Developer-Setup-Guide.md) | Self-hosting Tambo backend, creating PMS components |
+| [Tambo PMS Integration PRD](../experiments/00-PRD-Tambo-PMS-Integration.md) | Conversational analytics sidebar with 6 generative UI components |
+| [Tambo Developer Tutorial](../experiments/00-Tambo-Developer-Onboarding-Tutorial.md) | Building Tambo components and tools |
+| [Tambo Setup Guide](../experiments/00-Tambo-PMS-Developer-Setup-Guide.md) | Self-hosting Tambo backend, creating PMS components |
 
 ### Storybook (Component Development & Testing)
 | Document | Summary |
 |----------|---------|
-| [Storybook Developer Tutorial](../Experiments/01-Storybook-Developer-Tutorial.md) | Writing stories for all PMS UI components |
-| [Storybook Getting Started](../Experiments/01-Storybook-Getting-Started.md) | Installing Storybook 8 in Next.js 15 / React 19 |
+| [Storybook Developer Tutorial](../experiments/01-Storybook-Developer-Tutorial.md) | Writing stories for all PMS UI components |
+| [Storybook Getting Started](../experiments/01-Storybook-Getting-Started.md) | Installing Storybook 8 in Next.js 15 / React 19 |
 
 ### v0 (AI Code Generation)
 | Document | Summary |
 |----------|---------|
-| [v0 Developer Tutorial](../Experiments/02-v0-Developer-Tutorial.md) | Prompts for generating PMS UI pages |
-| [v0 Getting Started](../Experiments/02-v0-Getting-Started.md) | Using Vercel v0 with the PMS frontend |
+| [v0 Developer Tutorial](../experiments/02-v0-Developer-Tutorial.md) | Prompts for generating PMS UI pages |
+| [v0 Getting Started](../experiments/02-v0-Getting-Started.md) | Using Vercel v0 with the PMS frontend |
 
 ### Banani (AI Design)
 | Document | Summary |
 |----------|---------|
-| [Banani Developer Tutorial](../Experiments/03-Banani-Developer-Tutorial.md) | Prompts for designing PMS web screens |
-| [Banani Getting Started](../Experiments/03-Banani-Getting-Started.md) | Text-to-UI generation, Figma export |
+| [Banani Developer Tutorial](../experiments/03-Banani-Developer-Tutorial.md) | Prompts for designing PMS web screens |
+| [Banani Getting Started](../experiments/03-Banani-Getting-Started.md) | Text-to-UI generation, Figma export |
 
 ### POC Evaluation
 | Document | Summary |
 |----------|---------|
-| [POC Gap Analysis](../Experiments/04-POC-Gap-Analysis.md) | kind-clinical-data React SPA vs. system requirements |
+| [POC Gap Analysis](../experiments/04-POC-Gap-Analysis.md) | kind-clinical-data React SPA vs. system requirements |

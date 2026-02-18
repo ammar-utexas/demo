@@ -71,9 +71,10 @@ docs/
 │   │   ├── SUB-PR.md               # Patient Records subsystem requirements
 │   │   ├── SUB-CW.md               # Clinical Workflow subsystem requirements
 │   │   ├── SUB-MM.md               # Medication Management subsystem requirements
-│   │   ├── SUB-RA.md               # Reporting & Analytics subsystem requirements
-│   │   └── traceability-matrix.md  # RTM: forward + backward traceability
-│   └── testing-strategy.md          # Test levels, naming, run records
+│   │   └── SUB-RA.md               # Reporting & Analytics subsystem requirements
+├── testing/                         # Test strategy and traceability
+│   ├── testing-strategy.md          # Test levels, naming, run records
+│   └── traceability-matrix.md       # RTM: forward + backward traceability
 ├── architecture/                    # Architecture Decision Records (ADRs)
 ├── features/                        # Implementation details
 ├── api/                             # API contracts
@@ -266,7 +267,7 @@ cd pms-android
 - [ ] All tests passing in pms-backend (`pytest`) and pms-frontend (`npm run test:run`)
 - [ ] Read `CLAUDE.md` in each repo
 - [ ] Read `docs/specs/system-spec.md` for system context
-- [ ] Read `docs/specs/testing-strategy.md` for test conventions
+- [ ] Read `docs/testing/testing-strategy.md` for test conventions
 - [ ] Read `docs/index.md` for full documentation map
 
 ---
@@ -324,7 +325,7 @@ claude
 
 **Goal:** Ensure all requirements are traceable and the matrix is complete.
 
-1. **Update the traceability matrix** in `docs/specs/requirements/traceability-matrix.md`:
+1. **Update the traceability matrix** in `docs/testing/traceability-matrix.md`:
    - Forward traceability: SYS-REQ → SUB-* → module → test case → status
    - Backward traceability: test case → requirement(s) → last result → run ID
 
@@ -473,7 +474,7 @@ After each test execution, create a run record in `docs/test-evidence/`:
 ### Commit All Evidence
 
 ```bash
-git add docs/specs/ docs/test-evidence/
+git add docs/specs/ docs/testing/ docs/test-evidence/
 git commit -m "evidence: test run RUN-YYYY-MM-DD-NNN
 
 - Test results for SUB-PR-0007, SUB-PR-0008
@@ -520,7 +521,7 @@ git push
 3. **Check the traceability matrix** for current status:
 
 ```bash
-# Read docs/specs/requirements/traceability-matrix.md
+# Read docs/testing/traceability-matrix.md
 # Check coverage for SUB-MM-0001 and SUB-MM-0002
 ```
 
@@ -757,7 +758,7 @@ coderabbit review --type uncommitted --plain
 4. **Commit evidence** (test runs, /analyze reports, RTM updates)
 
 ```bash
-git add docs/specs/ docs/test-evidence/
+git add docs/specs/ docs/testing/ docs/test-evidence/
 git commit -m "evidence: end-of-day RTM and test updates
 
 - Updated traceability matrix with today's progress

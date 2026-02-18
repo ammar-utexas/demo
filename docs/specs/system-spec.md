@@ -127,4 +127,4 @@ Every test run must produce a **run record** linking to:
 - Timestamp and environment
 - Commit SHA of the code under test
 
-See [Traceability Matrix](requirements/traceability-matrix.md) for the live mapping.
+See [Traceability Matrix](../testing/traceability-matrix.md) for the live mapping.

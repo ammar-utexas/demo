@@ -45,7 +45,7 @@ TST-AUTH-{NNNN}                       # Cross-cutting auth tests
 
 Platform codes: `BE` (Backend), `WEB` (Web Frontend), `AND` (Android), `AI` (AI Infrastructure).
 
-> **Deprecation notice (v1.2):** The flat `TST-FE-{NNNN}` and `TST-AND-{NNNN}` prefixes are deprecated. New tests should use platform-scoped IDs (e.g., `TST-PR-0001-WEB` instead of `TST-FE-0001`). Existing test IDs are preserved with alias mappings in the [Traceability Matrix](requirements/traceability-matrix.md#test-id-migration-note).
+> **Deprecation notice (v1.2):** The flat `TST-FE-{NNNN}` and `TST-AND-{NNNN}` prefixes are deprecated. New tests should use platform-scoped IDs (e.g., `TST-PR-0001-WEB` instead of `TST-FE-0001`). Existing test IDs are preserved with alias mappings in the [Traceability Matrix](traceability-matrix.md#test-id-migration-note).
 
 Every test file must include requirement annotations:
 
@@ -95,7 +95,7 @@ fun `TST-AND-0001 PatientEntity roundtrip mapping`() { ... }
 2. **Implement** the feature using speckit: `/specify` → `/plan` → `/speckit.tasks`.
 3. **Write test(s)** with `@requirement` annotation linking to the **platform requirement ID** (e.g., `SUB-PR-0003-BE`). Use the `TST-{domain}-{NNNN}-{platform}` naming convention for new test IDs.
 4. **Update** the Platform Decomposition table in the subsystem requirements doc.
-5. **Update** the Backward Traceability section in `docs/specs/requirements/traceability-matrix.md`.
+5. **Update** the Backward Traceability section in `docs/testing/traceability-matrix.md`.
 
 ### When Running Tests
 
@@ -103,7 +103,7 @@ fun `TST-AND-0001 PatientEntity roundtrip mapping`() { ... }
 2. **Record** a new Test Run Log entry in the traceability matrix.
 3. **Update** the "Last Result" and "Run ID" for each affected test case.
 4. **Regenerate** the Coverage Summary.
-5. **Commit** all evidence: `git add docs/specs/ && git commit -m "evidence: test run RUN-YYYY-MM-DD-NNN"`.
+5. **Commit** all evidence: `git add docs/specs/ docs/testing/ && git commit -m "evidence: test run RUN-YYYY-MM-DD-NNN"`.
 
 ---
 

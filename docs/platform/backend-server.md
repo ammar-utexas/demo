@@ -44,6 +44,6 @@
 
 | Document | Summary |
 |----------|---------|
-| [OpenClaw Developer Tutorial](../Experiments/05-OpenClaw-Developer-Tutorial.md) | Building server-side PMS skills for the OpenClaw agent |
-| [OpenClaw Setup Guide](../Experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | Docker-based agent deployment with backend API integration |
-| [OpenClaw PMS Integration PRD](../Experiments/05-PRD-OpenClaw-PMS-Integration.md) | Agent skills interacting with backend APIs |
+| [OpenClaw Developer Tutorial](../experiments/05-OpenClaw-Developer-Tutorial.md) | Building server-side PMS skills for the OpenClaw agent |
+| [OpenClaw Setup Guide](../experiments/05-OpenClaw-PMS-Developer-Setup-Guide.md) | Docker-based agent deployment with backend API integration |
+| [OpenClaw PMS Integration PRD](../experiments/05-PRD-OpenClaw-PMS-Integration.md) | Agent skills interacting with backend APIs |
