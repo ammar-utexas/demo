@@ -1,7 +1,7 @@
 # Requirements Governance & Conflict Analysis
 
 **Document ID:** PMS-GOV-001
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-02-18
 **Parent:** [System Specification](../../specs/system-spec.md)
 
@@ -68,6 +68,174 @@ Use this when a new SYS-REQ is added or an existing one needs re-decomposition.
 | 8 | **Run conflict analysis** — check Sections 3, 4, and 5 for new conflicts introduced by the decomposition. | This document |
 
 **Approval gate:** Step 2 decisions (subsystem mapping) require architecture review.
+
+### 2.4 Procedure: Feature Branching & Release Strategy
+
+Use this when developing features concurrently, evaluating MVP variant implementations, or preparing a prioritized feature for release. This section connects to [ADR-0006: Release Management Strategy](../../architecture/0006-release-management-strategy.md) and the [Release Process](../../config/release-process.md).
+
+#### 2.4.1 Branch Naming Convention
+
+| Branch Type | Pattern | Example | Purpose |
+|---|---|---|---|
+| Feature | `feature/{name}` | `feature/offline-sync` | Standard feature development |
+| MVP Variant | `feature/{name}-v{N}` | `feature/search-v1`, `feature/search-v2` | Competing implementations of the same feature |
+| Release | `release/v{X.Y.Z}` | `release/v1.2.0` | Release candidate preparation |
+| Hotfix | `hotfix/v{X.Y.Z}` | `hotfix/v1.2.1` | Production emergency fix |
+| Docs | `docs/{topic}` | `docs/governance-update` | Documentation-only changes |
+
+**Rules:**
+1. Variant branches (`feature/{name}-v1`, `feature/{name}-v2`) must share the same base commit from `main`.
+2. Branch names must be consistent across all repositories in the multi-repo structure (pms-backend, pms-frontend, pms-android, pms-docs).
+3. Feature names use lowercase kebab-case (e.g., `offline-sync`, not `offlineSync` or `Offline_Sync`).
+
+#### 2.4.2 Concurrent Development Model
+
+When two or more features are developed in parallel on separate branches:
+
+| Step | Action | Artifacts Updated |
+|---|---|---|
+| 1 | **Create feature branch from `main`** — each feature starts from the latest `main`. Record the base commit SHA in the feature's tracking issue. | — |
+| 2 | **Rebase onto `main` every 2 days** — each feature branch must rebase onto the latest `main` at least once every 2 calendar days to minimize drift. | Feature branch |
+| 3 | **CI must pass on every push** — no feature branch may have a failing CI pipeline for more than 24 hours. | CI pipeline |
+| 4 | **Identify shared-code touchpoints** — before development begins, list files and modules modified by both features. Flag potential conflicts early. | Governance log |
+| 5 | **First-ready-first-merged** — the first feature to complete review and CI is merged to `main`. No feature has inherent merge priority unless the release corridor (Section 2.4.4) has been entered. | `main` branch |
+| 6 | **Second-to-merge must rebase** — after the first feature merges, the remaining feature must rebase onto the updated `main` and resolve any conflicts before its own merge. | Feature branch |
+| 7 | **Conflict analysis before merge** — run the conflict analysis (Sections 3, 4, and 5 of this document) for any requirement touched by the feature. Document new conflicts using the existing ID schemes (DC-*, PC-*, RC-*). | This document |
+
+**Conflict resolution rules for concurrent features:**
+
+| Conflict Type | Resolution |
+|---|---|
+| Shared file, different functions | Rebase resolves automatically; verify CI passes |
+| Shared file, same function | Second-to-merge must reconcile changes manually; require code review from both feature leads |
+| Shared requirement (same SUB-* ID modified) | Escalate to architecture review before merging the second feature |
+| Docs submodule (pms-docs) | Second-to-merge rebases the submodule pointer; verify all cross-references resolve |
+
+**Approval gate:** Step 7 conflict analysis requires tech lead sign-off before the merge to `main`.
+
+#### 2.4.3 MVP Variant Branching Pattern
+
+Use this when a feature has two or more candidate implementations and the team has not yet decided which approach to pursue. This pattern supports structured evaluation without committing to either approach prematurely.
+
+**Phase 1 — Variant Development**
+
+| Step | Action | Artifacts Updated |
+|---|---|---|
+| 1 | **Create variant branches from the same commit** — both `feature/{name}-v1` and `feature/{name}-v2` branch from the identical `main` commit. Record the shared base SHA. | — |
+| 2 | **Define evaluation criteria upfront** — before development begins, agree on the weighted scoring criteria (see Phase 2 scoring matrix). Document criteria in the feature's tracking issue. | Tracking issue |
+| 3 | **Time-box to 1 sprint** — variant development must not exceed 1 sprint (2 weeks). If neither variant is ready by sprint end, the decision gate proceeds with whatever is available. | — |
+| 4 | **Independent CI** — each variant branch runs its own CI pipeline independently. Both must pass before the decision gate. | CI pipeline |
+
+**Phase 2 — Decision Gate**
+
+A review meeting (60 minutes maximum) evaluates both variants using a weighted scoring matrix:
+
+| Criterion | Weight | Description |
+|---|---|---|
+| Requirement coverage | 30% | How many of the feature's acceptance criteria does the variant satisfy? |
+| Implementation complexity | 25% | Lines of code, number of new dependencies, cognitive complexity |
+| Test coverage | 20% | Unit, integration, and system test coverage percentage |
+| Performance | 15% | Benchmark results (latency, throughput, resource usage) |
+| Maintainability | 10% | Code readability, documentation quality, alignment with existing patterns |
+
+**Decision gate outputs:**
+1. Completed scoring matrix with per-criterion scores (1–5) and weighted totals.
+2. An architectural decision record (ADR) in `docs/architecture/` documenting: context, both variants evaluated, scoring results, and rationale for the selected variant.
+3. If scores are within 10%, the tech lead casts the deciding vote and documents the tiebreaker rationale in the ADR.
+
+**Phase 3 — Variant Retirement**
+
+| Step | Action | Artifacts Updated |
+|---|---|---|
+| 1 | **Merge the selected variant** — merge the winning variant branch into `main` following the standard merge process (CI pass, code review, conflict analysis per Section 2.4.2 Step 7). | `main` branch |
+| 2 | **Archive the rejected variant** — tag the rejected branch with `archive/{name}-v{N}` (e.g., `archive/search-v2`) and delete the branch. The tag preserves the commit history for future reference. | Git tags |
+| 3 | **Salvage reusable components** — if the rejected variant contains reusable code (utilities, tests, documentation), cherry-pick those commits into `main` or a follow-up feature branch. Reference the archive tag in the cherry-pick commit message. | `main` or feature branch |
+
+#### 2.4.4 One-Week Release Corridor
+
+Once a feature is prioritized for release, it enters a **7-day release corridor** that maps to the 4-environment pipeline defined in [ADR-0006](../../architecture/0006-release-management-strategy.md) and the [Release Process](../../config/release-process.md).
+
+| Day | Environment | Activities |
+|---|---|---|
+| Day 0 | — | **Priority declared.** Product owner confirms the feature is release-ready. Prerequisites: feature branch merged to `main`, all CI green, all requirement statuses in SUB-*.md updated. |
+| Day 1 | Dev | **Dev smoke test.** Deploy `main` to the dev environment. Run TST-UNIT-* and TST-INT-* suites. Fix any regressions before proceeding. |
+| Day 2–3 | QA | **QA validation.** Create a release candidate tag (`rc-v{X.Y.Z}`). Deploy to QA. Run full regression suite (TST-SYS-* and TST-E2E-*). QA team signs off or returns blockers. |
+| Day 4–5 | Staging | **Staging validation.** Deploy the RC to staging. Run platform compatibility tests. Update the [Release Compatibility Matrix](../../specs/release-compatibility-matrix.md) with tested version combinations. Execute TST-SYS-* acceptance tests against staging data. |
+| Day 6 | — | **CCB approval.** Change Control Board reviews: test results, compatibility matrix, updated requirement statuses, and ADRs. CCB approves or rejects. If approved, create the production tag (`v{X.Y.Z}`). |
+| Day 7 | Production | **Production deploy.** Deploy the production tag. Monitor error rates, latency, and key metrics for 4 hours post-deploy. If anomalies exceed thresholds, execute the rollback procedure from the [Release Process](../../config/release-process.md). |
+
+**Escalation rules:**
+
+| Scenario | Escalation |
+|---|---|
+| QA blocker (Day 2–3) | Fix on `main`, re-tag RC, restart from Day 2. Adds 2 days to corridor. |
+| Staging failure (Day 4–5) | If the failure is environment-specific, fix and re-deploy to staging (no day reset). If the failure is a code defect, fix on `main`, re-tag RC, restart from Day 2. |
+| CCB not available on Day 6 | Corridor pauses. Resume when CCB convenes (maximum 2 business days delay). |
+| Production deploy failure (Day 7) | Execute rollback immediately. Open a hotfix branch (`hotfix/v{X.Y.Z}`). Hotfix follows an accelerated 3-day corridor (Dev → QA → Production, skip staging). |
+
+**Multi-repo coordination:**
+- All repositories (pms-backend, pms-frontend, pms-android) entering the release corridor must use the same RC tag version.
+- The pms-docs submodule pointer is updated as part of the RC tag.
+- Production tags are created simultaneously across all repos after CCB approval.
+
+#### 2.4.5 Branch Lifecycle Diagram
+
+```
+main ─────────────●────────────────────────●──────────────────────●─── ...
+                  │                        │                      ↑
+                  ├── feature/offline-sync ─┘ (merge)             │
+                  │                                               │
+                  ├── feature/search-v1 ──────── (selected) ──────┘ (merge)
+                  │                                │
+                  └── feature/search-v2 ──── (rejected)
+                                                   │
+                                             archive/search-v2 (tag)
+
+Release Corridor (7 days):
+  Day 0        Day 1     Day 2-3     Day 4-5    Day 6      Day 7
+  Priority  →  Dev    →   QA      →  Staging →  CCB    →  Production
+  declared     smoke      rc-tag     compat     approve    v{X.Y.Z}
+               test       regress    matrix     prod tag   deploy
+```
+
+#### 2.4.6 Integration with Existing Governance
+
+This section maps branching and release events to existing governance procedures:
+
+| Event | Governance Procedure | Reference |
+|---|---|---|
+| New platform requirement identified during feature development | Procedure 2.1 — Adding a New Platform | Section 2.1 |
+| New subsystem requirement identified during feature development | Procedure 2.2 — Adding a New Domain Subsystem | Section 2.2 |
+| Existing requirement modified by a feature branch | Procedure 2.3 — Decomposing a System Requirement | Section 2.3 |
+| Concurrent features modify the same subsystem | Section 2.4.2 — Concurrent Development Model | Section 2.4.2 |
+| MVP variant selected after evaluation | Section 2.4.3 — MVP Variant Branching Pattern | Section 2.4.3 |
+| Feature enters release corridor | Section 2.4.4 — One-Week Release Corridor | Section 2.4.4 |
+
+**Artifact update requirements per feature merge:**
+
+| Artifact | When to Update |
+|---|---|
+| `SUB-*.md` (requirement docs) | When the feature adds, modifies, or resolves a domain or platform requirement |
+| `SYS-REQ.md` | When the feature affects a system-level requirement or its decomposition |
+| `traceability-matrix.md` | When new test cases are added or requirement statuses change |
+| `testing-strategy.md` | When new test patterns or platform-specific test runners are introduced |
+| `release-compatibility-matrix.md` | During the staging phase (Day 4–5) of the release corridor |
+| `subsystem-versions.md` | When the feature increments a subsystem version |
+| This document (PMS-GOV-001) | When the feature introduces new conflicts or race conditions (Sections 3, 4, 5) |
+| `docs/architecture/NNNN-*.md` | When an architectural decision is made (especially during MVP variant selection) |
+
+#### 2.4.7 Conflict Analysis Tie-In
+
+Feature branching introduces the risk of conflicts that span branches and are invisible until merge time. The following rules integrate the branching strategy with the conflict analysis framework in Sections 3, 4, and 5.
+
+| Rule | Description |
+|---|---|
+| **Pre-merge conflict scan** | Before merging any feature branch to `main`, run a diff of all requirement documents (SUB-*.md, SYS-REQ.md) against the current `main`. Identify any requirement IDs that were modified on both the feature branch and `main` since the branch point. |
+| **Cross-branch requirement audit** | When two feature branches are in concurrent development (Section 2.4.2), compare their modified requirement IDs weekly. If both branches modify the same requirement, escalate to architecture review before either merges. |
+| **New conflict documentation** | Any new conflict discovered during a feature merge must be documented in Sections 3, 4, or 5 of this document using the existing ID schemes (DC-{domain}-NN, PC-{platform}-NN, RC-{platform}-NN). Increment the "Total" counts in each section summary. |
+| **Post-merge verification** | After merging a feature branch, re-run the full conflict analysis (Sections 3, 4, 5) for all requirements touched by the feature. Verify that no new unresolved conflicts exist before the feature enters the release corridor. |
+
+**Approval gate:** The pre-merge conflict scan (Rule 1) requires tech lead sign-off. The scan results must be attached to the merge pull request.
 
 ---
 
@@ -192,7 +360,7 @@ Race conditions identified per platform where concurrent operations can produce 
 
 ## 6. Summary
 
-All 40 conflicts and race conditions have been resolved at the requirements level as of v1.3 (2026-02-18). The requirements documents (SYS-REQ.md, SUB-PR.md, SUB-CW.md, SUB-MM.md, SUB-RA.md, SUB-PM.md) have been updated to incorporate each resolution. Implementation of the updated requirements is tracked by the individual requirement statuses in each SUB-*.md file.
+All 40 conflicts and race conditions have been resolved at the requirements level as of v1.4 (2026-02-18). The requirements documents (SYS-REQ.md, SUB-PR.md, SUB-CW.md, SUB-MM.md, SUB-RA.md, SUB-PM.md) have been updated to incorporate each resolution. Implementation of the updated requirements is tracked by the individual requirement statuses in each SUB-*.md file.
 
 | Category | Count | Critical | High | Medium | Low | Resolved |
 |---|---|---|---|---|---|---|
