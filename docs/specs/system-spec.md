@@ -56,6 +56,7 @@ All components share a documentation submodule (`ammar-utexas/demo`) containing 
 | SUB-CW | Clinical Workflow | Scheduling, encounters, status tracking, clinical notes, referrals | Physicians, Nurses |
 | SUB-MM | Medication Management | Prescriptions, drug interactions, formulary, dispensing | Physicians, Pharmacists |
 | SUB-RA | Reporting & Analytics | Clinical dashboards, compliance reports, audit log queries | Administrators, Compliance |
+| SUB-PM | Prompt Management | Centralized prompt CRUD, versioning, audit trail, LLM-powered version comparison | Administrators |
 
 ## 5. User Roles
 

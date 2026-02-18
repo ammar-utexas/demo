@@ -1,8 +1,8 @@
 # System-Level Requirements (SYS-REQ)
 
 **Document ID:** PMS-SYS-REQ-001
-**Version:** 1.4
-**Date:** 2026-02-17
+**Version:** 1.5
+**Date:** 2026-02-18
 **Parent:** [System Specification](../system-spec.md)
 
 ---
@@ -21,6 +21,7 @@
 | SYS-REQ-0008 | Provide a web-based interface accessible from modern browsers (Chrome, Firefox, Safari, Edge) | High | Demo | Scaffolded |
 | SYS-REQ-0009 | Provide a native Android application for mobile clinical workflows | High | Demo | Scaffolded |
 | SYS-REQ-0010 | All system components must be deployable via Docker containers | Medium | Inspection | Scaffolded |
+| SYS-REQ-0011 | Provide centralized prompt management with versioning, CRUD operations, and LLM-powered comparison for all AI prompts used across the system | High | Test / Demo | Not Started |
 
 ---
 
@@ -37,7 +38,7 @@
 
 **Current Implementation:** JWT bearer authentication enforced on all patient endpoints via `require_role` → `require_auth` dependency chain. TOTP (MFA) not yet implemented — current login issues JWT from username + password only.
 
-**Decomposes To:** SUB-PR-0001 (→ BE, WEB, AND), SUB-CW-0001 (→ BE, WEB, AND), SUB-MM-0006 (→ BE, WEB, AND), SUB-RA-0004 (→ BE, WEB, AND)
+**Decomposes To:** SUB-PR-0001 (→ BE, WEB, AND), SUB-CW-0001 (→ BE, WEB, AND), SUB-MM-0006 (→ BE, WEB, AND), SUB-RA-0004 (→ BE, WEB, AND), SUB-PM-0001 (→ BE, WEB)
 
 ---
 
@@ -67,7 +68,7 @@
 
 **Current Implementation:** All 5 patient router methods call `audit_service.log_action` with user_id, action, resource_type, resource_id, and IP address. Encounter, medication, and report endpoint audit logging not yet implemented.
 
-**Decomposes To:** SUB-PR-0005 (→ BE), SUB-CW-0004 (→ BE), SUB-MM-0004 (→ BE), SUB-RA-0003 (→ BE, WEB, AND)
+**Decomposes To:** SUB-PR-0005 (→ BE), SUB-CW-0004 (→ BE), SUB-MM-0004 (→ BE), SUB-RA-0003 (→ BE, WEB, AND), SUB-PM-0005 (→ BE)
 
 ---
 
@@ -86,7 +87,7 @@
 
 > **Governance note (PC-BE-04):** The pharmacist role is required by SUB-MM-0007 (medication dispensing). The original 4-role model has been expanded to 5 roles to eliminate the cross-subsystem role inconsistency.
 
-**Decomposes To:** SUB-PR-0002 (→ BE), SUB-CW-0002 (→ BE), SUB-MM-0007 (→ BE), SUB-RA-0005 (→ BE)
+**Decomposes To:** SUB-PR-0002 (→ BE), SUB-CW-0002 (→ BE), SUB-MM-0007 (→ BE), SUB-RA-0005 (→ BE), SUB-PM-0002 (→ BE)
 
 ---
 
@@ -100,3 +101,20 @@
 3. Prescriber can override with documented clinical justification.
 
 **Decomposes To:** SUB-MM-0001 (→ BE, WEB, AND), SUB-MM-0002 (→ BE), SUB-CW-0005 (→ BE)
+
+---
+
+### SYS-REQ-0011: Centralized Prompt Management
+
+**Rationale:** The PMS uses AI prompts in multiple contexts (OpenClaw skills, MiniMax M2.5 agents, clinical document drafting). Prompts are currently scattered across code and configuration with no centralized management, versioning, or change tracking. A centralized subsystem enables consistent governance, audit trailing, and LLM-powered comparison of prompt versions.
+
+**Acceptance Criteria:**
+1. Administrators can create, read, update, and delete AI prompts via the web interface.
+2. Every prompt text modification creates a new immutable version with an auto-incremented version number.
+3. All prompt operations are recorded in the system audit trail.
+4. Users can view paginated version history for any prompt.
+5. Users can compare any two versions of a prompt via LLM-generated natural-language diff summary.
+
+**Current Implementation:** Not started.
+
+**Decomposes To:** SUB-PM-0003 (→ BE, WEB), SUB-PM-0004 (→ BE, WEB), SUB-PM-0006 (→ BE, WEB), SUB-PM-0007 (→ BE, WEB, AI)
