@@ -72,6 +72,59 @@ cd pms-android
 # Run on emulator (connects to backend at 10.0.2.2:8000)
 ```
 
+## Docker Compose (Full Stack)
+
+Run all services (backend, frontend, PostgreSQL) with a single command:
+
+```bash
+cd pms-backend
+
+# Configure environment
+cp .env.example .env
+# Edit .env: set SECRET_KEY and ENCRYPTION_KEY to real values
+# Generate an encryption key: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# Generate a secret key:      python -c "import secrets; print(secrets.token_urlsafe(32))"
+
+# Start all services
+docker compose up --build -d
+```
+
+| Service | URL | Notes |
+| --- | --- | --- |
+| Backend API | `http://localhost:8000` | FastAPI + Swagger docs at `/docs` |
+| Frontend | `http://localhost:3000` | Next.js |
+| PostgreSQL | `localhost:5432` | User: `postgres`, Password: `postgres`, DB: `pms` |
+
+> **Note:** The `.env` file must use `postgres` (the Docker service name) as the database host, not `localhost`:
+> `DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/pms`
+
+To stop all services:
+
+```bash
+docker compose down        # stop containers
+docker compose down -v     # stop and remove volumes (resets database)
+```
+
+## Authentication (Dev Workaround)
+
+The login endpoint (`POST /auth/token`) is currently a stub — it does not issue real JWTs. To access protected API routes during development, generate a valid token manually:
+
+```bash
+# From inside the running backend container:
+docker compose exec backend python -c "
+from pms.services.auth_service import create_access_token
+print(create_access_token('dev-admin-id', 'admin'))
+"
+```
+
+Use the token in API requests:
+
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:8000/patients/
+```
+
+Valid roles for RBAC: `admin`, `physician`, `nurse`.
+
 ## Running Tests
 
 ```bash
