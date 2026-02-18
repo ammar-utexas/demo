@@ -1,5 +1,14 @@
 .claude/
+.DS_Store
 
 # Word temp files
 ~$*
+
+# IDE
 .vscode/settings.json
+
+# NotebookLM artifacts
+.notebook-decks-meta.json
+generation-config.jsonl
+tasks.md
+.mcp.json
