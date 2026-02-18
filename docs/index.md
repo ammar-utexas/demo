@@ -103,10 +103,11 @@ Browse documentation organized by deployment platform — [full index](platform/
 
 ## Specifications & Requirements
 
-The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 11 system requirements, 43 domain requirements, and 82 platform requirements across 4 platforms.
+The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 13 system requirements, 54 domain requirements, and 111 platform requirements across 4 platforms.
 
 - [System Specification](specs/system-spec.md) — System-level scope, context, subsystem decomposition, and platform codes
-- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 11 system-level requirements with platform annotations
+- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 13 system-level requirements with platform annotations
+- [Authentication & User Management (SUB-AU)](specs/requirements/SUB-AU.md) — 11 domain requirements, 29 platform requirements (BE=14, WEB=9, AND=6)
 - [Patient Records (SUB-PR)](specs/requirements/SUB-PR.md) — 12 domain requirements, 25 platform requirements (BE=11, WEB=4, AND=7, AI=3)
 - [Clinical Workflow (SUB-CW)](specs/requirements/SUB-CW.md) — 8 domain requirements, 14 platform requirements (BE=8, WEB=3, AND=3)
 - [Medication Management (SUB-MM)](specs/requirements/SUB-MM.md) — 9 domain requirements, 13 platform requirements (BE=9, WEB=2, AND=2)

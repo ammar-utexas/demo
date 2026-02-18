@@ -46,7 +46,7 @@
 
 **Related Feature:** [Authentication & User Management](../../features/authentication.md)
 
-**Decomposes To:** SUB-PR-0001 (→ BE, WEB, AND), SUB-CW-0001 (→ BE, WEB, AND), SUB-MM-0006 (→ BE, WEB, AND), SUB-RA-0004 (→ BE, WEB, AND), SUB-PM-0001 (→ BE, WEB)
+**Decomposes To:** SUB-AU-0003 (→ BE, WEB, AND), SUB-AU-0004 (→ BE, WEB, AND), SUB-PR-0001 (→ BE, WEB, AND), SUB-CW-0001 (→ BE, WEB, AND), SUB-MM-0006 (→ BE, WEB, AND), SUB-RA-0004 (→ BE, WEB, AND), SUB-PM-0001 (→ BE, WEB)
 
 ---
 
@@ -113,7 +113,7 @@
 
 **Related Feature:** [Authentication & User Management](../../features/authentication.md)
 
-**Decomposes To:** SUB-PR-0002 (→ BE), SUB-CW-0002 (→ BE), SUB-MM-0007 (→ BE), SUB-RA-0005 (→ BE), SUB-PM-0002 (→ BE)
+**Decomposes To:** SUB-AU-0008 (→ BE, WEB), SUB-AU-0009 (→ BE, WEB, AND), SUB-AU-0010 (→ BE), SUB-PR-0002 (→ BE), SUB-CW-0002 (→ BE), SUB-MM-0007 (→ BE), SUB-RA-0005 (→ BE), SUB-PM-0002 (→ BE)
 
 ---
 
@@ -170,7 +170,7 @@
 
 **Related Feature:** [Authentication & User Management](../../features/authentication.md)
 
-**Decomposes To:** TBD (subsystem decomposition pending)
+**Decomposes To:** SUB-AU-0001 (→ BE, WEB, AND), SUB-AU-0002 (→ BE, WEB, AND), SUB-AU-0012 (→ BE), SUB-AU-0013 (→ BE), SUB-AU-0014 (→ BE)
 
 ---
 
@@ -195,4 +195,4 @@
 
 **Related Feature:** [Authentication & User Management](../../features/authentication.md)
 
-**Decomposes To:** TBD (subsystem decomposition pending)
+**Decomposes To:** SUB-AU-0005 (→ BE), SUB-AU-0006 (→ BE, WEB), SUB-AU-0007 (→ BE, WEB, AND), SUB-AU-0011 (→ BE), SUB-AU-0014 (→ BE), SUB-AU-0015 (→ WEB, AND)
