@@ -86,6 +86,11 @@ _No bug fixes documented yet._
 - [MCP Setup Guide](experiments/09-MCP-PMS-Developer-Setup-Guide.md) — FastMCP server deployment, OAuth 2.1 auth, audit logging, Claude Desktop and Next.js client integration
 - [MCP Developer Tutorial](experiments/09-MCP-Developer-Tutorial.md) — Hands-on onboarding: build custom MCP tools, resources, and prompts for PMS clinical workflows
 
+### Speechmatics Medical (Real-Time Clinical Speech-to-Text)
+- [PRD: Speechmatics Medical PMS Integration](experiments/10-PRD-SpeechmaticsMedical-PMS-Integration.md) — Real-time medical transcription with speaker diarization, 93% clinical accuracy, and HIPAA-compliant cloud/on-prem deployment
+- [Speechmatics Medical Setup Guide](experiments/10-SpeechmaticsMedical-PMS-Developer-Setup-Guide.md) — WebSocket proxy, Speechmatics API configuration, Next.js transcription UI, audit logging
+- [Speechmatics Medical Developer Tutorial](experiments/10-SpeechmaticsMedical-Developer-Tutorial.md) — Hands-on onboarding: build real-time clinical dictation with speaker labels end-to-end
+
 ---
 
 ## Documentation Views
