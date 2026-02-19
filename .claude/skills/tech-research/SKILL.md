@@ -112,7 +112,14 @@ Describe which ones are relevant and how}
 ## 11. Comparison with Existing Experiments
 {Compare with at least one other experiment already in docs/experiments/ — how is this complementary or different?}
 
-## 12. Appendix: Related Documents
+## 12. Research Sources
+{List the top 5-10 URLs that were most useful during research. For each, include:
+- The clickable markdown link: [Page Title](URL)
+- A brief note (5-10 words) on what information it provided
+
+Group by category (e.g., Official Documentation, Architecture & Specification, Security & Compliance, Ecosystem & Adoption). Only include links that materially informed the PRD — not every search result.}
+
+## 13. Appendix: Related Documents
 {Links to the other two files being generated, plus official docs}
 ```
 
