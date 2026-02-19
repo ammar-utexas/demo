@@ -91,6 +91,12 @@ _No bug fixes documented yet._
 - [Speechmatics Medical Setup Guide](experiments/10-SpeechmaticsMedical-PMS-Developer-Setup-Guide.md) — WebSocket proxy, Speechmatics API configuration, Next.js transcription UI, audit logging
 - [Speechmatics Medical Developer Tutorial](experiments/10-SpeechmaticsMedical-Developer-Tutorial.md) — Hands-on onboarding: build real-time clinical dictation with speaker labels end-to-end
 
+### Sanford Guide (Antimicrobial Clinical Decision Support)
+
+- [PRD: Sanford Guide PMS Integration](experiments/11-PRD-SanfordGuide-PMS-Integration.md) — Real-time antimicrobial treatment recommendations, dose adjustments, drug interactions, and stewardship support embedded in prescribing workflows
+- [Sanford Guide Setup Guide](experiments/11-SanfordGuide-PMS-Developer-Setup-Guide.md) — API client configuration, Redis caching, CDS sidebar panel, audit logging, and HIPAA-compliant data sanitization
+- [Sanford Guide Developer Tutorial](experiments/11-SanfordGuide-Developer-Tutorial.md) — Hands-on onboarding: build a syndrome-to-prescription CDS pipeline with interaction checking end-to-end
+
 ---
 
 ## Documentation Views
