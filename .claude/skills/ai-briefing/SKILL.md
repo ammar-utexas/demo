@@ -12,24 +12,36 @@ Your task is to research the last 14 days of AI ecosystem news and produce a **s
 
 ---
 
-## Step 0: Setup
+## Step 0: Setup & Context Loading
 
 1. Create the `news/` directory if it does not exist.
 2. Generate the filename using the current timestamp: `YYYY-MM-DD-HH-MM-SS.md` (use `date "+%Y-%m-%d-%H-%M-%S"`).
 3. Calculate the coverage period: today's date minus 14 days through today.
-4. If `$ARGUMENTS` contains a specific focus area, give it extra weight in the research and scoring. Otherwise, cover all categories equally.
+4. **Scan `news/` for the most recent existing brief.** If one exists, read it in full. Extract:
+   - All watchlist items and their scores
+   - Categories that had thin coverage or were missing items
+   - Items that need status updates
+   - This informs your search strategy in Step 1.
+5. If `$ARGUMENTS` contains a specific focus area, give it extra weight in the research and scoring. Otherwise, cover all categories equally.
 
-## Step 1: Research (Parallel Web Searches)
+## Step 1: Research Phase 1 — Broad Sweep (Parallel)
 
-Use **WebSearch** extensively across all categories below. Launch searches in parallel batches to maximize efficiency. Perform **at least 12 distinct searches** covering:
+Use **WebSearch** extensively. Launch searches in parallel batches. Perform **at least 12 distinct searches** covering all 7 categories below.
+
+**Write specific queries, not generic ones:**
+- BAD: "Anthropic Claude announcements February 2026"
+- GOOD: "Anthropic Claude Sonnet 4.6 release features pricing February 2026"
+- GOOD: "Claude Code enterprise adoption GitHub Agent HQ 2026"
+- GOOD: "healthcare voice AI startup funding Series A 2026"
+- GOOD: "Oracle Health ambient clinical AI launch NHS 2026"
 
 ### 1.1 Major AI Labs
 Search for announcements, model releases, and significant updates from:
-- Anthropic (Claude models, Claude Code, API changes, enterprise features)
-- OpenAI (GPT models, ChatGPT, Codex, API changes, partnerships)
-- Google (Gemini models, Workspace AI, API changes, Google I/O)
+- Anthropic (Claude models, Claude Code, API changes, enterprise features, partnerships)
+- OpenAI (GPT models, ChatGPT, Codex, API changes, partnerships, security features)
+- Google (Gemini models, Workspace AI, API changes, partnerships)
 - Meta (LLaMA models, open-weight releases)
-- xAI (Grok models, voice, API access)
+- xAI (Grok models, voice API, enterprise access)
 - Mistral (model releases, edge deployment, pricing)
 - Cohere (enterprise AI, RAG, embeddings)
 
@@ -37,8 +49,9 @@ Search for announcements, model releases, and significant updates from:
 Search for updates from:
 - GitHub Copilot (agent mode, features, pricing)
 - Cursor (new versions, multi-agent, features)
-- Windsurf (Cascade updates, features)
+- Windsurf (Cascade updates, Arena Mode, new models)
 - Claude Code (enterprise adoption, GitHub integration, new capabilities)
+- Xcode AI integrations (Claude Agent SDK, Codex)
 - Devin (autonomous coding, pricing, capabilities)
 - Replit Agent (new versions, autonomous workflows)
 - v0 / Bolt.new / Lovable (AI app builders, vibe coding)
@@ -48,9 +61,9 @@ Search for updates from:
 - n8n (AI agent features, HITL, new nodes)
 - Make / Zapier AI (automation capabilities)
 - LangChain / LangGraph (framework updates, production features)
-- CrewAI (multi-agent, new versions)
+- CrewAI (multi-agent, new versions, compliance)
 - AutoGen (Microsoft, agent frameworks)
-- OpenAI Agents SDK (Agent Builder, ChatKit)
+- OpenAI Agents SDK (Agent Builder, AgentKit, ChatKit)
 
 ### 1.4 Infrastructure & Models
 Search for:
@@ -64,17 +77,17 @@ Search for:
 ### 1.5 Voice & Healthcare AI
 Search for:
 - Voice AI platforms (Speechmatics, Deepgram, AssemblyAI, ElevenLabs)
-- Medical AI tools and clinical AI
-- EHR integrations and ambient clinical AI
-- Remote patient monitoring and wearables
-- Healthcare AI market developments
+- Healthcare voice AI startups and funding rounds
+- EHR integrations and ambient clinical AI (Oracle Health, Epic, Cerner)
+- Remote patient monitoring and wearables (Validic, Philips, Masimo)
+- Healthcare AI market developments and clinical AI agents
 
 ### 1.6 Standards & Regulation
 Search for:
-- MCP (Model Context Protocol) updates and ecosystem
+- MCP (Model Context Protocol) updates, new servers, security
 - AI executive orders and federal policy
 - HIPAA/AI guidance and enforcement
-- FDA AI/ML framework updates
+- FDA AI/ML framework updates, CDS guidance
 - State AI regulation (Colorado, etc.)
 - Healthcare compliance developments
 
@@ -84,6 +97,21 @@ Search for:
 - Reddit community sentiment (r/LocalLLaMA, r/ClaudeAI, r/ChatGPT, r/MachineLearning)
 - ArXiv notable papers (applied AI, agents, healthcare AI)
 - Product Hunt AI launches
+
+## Step 1.5: Research Phase 2 — Targeted Follow-ups
+
+After Phase 1, review all results and identify:
+- **Names, companies, or products mentioned** in search results that you haven't directly searched for yet
+- **Categories with fewer than 2 substantive findings** — do additional searches
+- **Items from the previous brief's watchlist** that need updated status
+- **Funding rounds, partnerships, or launches** referenced in passing that deserve their own search
+
+Launch **6-10 additional targeted searches** to fill these gaps. These should be specific:
+- "Secai Voxira healthcare voice AI agent funding"
+- "OpenAI Lockdown Mode ChatGPT enterprise security"
+- "Apple Xcode Claude Agent SDK integration details"
+
+**Do NOT proceed to scoring until every category has at least 2 findings backed by primary sources.**
 
 ## Step 2: Score Each Development
 
@@ -102,11 +130,16 @@ For each notable development found, assign a **Disruption Score (1-10)**:
 - -1 for unresolved critical bugs or broken promises
 - -1 for hype fade with no real usage evidence
 
-**Always frame impact through these lenses:**
-1. Healthcare AI automation and voice AI systems
-2. AI-assisted software development workflows
-3. Remote patient monitoring and data integration
-4. Teaching AI/data science in biomedical informatics
+## Step 2.5: Coverage Self-Check
+
+Before writing the report, verify ALL of these:
+- [ ] Every category (1.1-1.7) has at least 2 substantive findings
+- [ ] Previous watchlist items all have updated status (if previous brief exists)
+- [ ] At least 3 items are NEW (not carried from previous brief)
+- [ ] You have at least 10 real, clickable URLs for the Top 10 Links section
+- [ ] No item's "Impact on You" is generic filler — every bullet is specific and actionable
+
+**If any check fails, do more targeted searches before proceeding.**
 
 ## Step 3: Generate the Report
 
@@ -133,7 +166,7 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 
 | Item | Score | Change | Reason |
 |------|-------|--------|--------|
-{Items whose scores would have changed from a previous brief. For first-time items, mark as NEW.}
+{Items whose scores changed from previous brief. For first-time items, mark as NEW.}
 
 ---
 
@@ -147,29 +180,26 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 
 ## TOP 10 LINKS I MUST VISIT TODAY
 
-{Curate the 10 most important URLs from the research that Ammar should personally read today. Rank by urgency and relevance to his work. For each link:}
-
 | # | Link | Why Visit | Score Context |
 |---|------|-----------|---------------|
 | 1 | [{descriptive title}]({URL}) | {One sentence on what you'll learn and why it matters today} | {Related item score}/10 |
-| 2 | ... | ... | ... |
 | ... | ... | ... | ... |
 | 10 | ... | ... | ... |
 
-{Selection criteria for these 10 links:
+Selection criteria:
 - Prioritize official announcements, release posts, and technical docs over news aggregator summaries
-- Include at least 1 link from each of these categories: AI models, dev tools, healthcare AI, regulation
+- Include at least 1 link from each: AI models, dev tools, healthcare AI, regulation
 - Bias toward links with actionable information (APIs to try, docs to read, tools to evaluate)
-- Include any link that relates to a score 8+ item
-- Prefer primary sources (company blogs, GitHub repos, official docs) over secondary coverage}
+- Include any link related to a score 8+ item
+- Prefer primary sources (company blogs, GitHub repos, official docs) over secondary coverage
 
 ---
 
-## ACTIVE WATCHLIST (Top 15 by Score)
+## WATCHLIST (All items scoring 5+, sorted by score)
 
-| Rank | Item | Score | Status | Action By |
-|------|------|-------|--------|-----------|
-{Top 15 items sorted by score descending. Status options: Adopt / Prototype / Evaluate / Watch}
+| Rank | Item | Score | Trend | Status | Action By | Notes |
+|------|------|-------|-------|--------|-----------|-------|
+{All tracked items sorted by score descending. Trend: NEW/+N/-N/=. Status: Adopt / Prototype / Evaluate / Watch. Notes: one-line context.}
 
 ---
 
@@ -179,7 +209,7 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 
 ### 1. Major AI Labs
 
-{For each lab with news this period, include:}
+{For each lab with news this period:}
 
 #### {Lab Name} — {Headline}
 
@@ -189,7 +219,7 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 {Bullet list of specific changes}
 
 **Impact on You:**
-{Bullet list with italic category labels: *Healthcare AI automation*, *AI-assisted development*, *Remote patient monitoring*, *Teaching*}
+{1-3 bullets. Only include categories where impact is real and specific. Skip categories where the connection is forced.}
 
 **Disruption Score: X/10** — {One-line action recommendation}
 
@@ -197,7 +227,7 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 
 ### 2. AI Coding & Dev Tools
 
-{Same format as above for each tool with significant news}
+{Same format. One sub-section per tool with significant news.}
 
 ---
 
@@ -225,19 +255,11 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 
 ---
 
-## FULL WATCHLIST DETAIL
-
-| # | Item | Score | Entered | Days Tracked | Trend | Notes |
-|---|------|-------|---------|--------------|-------|-------|
-{All tracked items with entry dates, trend arrows (NEW/+N/-N/=), and brief notes}
-
----
-
 ## RECOMMENDED ACTIONS
 
 ### Immediate (This Week)
 
-{3-4 numbered actions with bold titles and explanations}
+{3-4 numbered actions with bold titles and one-line explanations}
 
 ### This Sprint (Next 2 Weeks)
 
@@ -249,11 +271,9 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 
 ---
 
-## MARKET CONTEXT & TRENDS
+## MARKET CONTEXT
 
-### The Big Picture ({coverage period})
-
-{5-7 numbered macro observations about the AI landscape, each as a bold thesis with 2-3 sentences of supporting evidence. Always relate back to healthcare tech / AI automation / voice AI / RPM / AI-assisted dev.}
+{3-5 macro observations. One bold thesis sentence each — no padding. Only include observations supported by 2+ items from this brief.}
 
 ---
 
@@ -262,26 +282,13 @@ Why this score: {2-3 sentence justification citing specific signals — e.g., Gi
 *Flag any item hitting 8+ immediately — do not wait for daily brief*
 ```
 
-## Step 4: Scan Previous Briefs (if any)
-
-Before finalizing, scan the `news/` directory for any existing brief files. If previous briefs exist:
-- Read the most recent one to identify previously tracked items
-- Carry forward watchlist items that are still scoring 5+ and within 14 days
-- Calculate score changes (movers) relative to the previous brief
-- Note items that should be archived (below 5 for 14+ days)
-
-If no previous briefs exist, treat all items as NEW entries.
-
 ## Important Guidelines
 
 - **Bias toward signal over noise.** Don't report minor version bumps unless they unlock new capability.
-- **Always frame impact through Ammar's lens:** healthcare CTO, automation builder, AI-assisted dev, educator.
 - **Be honest about hype vs. substance.** Miss a trend for a day rather than chase vaporware.
 - **Primary sources first.** Prefer official blogs, changelogs, GitHub repos, and documentation over news aggregator summaries.
-- **Top 10 Links must be clickable.** Every URL in the links section must be a real, valid URL discovered during research. Never fabricate URLs.
-- **Disruption scores must be justified.** Cite specific evidence (benchmarks, GitHub activity, enterprise announcements) for every score.
-- **Healthcare relevance is mandatory.** Every item must have a clear "Impact on You" that connects to healthcare tech, voice AI, RPM, AI-assisted dev, or teaching.
-- **Use markdown tables consistently.** All tabular data must use proper markdown table formatting.
-- **Include source links.** Every detailed analysis section must include markdown hyperlinks to sources.
-- **Perform at least 12 web searches.** Cover all 7 sub-categories in Step 1. Run searches in parallel batches for efficiency.
+- **Top 10 Links must be clickable.** Every URL must be a real URL discovered during research. Never fabricate URLs.
+- **Disruption scores must be justified.** Cite specific evidence (benchmarks, GitHub activity, enterprise announcements).
+- **No filler in "Impact on You."** Only include impact categories that are genuinely relevant to the item. If an item only affects AI-assisted development, don't force a healthcare or teaching angle.
+- **Perform at least 18 web searches total** (12+ in Phase 1, 6+ in Phase 2). Cover all 7 sub-categories.
 - **Track items for 14 days** on the watchlist, then archive unless still scoring 5+.
