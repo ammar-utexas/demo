@@ -76,6 +76,11 @@ _No bug fixes documented yet._
 - [MedASR Setup Guide](experiments/07-MedASR-PMS-Developer-Setup-Guide.md) — Self-hosted GPU Docker deployment, FastAPI inference service, PMS backend and frontend integration
 - [MedASR Developer Tutorial](experiments/07-MedASR-Developer-Tutorial.md) — Hands-on onboarding: build your first clinical dictation integration end-to-end
 
+### Adaptive Thinking (AI Reasoning Optimization)
+- [PRD: Adaptive Thinking PMS Integration](experiments/08-PRD-AdaptiveThinking-PMS-Integration.md) — Effort-routed AI reasoning for clinical decision support, cost optimization, and interleaved agentic workflows
+- [Adaptive Thinking Setup Guide](experiments/08-AdaptiveThinking-PMS-Developer-Setup-Guide.md) — SDK migration from deprecated extended thinking, effort routing, telemetry, and streaming integration
+- [Adaptive Thinking Developer Tutorial](experiments/08-AdaptiveThinking-Developer-Tutorial.md) — Hands-on onboarding: build effort-routed clinical AI features end-to-end
+
 ---
 
 ## Documentation Views
