@@ -97,6 +97,16 @@ _No bug fixes documented yet._
 - [Sanford Guide Setup Guide](experiments/11-SanfordGuide-PMS-Developer-Setup-Guide.md) — API client configuration, Redis caching, CDS sidebar panel, audit logging, and HIPAA-compliant data sanitization
 - [Sanford Guide Developer Tutorial](experiments/11-SanfordGuide-Developer-Tutorial.md) — Hands-on onboarding: build a syndrome-to-prescription CDS pipeline with interaction checking end-to-end
 
+### AI Zero-Day Vulnerability Scan (AI-Powered Security)
+- [PRD: AI Zero-Day Scan PMS Integration](experiments/12-PRD-AIZeroDayScan-PMS-Integration.md) — AI-powered zero-day vulnerability scanning using Claude Opus 4.6 for continuous security assurance of PMS codebase and dependencies
+- [AI Zero-Day Scan Setup Guide](experiments/12-AIZeroDayScan-PMS-Developer-Setup-Guide.md) — CI/CD security gate, deep dependency auditor service, security dashboard integration
+- [AI Zero-Day Scan Developer Tutorial](experiments/12-AIZeroDayScan-Developer-Tutorial.md) — Hands-on onboarding: scan vulnerable code, triage findings, build custom healthcare security prompts
+
+### Gemma 3 (On-Premise Open-Weight Clinical AI)
+- [PRD: Gemma 3 PMS Integration](experiments/13-PRD-Gemma3-PMS-Integration.md) — Self-hosted multimodal AI backbone using Google's Gemma 3 and MedGemma for HIPAA-compliant clinical summarization, structured extraction, and medication intelligence with zero PHI egress
+- [Gemma 3 Setup Guide](experiments/13-Gemma3-PMS-Developer-Setup-Guide.md) — Ollama deployment, AI Gateway service, OpenAI-compatible API, PMS backend and frontend integration
+- [Gemma 3 Developer Tutorial](experiments/13-Gemma3-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation pipeline with drug interaction checking end-to-end
+
 ---
 
 ## Documentation Views
