@@ -35,7 +35,7 @@ Use **FastAPI with async SQLAlchemy + asyncpg**.
 | Pydantic v2 | Request/response validation |
 | pydantic-settings | Environment configuration |
 | python-jose | JWT token creation/verification |
-| passlib[bcrypt] | Password hashing |
+| bcrypt | Password hashing |
 | Alembic | Database migrations |
 
 ## Architecture

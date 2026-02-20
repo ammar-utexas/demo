@@ -10,7 +10,7 @@
 | asyncpg | >=0.30.0 | PostgreSQL async driver |
 | pydantic-settings | >=2.6.0 | Environment config |
 | python-jose[cryptography] | >=3.3.0 | JWT tokens |
-| passlib[bcrypt] | >=1.7.4 | Password hashing |
+| bcrypt | >=4.0.0 | Password hashing |
 | alembic | >=1.14.0 | Database migrations |
 | pytest | >=8.3.0 | Testing (dev) |
 | pytest-asyncio | >=0.24.0 | Async test support (dev) |
