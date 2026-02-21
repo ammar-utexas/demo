@@ -35,6 +35,6 @@ The Prompt Management subsystem provides centralized CRUD, automatic versioning,
 
 | Platform | File | Req Count |
 |----------|------|-----------|
-| Backend (BE) | [SUB-PM-BE](../platform/SUB-PM-BE.md) | 7 |
-| Web Frontend (WEB) | [SUB-PM-WEB](../platform/SUB-PM-WEB.md) | 5 |
-| AI Infrastructure (AI) | [SUB-PM-AI](../platform/SUB-PM-AI.md) | 1 |
+| Backend (BE) | [SUB-BE](../platform/SUB-BE.md#prompt-management-sub-pm) | 7 |
+| Web Frontend (WEB) | [SUB-WEB](../platform/SUB-WEB.md#prompt-management-sub-pm) | 5 |
+| AI Infrastructure (AI) | [SUB-AI](../platform/SUB-AI.md#prompt-management-sub-pm) | 1 |

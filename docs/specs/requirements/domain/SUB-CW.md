@@ -28,6 +28,6 @@ The Clinical Workflow subsystem manages encounter scheduling, status tracking, c
 
 | Platform | File | Req Count |
 |----------|------|-----------|
-| Backend (BE) | [SUB-CW-BE](../platform/SUB-CW-BE.md) | 8 |
-| Web Frontend (WEB) | [SUB-CW-WEB](../platform/SUB-CW-WEB.md) | 3 |
-| Android (AND) | [SUB-CW-AND](../platform/SUB-CW-AND.md) | 3 |
+| Backend (BE) | [SUB-BE](../platform/SUB-BE.md#clinical-workflow-sub-cw) | 8 |
+| Web Frontend (WEB) | [SUB-WEB](../platform/SUB-WEB.md#clinical-workflow-sub-cw) | 3 |
+| Android (AND) | [SUB-AND](../platform/SUB-AND.md#clinical-workflow-sub-cw) | 3 |

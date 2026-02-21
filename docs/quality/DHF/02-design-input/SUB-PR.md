@@ -40,7 +40,7 @@ Starting with SYS-REQ-0012, this subsystem also encompasses **dermatology clinic
 
 | Platform | File | Req Count |
 |----------|------|-----------|
-| Backend (BE) | [SUB-PR-BE](../platform/SUB-PR-BE.md) | 15 |
-| Web Frontend (WEB) | [SUB-PR-WEB](../platform/SUB-PR-WEB.md) | 8 |
-| Android (AND) | [SUB-PR-AND](../platform/SUB-PR-AND.md) | 8 |
-| AI Infrastructure (AI) | [SUB-PR-AI](../platform/SUB-PR-AI.md) | 5 |
+| Backend (BE) | [SUB-BE](../platform/SUB-BE.md#patient-records-sub-pr) | 15 |
+| Web Frontend (WEB) | [SUB-WEB](../platform/SUB-WEB.md#patient-records-sub-pr) | 8 |
+| Android (AND) | [SUB-AND](../platform/SUB-AND.md#patient-records-sub-pr) | 8 |
+| AI Infrastructure (AI) | [SUB-AI](../platform/SUB-AI.md#patient-records-sub-pr) | 5 |

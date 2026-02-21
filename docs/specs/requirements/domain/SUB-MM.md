@@ -29,6 +29,6 @@ The Medication Management subsystem handles the medication catalog, prescription
 
 | Platform | File | Req Count |
 |----------|------|-----------|
-| Backend (BE) | [SUB-MM-BE](../platform/SUB-MM-BE.md) | 9 |
-| Web Frontend (WEB) | [SUB-MM-WEB](../platform/SUB-MM-WEB.md) | 2 |
-| Android (AND) | [SUB-MM-AND](../platform/SUB-MM-AND.md) | 2 |
+| Backend (BE) | [SUB-BE](../platform/SUB-BE.md#medication-management-sub-mm) | 9 |
+| Web Frontend (WEB) | [SUB-WEB](../platform/SUB-WEB.md#medication-management-sub-mm) | 2 |
+| Android (AND) | [SUB-AND](../platform/SUB-AND.md#medication-management-sub-mm) | 2 |

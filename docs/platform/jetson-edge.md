@@ -13,7 +13,7 @@
 | Document | Summary |
 |----------|---------|
 | [Vision Capabilities](../features/vision-capabilities.md) | MONAI (wound), ArcFace (patient ID), PaddleOCR (documents) — TensorRT-optimized |
-| [SUB-PR-AI](../specs/requirements/platform/SUB-PR-AI.md) | 5 AI platform requirements for on-device vision and dermatology endpoints |
+| [SUB-AI](../specs/requirements/platform/SUB-AI.md) | All AI infrastructure platform requirements across 2 domains (6 reqs) |
 
 ## Deployment & Configuration
 

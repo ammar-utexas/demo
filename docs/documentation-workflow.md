@@ -376,11 +376,11 @@ Increment version numbers and dates in all modified file headers.
 - [ ] Identify which subsystem(s) the feature belongs to (PR, CW, MM, RA, PM)
 - [ ] Read the target `docs/specs/requirements/domain/SUB-{code}.md` — note version, highest req ID, platform counts
 - [ ] Add domain requirement rows to the Requirements table: `SUB-{code}-XXXX`
-- [ ] Add platform requirement rows to the applicable platform files in `docs/specs/requirements/platform/`:
-  - [ ] `SUB-{code}-XXXX-BE` in `SUB-{code}-BE.md` — Backend API endpoint, service, model
-  - [ ] `SUB-{code}-XXXX-WEB` in `SUB-{code}-WEB.md` — Web UI component, page, form
-  - [ ] `SUB-{code}-XXXX-AND` in `SUB-{code}-AND.md` — Android screen, ViewModel, repository
-  - [ ] `SUB-{code}-XXXX-AI` in `SUB-{code}-AI.md` — ML model, inference service, embedding pipeline
+- [ ] Add platform requirement rows to the applicable consolidated platform files in `docs/specs/requirements/platform/`:
+  - [ ] `SUB-{code}-XXXX-BE` in `SUB-BE.md` (under the relevant domain section) — Backend API endpoint, service, model
+  - [ ] `SUB-{code}-XXXX-WEB` in `SUB-WEB.md` (under the relevant domain section) — Web UI component, page, form
+  - [ ] `SUB-{code}-XXXX-AND` in `SUB-AND.md` (under the relevant domain section) — Android screen, ViewModel, repository
+  - [ ] `SUB-{code}-XXXX-AI` in `SUB-AI.md` (under the relevant domain section) — ML model, inference service, embedding pipeline
 - [ ] Update Platform Decomposition index table in the domain file (req counts)
 - [ ] Update status rollup note at bottom of Requirements table
 - [ ] Increment version number and update date in domain file header
@@ -612,13 +612,13 @@ from testing-strategy.md.
 
 > **This is the implementation milestone.** All prior steps (1–6) are documentation and planning. Steps 8–10 are configuration, verification, and release. Code is written here.
 
-The implementation follows the **GitHub Speckit full cycle** — five phases executed per platform. The **platform constitution** (the platform requirement file `SUB-{CODE}-{PLATFORM}.md`) is the governing specification for each cycle.
+The implementation follows the **GitHub Speckit full cycle** — five phases executed per platform. The **platform constitution** (the consolidated platform requirement file `SUB-{PLATFORM}.md`) is the governing specification for each cycle.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  SPECKIT FULL CYCLE  (repeat per platform: BE, WEB, AND, AI)    │
 │                                                                  │
-│  Constitution: docs/specs/requirements/platform/SUB-*-{PLAT}.md │
+│  Constitution: docs/specs/requirements/platform/SUB-{PLAT}.md   │
 │                                                                  │
 │  7a. CLARIFY   — /specify  (double-check requirements)          │
 │  7b. PLAN      — /plan     (technical implementation plan)      │
@@ -641,7 +641,7 @@ Double-check that the platform requirements are complete, unambiguous, and consi
 > | `pms-android` | AND |
 > | `pms-derm-cds` | AI |
 >
-> It then reads **all** platform requirement files for that platform (e.g., for BE: `SUB-PR-BE.md`, `SUB-CW-BE.md`, `SUB-MM-BE.md`, `SUB-RA-BE.md`, `SUB-PM-BE.md`) and filters to only those requirements that trace to the target feature's SYS-REQ.
+> It then reads the **consolidated** platform requirement file for that platform (e.g., for BE: `SUB-BE.md` which contains all domain sections) and filters to only those requirements that trace to the target feature's SYS-REQ.
 
 **Checklist:**
 - [ ] Run `/specify` from within the target repository (or provide the repo name and feature branch)

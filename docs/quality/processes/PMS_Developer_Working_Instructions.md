@@ -74,12 +74,11 @@ docs/
 │   │   │   ├── SUB-MM.md           # Medication Management (9 domain reqs)
 │   │   │   ├── SUB-RA.md           # Reporting & Analytics (8 domain reqs)
 │   │   │   └── SUB-PM.md           # Prompt Management (7 domain reqs)
-│   │   └── platform/               # Platform-specific requirements
-│   │       ├── SUB-PR-BE.md        # Patient Records — Backend (15 reqs)
-│   │       ├── SUB-PR-WEB.md       # Patient Records — Web Frontend (8 reqs)
-│   │       ├── SUB-PR-AND.md       # Patient Records — Android (8 reqs)
-│   │       ├── SUB-PR-AI.md        # Patient Records — AI Infrastructure (5 reqs)
-│   │       └── ...                 # (16 platform files total)
+│   │   └── platform/               # Consolidated platform requirements
+│   │       ├── SUB-BE.md           # Backend — all domains (47 reqs)
+│   │       ├── SUB-WEB.md          # Web Frontend — all domains (24 reqs)
+│   │       ├── SUB-AND.md          # Android — all domains (18 reqs)
+│   │       └── SUB-AI.md           # AI Infrastructure — all domains (6 reqs)
 ├── testing/                         # Test strategy and traceability
 │   ├── testing-strategy.md          # Test levels, naming, run records
 │   └── traceability-matrix.md       # RTM: forward + backward traceability
@@ -598,7 +597,7 @@ claude
 # logging (SYS-REQ-0003)."
 ```
 
-3. **Update the Implementation Mapping** in `docs/specs/requirements/platform/SUB-MM-BE.md`:
+3. **Update the Implementation Mapping** in `docs/specs/requirements/platform/SUB-BE.md` (Medication Management section):
 
 ```markdown
 | SUB-MM-0001 | `services/interaction_checker.py` | — | — | TST-MM-0001 |

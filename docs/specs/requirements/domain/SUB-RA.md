@@ -30,6 +30,6 @@ SUB-RA-0008 adds **dermatology classification analytics** — aggregating lesion
 
 | Platform | File | Req Count |
 |----------|------|-----------|
-| Backend (BE) | [SUB-RA-BE](../platform/SUB-RA-BE.md) | 8 |
-| Web Frontend (WEB) | [SUB-RA-WEB](../platform/SUB-RA-WEB.md) | 6 |
-| Android (AND) | [SUB-RA-AND](../platform/SUB-RA-AND.md) | 5 |
+| Backend (BE) | [SUB-BE](../platform/SUB-BE.md#reporting--analytics-sub-ra) | 8 |
+| Web Frontend (WEB) | [SUB-WEB](../platform/SUB-WEB.md#reporting--analytics-sub-ra) | 6 |
+| Android (AND) | [SUB-AND](../platform/SUB-AND.md#reporting--analytics-sub-ra) | 5 |

@@ -374,24 +374,42 @@ For each subsystem, create `docs/specs/requirements/domain/SUB-{code}.md`:
 | SUB-{CODE}-0001 | SUB-{CODE}-0001-BE | SUB-{CODE}-0001-WEB | — | — |
 ```
 
-### 5d. Create Platform Requirement Templates
+### 5d. Create Consolidated Platform Requirement Files
 
-For each subsystem + platform combination, create `docs/specs/requirements/platform/SUB-{code}-{PLATFORM}.md`:
+For each platform, create a single consolidated file `docs/specs/requirements/platform/SUB-{PLATFORM}.md` containing sections for all applicable domains:
 
 ```markdown
-# Platform Requirements: {Subsystem} — {Platform} (SUB-{CODE}-{PLATFORM})
+# Platform Requirements: {Platform Name} (SUB-{PLATFORM})
 
 **Version:** 0.1
 **Date:** YYYY-MM-DD
+**Platform:** {Platform Name} ({PLATFORM}) — {N} requirements across {M} domains
+**Repository:** {repo}
+**Technology:** {tech stack}
 
-## Requirements
+---
 
-| Req ID | Description | Parent Domain Req | Module(s) | Test Case ID | Status |
-|--------|-------------|-------------------|-----------|-------------|--------|
-| SUB-{CODE}-0001-{PLATFORM} | ... | SUB-{CODE}-0001 | ... | TST-{CODE}-0001-{PLATFORM} | Not Started |
+## Summary
+
+| Domain | Req Count | Status Breakdown |
+|--------|-----------|-----------------|
+| {Domain Name} ({CODE}) | N | ... |
+| **Total** | **N** | |
+
+---
+
+## {Domain Name} (SUB-{CODE})
+
+**Parent:** [SUB-{CODE} (Domain)](../domain/SUB-{CODE}.md)
+
+| Platform Req ID | Parent | Description | Module(s) | Test Case(s) | Status |
+|---|---|---|---|---|---|
+| SUB-{CODE}-0001-{PLATFORM} | SUB-{CODE}-0001 | ... | ... | TST-{CODE}-0001-{PLATFORM} | Not Started |
+
+(repeat domain sections for each applicable domain)
 ```
 
-Only create platform files for subsystem + platform combinations that apply to your project.
+Only create platform files for platforms that apply to your project. Each platform file contains all domain sections relevant to that platform.
 
 ---
 
@@ -554,7 +572,7 @@ Complete list of files to create, grouped by directory. Check each off as you cr
 
 - [ ] `docs/specs/requirements/SYS-REQ.md`
 - [ ] `docs/specs/requirements/domain/SUB-{code}.md` (one per subsystem)
-- [ ] `docs/specs/requirements/platform/SUB-{code}-{PLATFORM}.md` (one per subsystem + platform)
+- [ ] `docs/specs/requirements/platform/SUB-{PLATFORM}.md` (one per platform, consolidated across domains)
 
 ### `docs/testing/` (2 files)
 
@@ -946,13 +964,15 @@ For each subsystem in {SUBSYSTEMS}, create:
    - Platform Decomposition index table: Domain Req | (one column per applicable platform)
    - Status rollup note explaining the strict rollup rule
 
-2. For each applicable platform in {PLATFORMS}, create:
-   docs/specs/requirements/platform/SUB-{CODE}-{PLATFORM}.md with:
-   - Document header: Version 0.1, today's date
-   - Empty Requirements table: Req ID | Description | Parent Domain Req | Module(s) | Test Case ID | Status
+2. For each applicable platform in {PLATFORMS}, create a single consolidated file:
+   docs/specs/requirements/platform/SUB-{PLATFORM}.md with:
+   - Document header: Version 0.1, today's date, platform name, repository, technology
+   - Summary table showing domain req counts
+   - One section per applicable domain, each with:
+     Requirements table: Platform Req ID | Parent | Description | Module(s) | Test Case(s) | Status
 
-Only create platform files for subsystem+platform combinations that
-make sense for the project. Not every subsystem needs every platform.
+Only create platform files for platforms that apply to your project.
+Each platform file contains all domain sections relevant to that platform.
 
 Also create placeholder files:
 - docs/specs/subsystem-versions.md — empty version tracking table

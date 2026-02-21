@@ -19,10 +19,7 @@
 
 | Document | BE Reqs | Summary |
 |----------|---------|---------|
-| [SUB-PR-BE](../specs/requirements/platform/SUB-PR-BE.md) | 15 | Patient CRUD, encryption, audit, search, pagination, lesion endpoints |
-| [SUB-CW-BE](../specs/requirements/platform/SUB-CW-BE.md) | 8 | Encounter lifecycle, auth, RBAC, alerts, audit |
-| [SUB-MM-BE](../specs/requirements/platform/SUB-MM-BE.md) | 9 | Drug interactions, encryption, FHIR, RBAC, refill tracking |
-| [SUB-RA-BE](../specs/requirements/platform/SUB-RA-BE.md) | 8 | Dashboard data, audit log queries, CSV export, derm analytics |
+| [SUB-BE](../specs/requirements/platform/SUB-BE.md) | 47 | All backend platform requirements across 5 domains |
 
 ## Features & Implementation
 

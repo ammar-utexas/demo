@@ -13,10 +13,7 @@
 
 | Document | WEB Reqs | Summary |
 |----------|----------|---------|
-| [SUB-PR-WEB](../specs/requirements/platform/SUB-PR-WEB.md) | 8 | Patient record forms, search, list views, dermatology UI |
-| [SUB-CW-WEB](../specs/requirements/platform/SUB-CW-WEB.md) | 3 | Encounter management UI |
-| [SUB-MM-WEB](../specs/requirements/platform/SUB-MM-WEB.md) | 2 | Medication management UI |
-| [SUB-RA-WEB](../specs/requirements/platform/SUB-RA-WEB.md) | 6 | Dashboards, charts, audit log viewer, derm analytics |
+| [SUB-WEB](../specs/requirements/platform/SUB-WEB.md) | 24 | All web frontend platform requirements across 5 domains |
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | — | SYS-08: Web UI system requirement |
 
 ## Features & Implementation

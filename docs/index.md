@@ -202,11 +202,10 @@ The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → D
 
 ### Platform Requirements
 
-- **Patient Records:** [BE](specs/requirements/platform/SUB-PR-BE.md) (15) | [WEB](specs/requirements/platform/SUB-PR-WEB.md) (8) | [AND](specs/requirements/platform/SUB-PR-AND.md) (8) | [AI](specs/requirements/platform/SUB-PR-AI.md) (5)
-- **Clinical Workflow:** [BE](specs/requirements/platform/SUB-CW-BE.md) (8) | [WEB](specs/requirements/platform/SUB-CW-WEB.md) (3) | [AND](specs/requirements/platform/SUB-CW-AND.md) (3)
-- **Medication Management:** [BE](specs/requirements/platform/SUB-MM-BE.md) (9) | [WEB](specs/requirements/platform/SUB-MM-WEB.md) (2) | [AND](specs/requirements/platform/SUB-MM-AND.md) (2)
-- **Reporting & Analytics:** [BE](specs/requirements/platform/SUB-RA-BE.md) (8) | [WEB](specs/requirements/platform/SUB-RA-WEB.md) (6) | [AND](specs/requirements/platform/SUB-RA-AND.md) (5)
-- **Prompt Management:** [BE](specs/requirements/platform/SUB-PM-BE.md) (7) | [WEB](specs/requirements/platform/SUB-PM-WEB.md) (5) | [AI](specs/requirements/platform/SUB-PM-AI.md) (1)
+- [Backend (SUB-BE)](specs/requirements/platform/SUB-BE.md) — 47 requirements across 5 domains
+- [Web Frontend (SUB-WEB)](specs/requirements/platform/SUB-WEB.md) — 24 requirements across 5 domains
+- [Android (SUB-AND)](specs/requirements/platform/SUB-AND.md) — 18 requirements across 4 domains
+- [AI Infrastructure (SUB-AI)](specs/requirements/platform/SUB-AI.md) — 6 requirements across 2 domains
 
 ## Testing & Traceability
 
