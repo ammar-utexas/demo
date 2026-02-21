@@ -218,6 +218,7 @@ The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → D
 - [Requirements Governance & Conflict Analysis](quality/processes/requirements-governance.md) — Governance procedures, feature branching & release strategy, 14 domain conflicts, 12 platform conflicts, 14 race conditions
 - [PMS Developer Working Instructions](quality/processes/PMS_Developer_Working_Instructions.md) — Development process guide
 - [Development Pipeline Tutorial](quality/processes/Development_Pipeline_Tutorial.md) — CI/CD pipeline tutorial
+- [Repository Setup Guide](quality/processes/repository-setup-guide.md) — Step-by-step guide to bootstrap a new repository with this documentation process
 - [ISO 13485:2016 Standard](quality/standards/iso-13485-2016.pdf) — Medical device QMS standard
 
 ### Design History File (DHF)
