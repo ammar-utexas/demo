@@ -26,29 +26,36 @@ All components share a documentation submodule (`ammar-utexas/demo`) containing 
 
 ## 3. System Context
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                        PMS System                            │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────┐               │
-│  │  Web UI  │  │ Android  │  │  Backend API │               │
-│  │ (Next.js)│  │ (Kotlin) │  │  (FastAPI)   │               │
-│  └────┬─────┘  └────┬─────┘  └──────┬───────┘               │
-│       │              │               │                       │
-│       └──────────────┴───────────────┤                       │
-│                      │               │                       │
-│              ┌───────┴────────┐  ┌───┴───────────────────┐   │
-│              │  PostgreSQL DB │  │  Dermatology CDS      │   │
-│              │                │  │  (ONNX Runtime,       │   │
-│              │  + pgvector    │  │   EfficientNet-B4)    │   │
-│              └────────────────┘  └───────────────────────┘   │
-└──────────────────────────────────────────────────────────────┘
-         │                    │
-    ┌────┴────┐         ┌────┴────┐
-    │ External│         │  Audit  │
-    │  EHR    │         │  Log    │
-    │ (FHIR)  │         │ Archive │
-    └─────────┘         └─────────┘
+```mermaid
+flowchart TB
+    subgraph PMS["PMS System"]
+        WebUI["Web UI<br/>(Next.js :3000)"]
+        Android["Android App<br/>(Kotlin)"]
+        Backend["Backend API<br/>(FastAPI :8000)"]
+        DermCDS["Dermatology CDS<br/>(ONNX Runtime :8090)"]
+        DB[("PostgreSQL<br/>+ pgvector")]
+
+        WebUI --> Backend
+        Android --> Backend
+        Backend --> DB
+        Backend --> DermCDS
+        DermCDS --> DB
+    end
+
+    EHR["External EHR<br/>(FHIR R4)"]
+    Audit["Audit Log<br/>Archive"]
+
+    Backend <--> EHR
+    Backend --> Audit
+
+    style PMS fill:#f0f4ff,stroke:#3366cc
+    style WebUI fill:#d4edda,stroke:#28a745
+    style Android fill:#d4edda,stroke:#28a745
+    style Backend fill:#cce5ff,stroke:#0066cc
+    style DermCDS fill:#fff3cd,stroke:#cc8800
+    style DB fill:#e2d9f3,stroke:#6f42c1
+    style EHR fill:#f8f9fa,stroke:#6c757d
+    style Audit fill:#f8f9fa,stroke:#6c757d
 ```
 
 ## 4. Subsystem Decomposition
