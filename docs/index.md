@@ -131,6 +131,11 @@ _No bug fixes documented yet._
 - [ISICArchive Setup Guide](experiments/18-ISICArchive-PMS-Developer-Setup-Guide.md) — Dermatology CDS Docker service deployment, ONNX Runtime classification, pgvector reference cache, lesion API endpoints, and Next.js classification UI
 - [ISICArchive Developer Tutorial](experiments/18-ISICArchive-Developer-Tutorial.md) — Hands-on onboarding: classify a skin lesion, build similarity search, implement risk scoring, and track lesion changes over time end-to-end
 
+### Superpowers (AI Development Workflow Enforcement)
+- [PRD: Superpowers PMS Integration](experiments/19-PRD-Superpowers-PMS-Integration.md) — Agentic skills framework enforcing TDD, Socratic brainstorming, subagent-driven development, and two-stage code review for healthcare-grade AI-assisted development with PMS-specific HIPAA and architecture custom skills
+- [Superpowers Setup Guide](experiments/19-Superpowers-PMS-Developer-Setup-Guide.md) — Claude Code plugin installation, PMS custom skills creation (HIPAA patterns, testing requirements, architecture conventions), and TDD workflow configuration
+- [Superpowers Developer Tutorial](experiments/19-Superpowers-Developer-Tutorial.md) — Hands-on onboarding: build a PMS feature using the full Superpowers workflow (brainstorm, plan, TDD execute, review) with custom healthcare skills end-to-end
+
 ---
 
 ## Documentation Views
