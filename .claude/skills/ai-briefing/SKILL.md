@@ -16,24 +16,48 @@ Your task is to research the last 14 days of AI ecosystem news and produce a **s
 
 1. Create the `news/` directory if it does not exist.
 2. Generate the filename using the current timestamp: `YYYY-MM-DD-HH-MM-SS.md` (use `date "+%Y-%m-%d-%H-%M-%S"`).
-3. Calculate the coverage period: today's date minus 14 days through today.
-4. **Scan `news/` for the most recent existing brief.** If one exists, read it in full. Extract:
+3. **Compute date variables** for use in all search queries throughout the brief:
+   ```bash
+   CURRENT_MONTH=$(date "+%B")         # e.g., "February"
+   CURRENT_YEAR=$(date "+%Y")          # e.g., "2026"
+   PREV_MONTH=$(date -v-14d "+%B")     # month from 14 days ago
+   COVERAGE_START=$(date -v-14d "+%Y-%m-%d")
+   COVERAGE_END=$(date "+%Y-%m-%d")
+   ```
+   These variables ensure all search queries reference the actual coverage period rather than hardcoded dates.
+4. Calculate the coverage period: `$COVERAGE_START` through `$COVERAGE_END`.
+5. **Scan `news/` for the most recent existing brief.** If one exists, read it in full. Extract:
    - All watchlist items and their scores
    - Categories that had thin coverage or were missing items
    - Items that need status updates
    - This informs your search strategy in Step 1.
-5. If `$ARGUMENTS` contains a specific focus area, give it extra weight in the research and scoring. Otherwise, cover all categories equally.
+6. If `$ARGUMENTS` contains a specific focus area, give it extra weight in the research and scoring. Otherwise, cover all categories equally.
 
 ## Step 1: Research Phase 1 — Broad Sweep (Parallel)
 
 Use **WebSearch** extensively. Launch searches in parallel batches. Perform **at least 12 distinct searches** covering all 7 categories below.
 
-**Write specific queries, not generic ones:**
-- BAD: "Anthropic Claude announcements February 2026"
-- GOOD: "Anthropic Claude Sonnet 4.6 release features pricing February 2026"
-- GOOD: "Claude Code enterprise adoption GitHub Agent HQ 2026"
-- GOOD: "healthcare voice AI startup funding Series A 2026"
-- GOOD: "Oracle Health ambient clinical AI launch NHS 2026"
+### Date Handling in Search Queries
+
+**Use `date` to compute the current month and year dynamically** — never hardcode month names or years. Before writing any search query, run:
+
+```bash
+CURRENT_MONTH=$(date "+%B")    # e.g., "February"
+CURRENT_YEAR=$(date "+%Y")     # e.g., "2026"
+PREV_MONTH=$(date -v-14d "+%B") # month from 14 days ago (may differ)
+```
+
+Then construct queries using these variables. If the coverage period spans two months, include both month names in relevant queries.
+
+**Write specific queries anchored to the coverage period, not generic ones:**
+- BAD: "Anthropic Claude announcements" *(too vague, returns old results)*
+- BAD: "AI news March 2025" *(hardcoded stale date)*
+- GOOD: "Anthropic Claude new model release features pricing {CURRENT_MONTH} {CURRENT_YEAR}"
+- GOOD: "Claude Code enterprise adoption GitHub Agent HQ {CURRENT_YEAR}"
+- GOOD: "healthcare voice AI startup funding Series A {CURRENT_YEAR}"
+- GOOD: "Oracle Health ambient clinical AI launch {CURRENT_MONTH} {CURRENT_YEAR}"
+
+Every search query that includes a date **must** use the computed current month/year or the coverage period boundaries. If a query doesn't need a date (e.g., searching for a specific product name), omit the date rather than guessing.
 
 ### 1.1 Major AI Labs
 Search for announcements, model releases, and significant updates from:
@@ -106,10 +130,10 @@ After Phase 1, review all results and identify:
 - **Items from the previous brief's watchlist** that need updated status
 - **Funding rounds, partnerships, or launches** referenced in passing that deserve their own search
 
-Launch **6-10 additional targeted searches** to fill these gaps. These should be specific:
-- "Secai Voxira healthcare voice AI agent funding"
-- "OpenAI Lockdown Mode ChatGPT enterprise security"
-- "Apple Xcode Claude Agent SDK integration details"
+Launch **6-10 additional targeted searches** to fill these gaps. These should be specific and use the computed date variables where relevant:
+- "Secai Voxira healthcare voice AI agent funding {CURRENT_YEAR}"
+- "OpenAI Lockdown Mode ChatGPT enterprise security {CURRENT_MONTH} {CURRENT_YEAR}"
+- "Apple Xcode Claude Agent SDK integration details {CURRENT_YEAR}"
 
 **Do NOT proceed to scoring until every category has at least 2 findings backed by primary sources.**
 
