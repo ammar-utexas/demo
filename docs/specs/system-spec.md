@@ -13,33 +13,36 @@ This document defines the system-level specification for the Patient Management 
 
 ## 2. Scope
 
-The PMS consists of three deployable components sharing a common backend API:
+The PMS consists of three deployable components sharing a common backend API, plus an AI microservice for dermatology clinical decision support:
 
 | Component | Repository | Technology |
 |---|---|---|
 | Backend API | `ammar-utexas/pms-backend` | Python, FastAPI, PostgreSQL |
 | Web Frontend | `ammar-utexas/pms-frontend` | Next.js, React, TypeScript |
 | Android App | `ammar-utexas/pms-android` | Kotlin, Jetpack Compose |
+| Dermatology CDS | `ammar-utexas/pms-backend` (services/derm-cds) | Python, ONNX Runtime, pgvector |
 
 All components share a documentation submodule (`ammar-utexas/demo`) containing specifications, requirements, and traceability evidence.
 
 ## 3. System Context
 
 ```
-┌─────────────────────────────────────────────────┐
-│                  PMS System                     │
-│                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────┐  │
-│  │  Web UI  │  │ Android  │  │  Backend API │  │
-│  │ (Next.js)│  │ (Kotlin) │  │  (FastAPI)   │  │
-│  └────┬─────┘  └────┬─────┘  └──────┬───────┘  │
-│       │              │               │          │
-│       └──────────────┴───────────────┘          │
-│                      │                          │
-│              ┌───────┴────────┐                 │
-│              │  PostgreSQL DB │                 │
-│              └────────────────┘                 │
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                        PMS System                            │
+│                                                              │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────┐               │
+│  │  Web UI  │  │ Android  │  │  Backend API │               │
+│  │ (Next.js)│  │ (Kotlin) │  │  (FastAPI)   │               │
+│  └────┬─────┘  └────┬─────┘  └──────┬───────┘               │
+│       │              │               │                       │
+│       └──────────────┴───────────────┤                       │
+│                      │               │                       │
+│              ┌───────┴────────┐  ┌───┴───────────────────┐   │
+│              │  PostgreSQL DB │  │  Dermatology CDS      │   │
+│              │                │  │  (ONNX Runtime,       │   │
+│              │  + pgvector    │  │   EfficientNet-B4)    │   │
+│              └────────────────┘  └───────────────────────┘   │
+└──────────────────────────────────────────────────────────────┘
          │                    │
     ┌────┴────┐         ┌────┴────┐
     │ External│         │  Audit  │
@@ -55,7 +58,7 @@ All components share a documentation submodule (`ammar-utexas/demo`) containing 
 | SUB-PR | Patient Records | Demographics, medical history, documents, consent, encrypted PHI, AI vision (wound assessment, patient ID verification, document OCR), dermatology CDS (skin lesion classification, similarity search, risk scoring, longitudinal tracking) | All roles |
 | SUB-CW | Clinical Workflow | Scheduling, encounters, status tracking, clinical notes, referrals | Physicians, Nurses |
 | SUB-MM | Medication Management | Prescriptions, drug interactions, formulary, dispensing | Physicians, Pharmacists |
-| SUB-RA | Reporting & Analytics | Clinical dashboards, compliance reports, audit log queries | Administrators, Compliance |
+| SUB-RA | Reporting & Analytics | Clinical dashboards, compliance reports, audit log queries, dermatology classification analytics | Administrators, Compliance |
 | SUB-PM | Prompt Management | Centralized prompt CRUD, versioning, audit trail, LLM-powered version comparison | Administrators |
 
 ## 5. User Roles
@@ -66,6 +69,7 @@ All components share a documentation submodule (`ammar-utexas/demo`) containing 
 | Nurse | Clinical read/write | Patient vitals, encounter notes, medication administration |
 | Administrator | System management | User management, configuration, compliance reports |
 | Billing | Financial only | Insurance, billing codes, financial reports |
+| Pharmacist | Medication management | Medication dispensing, formulary management, interaction review |
 
 ## 6. Regulatory Constraints
 
@@ -107,7 +111,7 @@ Requirements decompose into platform-specific requirements using the following p
 | `BE` | Backend API | `ammar-utexas/pms-backend` | Python, FastAPI, PostgreSQL |
 | `WEB` | Web Frontend | `ammar-utexas/pms-frontend` | Next.js, React, TypeScript |
 | `AND` | Android App | `ammar-utexas/pms-android` | Kotlin, Jetpack Compose |
-| `AI` | AI Infrastructure | Edge deployment (Jetson Thor) | Python, ONNX Runtime, TensorRT |
+| `AI` | AI Infrastructure | Edge deployment (Jetson Thor), Dermatology CDS Docker service | Python, ONNX Runtime, TensorRT, pgvector |
 
 A domain requirement (e.g., `SUB-PR-0003`) decomposes into one or more platform requirements (e.g., `SUB-PR-0003-BE`, `SUB-PR-0003-WEB`, `SUB-PR-0003-AND`). Not every domain requirement requires all platforms — backend-only concerns like encryption and audit logging may have only a `BE` platform requirement.
 
