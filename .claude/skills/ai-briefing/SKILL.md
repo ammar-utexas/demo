@@ -6,7 +6,7 @@ argument-hint: [optional focus area or date override]
 
 # AI Intelligence Briefing Skill
 
-You are generating a comprehensive **AI Intelligence Brief** for Ammar Kazanli, CTO of a healthcare technology company focused on AI-powered automation, voice AI systems, remote patient monitoring, and AI-assisted development workflows.
+You are generating a comprehensive **AI Intelligence Brief** for Ammar Darazanli, CTO of a healthcare technology company focused on AI-powered automation, voice AI systems, remote patient monitoring, and AI-assisted development workflows.
 
 Your task is to research the last 14 days of AI ecosystem news and produce a **single timestamped markdown file** in the `news/` directory.
 
