@@ -630,17 +630,147 @@ The implementation follows the **GitHub Speckit full cycle** — five phases exe
 
 #### 7a. Clarify (`/specify`)
 
-Double-check that the platform requirements are complete, unambiguous, and consistent before writing any code.
+Double-check that the platform requirements are complete, unambiguous, and consistent before writing any code. The `/specify` prompt auto-detects the current platform from the repository name and extracts all requirements for the target feature across every domain subsystem — no manual `{CODE}` or `{PLATFORM}` substitution needed.
 
-- [ ] Read the platform constitution: `docs/specs/requirements/platform/SUB-{CODE}-{PLATFORM}.md`
-- [ ] Read the parent domain file: `docs/specs/requirements/domain/SUB-{CODE}.md`
-- [ ] Read the API contracts: `docs/api/backend-endpoints.md`
-- [ ] Run `/specify` to validate that each requirement in the constitution is:
+> **Platform Detection.** The prompt maps the current repository to a platform code using the table in [system-spec.md §8.1](specs/system-spec.md):
+>
+> | Repository | Platform Code |
+> |---|---|
+> | `pms-backend` | BE |
+> | `pms-frontend` | WEB |
+> | `pms-android` | AND |
+> | `pms-derm-cds` | AI |
+>
+> It then reads **all** platform requirement files for that platform (e.g., for BE: `SUB-PR-BE.md`, `SUB-CW-BE.md`, `SUB-MM-BE.md`, `SUB-RA-BE.md`, `SUB-PM-BE.md`) and filters to only those requirements that trace to the target feature's SYS-REQ.
+
+**Checklist:**
+- [ ] Run `/specify` from within the target repository (or provide the repo name and feature branch)
+- [ ] Review the output requirement hierarchy (system → domain → platform) for completeness
+- [ ] Verify each extracted platform requirement is:
   - Unambiguous and testable
   - Linked to a parent domain requirement
   - Assigned a test case ID (`TST-{CODE}-XXXX-{PLATFORM}`)
   - Consistent with cross-cutting system requirements (SYS-REQ-0001 auth, SYS-REQ-0002 encryption, SYS-REQ-0003 audit, SYS-REQ-0005 RBAC)
 - [ ] Flag and resolve any gaps or ambiguities before proceeding
+
+**AI Agent Prompt (`/specify`):**
+```
+You are running the /specify phase (Step 7a) of the GitHub Speckit cycle.
+Your job is to extract and validate ALL platform requirements for a given
+feature on the current platform.
+
+INPUT: Feature branch name (or SYS-REQ ID) and current repository name.
+OUTPUT: Structured requirements hierarchy with validation results.
+
+──────────────────────────────────────────────────────────────────────────
+STEP 1 — DETECT PLATFORM
+──────────────────────────────────────────────────────────────────────────
+Map the current repository name to a platform code:
+
+  pms-backend   → BE
+  pms-frontend  → WEB
+  pms-android   → AND
+  pms-derm-cds  → AI
+
+If the repo name does not match any entry, ask the user to confirm the
+platform code.
+
+──────────────────────────────────────────────────────────────────────────
+STEP 2 — IDENTIFY TARGET SYS-REQ(s)
+──────────────────────────────────────────────────────────────────────────
+Determine the system requirement(s) for this feature:
+  - Parse the feature branch name for clues (e.g., feature/isic-archive-integration
+    → SYS-REQ-0012).
+  - If ambiguous, ask the user which SYS-REQ ID(s) this feature implements.
+
+──────────────────────────────────────────────────────────────────────────
+STEP 3 — READ SYS-REQ & FIND DOMAIN DECOMPOSITION
+──────────────────────────────────────────────────────────────────────────
+Read: docs/specs/requirements/SYS-REQ.md
+
+For each target SYS-REQ, find the "Decomposes To" field. This lists all
+domain requirement IDs with their platform annotations. Example:
+
+  SYS-REQ-0012 Decomposes To:
+    SUB-PR-0013 (→ BE, WEB, AND, AI)
+    SUB-PR-0014 (→ BE, WEB, AI)
+    SUB-PR-0015 (→ BE, WEB)
+    SUB-PR-0016 (→ BE, WEB)
+    SUB-RA-0008 (→ BE, WEB)
+
+Filter: Keep only domain requirements whose platform annotations include
+the detected platform (e.g., for BE, keep all five above).
+
+──────────────────────────────────────────────────────────────────────────
+STEP 4 — READ DOMAIN REQUIREMENT FILES
+──────────────────────────────────────────────────────────────────────────
+For each relevant domain subsystem code (e.g., PR, RA), read:
+  docs/specs/requirements/domain/SUB-{CODE}.md
+
+Extract the matching domain requirement rows (description, status, parent
+SYS-REQ link).
+
+──────────────────────────────────────────────────────────────────────────
+STEP 5 — READ PLATFORM REQUIREMENT FILES
+──────────────────────────────────────────────────────────────────────────
+For each relevant subsystem code, read:
+  docs/specs/requirements/platform/SUB-{CODE}-{PLATFORM}.md
+
+Extract only the platform requirement rows that trace to the domain
+requirements identified in Step 3. For each row, capture: Req ID,
+description, parent domain req, modules, test case ID, status.
+
+──────────────────────────────────────────────────────────────────────────
+STEP 6 — READ SUPPORTING DOCUMENTS
+──────────────────────────────────────────────────────────────────────────
+Read these additional files for validation context:
+
+  - docs/api/backend-endpoints.md (for BE platform — verify API contracts)
+  - docs/quality/processes/requirements-governance.md (extract conflict
+    and race-condition references affecting the target requirements)
+  - docs/testing/traceability-matrix.md (verify test case IDs exist)
+
+──────────────────────────────────────────────────────────────────────────
+STEP 7 — VALIDATE & OUTPUT
+──────────────────────────────────────────────────────────────────────────
+Produce a structured output with the following sections:
+
+A) PLATFORM DETECTION
+   - Repository: {repo}
+   - Platform: {PLATFORM}
+   - Feature branch: {branch}
+   - Target SYS-REQ(s): {IDs}
+
+B) REQUIREMENTS HIERARCHY
+   For each platform requirement, output:
+
+   | Platform Req | Description | Domain Parent | SYS-REQ Parent | Modules | Test Case ID | Status |
+   |---|---|---|---|---|---|---|
+
+   Group rows by domain subsystem (e.g., SUB-PR, SUB-RA).
+
+C) CROSS-CUTTING REQUIREMENTS CHECK
+   Verify consistency with:
+   - SYS-REQ-0001 (Authentication / MFA)
+   - SYS-REQ-0002 (Encryption at rest & in transit)
+   - SYS-REQ-0003 (Audit trail)
+   - SYS-REQ-0005 (RBAC)
+   For each, state whether the feature's requirements address it and how.
+
+D) GOVERNANCE REFERENCES
+   List any conflict IDs (DC-*, PC-*, RC-*) from requirements-governance.md
+   that affect the target requirements, with their resolution status.
+
+E) GAPS & ISSUES
+   Flag any requirement that is:
+   - Missing a test case ID
+   - Missing a parent domain link
+   - Ambiguous or untestable
+   - Inconsistent with cross-cutting requirements
+   - Referenced in an unresolved governance conflict
+
+If no gaps are found, state: "All requirements validated — ready for /plan."
+```
 
 #### 7b. Plan (`/plan`)
 
@@ -713,11 +843,13 @@ Read these files before starting:
 Execute the five-phase speckit cycle:
 
 PHASE 7a — CLARIFY (/specify):
-Review every requirement row in the platform constitution file.
-For each requirement, verify it is unambiguous, testable, linked to a
-parent domain req, and has a test case ID assigned. Flag any gaps.
-Verify consistency with SYS-REQ-0001 (auth), SYS-REQ-0002 (encryption),
-SYS-REQ-0003 (audit), SYS-REQ-0005 (RBAC).
+Run the /specify prompt (see the dedicated AI Agent Prompt in Step 7a
+above). It auto-detects the platform from the repo name, reads SYS-REQ.md
+to find the feature's domain decomposition, then reads ALL platform
+requirement files for this platform filtered to the target SYS-REQ.
+Output: structured hierarchy with full parent chain, cross-cutting
+requirements check, governance references, and gap report.
+If gaps are found, resolve them before proceeding to /plan.
 
 PHASE 7b — PLAN (/plan):
 Generate a technical implementation plan for SUB-{CODE}-{PLATFORM}.
