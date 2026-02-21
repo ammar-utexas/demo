@@ -301,6 +301,28 @@ Selection criteria:
 
 ---
 
+## 7-DAY TREND DASHBOARD
+
+This table tracks the **top-scoring items (7+ score)** across the last 7 days of the coverage period. Each column represents a day. The score shown is the item's disruption score on that day based on news activity. Use this to spot acceleration, sustained momentum, or fade-outs at a glance.
+
+**How to build this table:**
+1. For each item scoring 7+ in the current brief, look back through the last 7 days of the coverage period.
+2. Assign a daily score based on whether significant news, releases, or developments occurred on that specific day. Use `—` if no news activity for that item on that day.
+3. The "Trend" column summarizes the 7-day trajectory: `Surging` (3+ days of high activity), `Sustained` (steady presence), `Spiked` (one major day then quiet), `Building` (increasing over the week), `Cooling` (decreasing).
+4. The "CTO Note" column provides a one-line actionable observation about what the trend means for decision-making.
+
+| Item | {Day-7} | {Day-6} | {Day-5} | {Day-4} | {Day-3} | {Day-2} | {Day-1 (today)} | Trend | CTO Note |
+|------|---------|---------|---------|---------|---------|---------|-----------------|-------|----------|
+{Replace {Day-N} headers with actual dates (e.g., Feb 15, Feb 16, ..., Feb 21). One row per item scoring 7+. Daily scores reflect news activity on that specific day. Use — for quiet days. Trend column: Surging/Sustained/Spiked/Building/Cooling. CTO Note: one-line actionable insight.}
+
+**Reading the dashboard:**
+- **Surging items** (3+ active days) = high conviction signals, prioritize action
+- **Spiked items** (single day) = may be announcement-driven, wait for follow-through before investing time
+- **Sustained items** (steady across days) = durable trends worth strategic planning
+- **Cooling items** = previous priorities losing momentum, consider deprioritizing
+
+---
+
 *Next brief: {tomorrow's date}*
 *Archive items scoring below 5 after 14 days on watchlist*
 *Flag any item hitting 8+ immediately — do not wait for daily brief*
