@@ -24,7 +24,7 @@ Use this when a new deployable component is introduced (e.g., an iOS app or a de
 | 1 | **Assign platform code** — choose a unique 2–3 letter code (e.g., `IOS`). Verify it does not collide with existing codes (BE, WEB, AND, AI). | — |
 | 2 | **Register in system-spec.md** — add a row to Section 8.1 (Platform Codes) with the code, platform name, repository, and technology. | `system-spec.md` |
 | 3 | **Audit every domain requirement** — for each of the 35 domain requirements across SUB-PR, SUB-CW, SUB-MM, and SUB-RA, determine if the new platform requires a platform-specific requirement. Record the decision (yes/no) and rationale. | Governance log |
-| 4 | **Create platform requirements** — for each "yes" decision, add a row to the Platform Decomposition section of the relevant `SUB-*.md`. Use the format `SUB-{domain}-{NNNN}-{PLATFORM}`. | `SUB-PR.md`, `SUB-CW.md`, `SUB-MM.md`, `SUB-RA.md` |
+| 4 | **Create platform requirements** — for each "yes" decision, create a platform file `platform/SUB-{domain}-{PLATFORM}.md` (or add to an existing one). Use the format `SUB-{domain}-{NNNN}-{PLATFORM}`. Update the Platform Decomposition index table in the corresponding `domain/SUB-{domain}.md`. | `platform/SUB-*-{PLATFORM}.md`, `domain/SUB-*.md` |
 | 5 | **Create test case stubs** — add `TST-{domain}-{NNNN}-{PLATFORM}` entries to the backward traceability section of `traceability-matrix.md`. | `traceability-matrix.md` |
 | 6 | **Update platform traceability summary** — add a column for the new platform in the Platform Traceability Summary section and set initial statuses. | `traceability-matrix.md` |
 | 7 | **Update coverage summary** — add a row for the new platform in the Coverage Summary by Platform table. | `traceability-matrix.md` |
@@ -42,9 +42,9 @@ Use this when a new functional domain is introduced (e.g., SUB-BL for Billing or
 |---|---|---|
 | 1 | **Assign subsystem code** — choose a unique 2-letter code (e.g., `BL`). Verify it does not collide with existing codes (PR, CW, MM, RA). | — |
 | 2 | **Register in system-spec.md** — add a row to Section 4 (Subsystem Decomposition) with the code, subsystem name, scope, and primary actor. | `system-spec.md` |
-| 3 | **Create subsystem requirements document** — create `docs/docs/specs/requirements/SUB-{CODE}.md` following the template structure of existing subsystem docs. Include: scope, requirements table, and platform decomposition sections. | `SUB-{CODE}.md` (new) |
-| 4 | **Define domain requirements** — enumerate all domain requirements with IDs `SUB-{CODE}-NNNN`. Link each to a parent SYS-REQ where applicable. | `SUB-{CODE}.md` |
-| 5 | **Decompose into platform requirements** — for each domain requirement, create platform-specific requirements for each applicable platform (BE, WEB, AND, AI). | `SUB-{CODE}.md` |
+| 3 | **Create subsystem requirements documents** — create `docs/specs/requirements/domain/SUB-{CODE}.md` for domain requirements and `docs/specs/requirements/platform/SUB-{CODE}-{PLATFORM}.md` for each applicable platform, following the template structure of existing subsystem docs. | `domain/SUB-{CODE}.md` (new), `platform/SUB-{CODE}-*.md` (new) |
+| 4 | **Define domain requirements** — enumerate all domain requirements with IDs `SUB-{CODE}-NNNN` in `domain/SUB-{CODE}.md`. Link each to a parent SYS-REQ where applicable. | `domain/SUB-{CODE}.md` |
+| 5 | **Decompose into platform requirements** — for each domain requirement, create platform-specific requirements in `platform/SUB-{CODE}-{PLATFORM}.md` for each applicable platform (BE, WEB, AND, AI). Update the Platform Decomposition index table in `domain/SUB-{CODE}.md`. | `platform/SUB-{CODE}-*.md`, `domain/SUB-{CODE}.md` |
 | 6 | **Update SYS-REQ.md** — for any system requirement that the new subsystem satisfies, add the new SUB-{CODE}-NNNN to the "Decomposes To" field. | `SYS-REQ.md` |
 | 7 | **Update traceability matrix** — add forward traceability rows, backward traceability test stubs, and platform traceability summary for the new subsystem. | `traceability-matrix.md` |
 | 8 | **Update index.md** — add the new subsystem to the Specifications & Requirements section and update counts. | `index.md` |
@@ -60,8 +60,8 @@ Use this when a new SYS-REQ is added or an existing one needs re-decomposition.
 |---|---|---|
 | 1 | **Define or update the system requirement** — add/modify the entry in `SYS-REQ.md` with ID, description, priority, rationale, and acceptance criteria. | `SYS-REQ.md` |
 | 2 | **Identify affected subsystems** — determine which of the 4 subsystems (PR, CW, MM, RA) must implement aspects of this requirement. | Governance log |
-| 3 | **Create domain requirements** — in each affected `SUB-*.md`, add a domain requirement that traces to the system requirement via the Parent field. | `SUB-PR.md`, `SUB-CW.md`, `SUB-MM.md`, `SUB-RA.md` |
-| 4 | **Decompose into platform requirements** — for each new domain requirement, determine which platforms (BE, WEB, AND, AI) require implementation and add platform requirements. | `SUB-*.md` |
+| 3 | **Create domain requirements** — in each affected `domain/SUB-*.md`, add a domain requirement that traces to the system requirement via the Parent field. | `domain/SUB-PR.md`, `domain/SUB-CW.md`, `domain/SUB-MM.md`, `domain/SUB-RA.md` |
+| 4 | **Decompose into platform requirements** — for each new domain requirement, determine which platforms (BE, WEB, AND, AI) require implementation and add platform requirements to the corresponding `platform/SUB-*-{PLATFORM}.md` file. Update the Platform Decomposition index table in the domain file. | `platform/SUB-*-{PLATFORM}.md`, `domain/SUB-*.md` |
 | 5 | **Update "Decomposes To"** — in `SYS-REQ.md`, update the requirement's "Decomposes To" field listing all new SUB-*-NNNN IDs with their platform annotations. | `SYS-REQ.md` |
 | 6 | **Update traceability matrix** — add forward and backward traceability entries. Create test case stubs for each new platform requirement. | `traceability-matrix.md` |
 | 7 | **Verify strict rollup** — confirm that the system requirement's verification status correctly reflects the strict rollup rule: "Verified" only when ALL domain requirements are verified, each domain requirement verified only when ALL its platform requirements are verified. | `traceability-matrix.md` |
@@ -215,7 +215,7 @@ This section maps branching and release events to existing governance procedures
 
 | Artifact | When to Update |
 |---|---|
-| `SUB-*.md` (requirement docs) | When the feature adds, modifies, or resolves a domain or platform requirement |
+| `domain/SUB-*.md` and `platform/SUB-*-{PLATFORM}.md` (requirement docs) | When the feature adds, modifies, or resolves a domain or platform requirement |
 | `SYS-REQ.md` | When the feature affects a system-level requirement or its decomposition |
 | `traceability-matrix.md` | When new test cases are added or requirement statuses change |
 | `testing-strategy.md` | When new test patterns or platform-specific test runners are introduced |

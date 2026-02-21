@@ -23,7 +23,10 @@ docs/
 │   ├── risk-management/ # Risk analyses
 │   └── standards/       # Regulatory standards (e.g., ISO 13485)
 ├── specs/               # System and subsystem specifications
-│   ├── requirements/    # SYS-REQ, SUB-PR/CW/MM/RA/PM requirement docs
+│   ├── requirements/    # Three-tier requirements decomposition
+│   │   ├── SYS-REQ.md  # System requirements (top level)
+│   │   ├── domain/      # Domain-level subsystem requirements (SUB-PR, SUB-CW, etc.)
+│   │   └── platform/    # Platform-specific requirements (SUB-PR-BE, SUB-PR-WEB, etc.)
 │   └── ...              # System spec, subsystem versions, compatibility matrix
 ├── testing/             # Test strategy, traceability matrix, evidence
 │   ├── evidence/        # Test run records

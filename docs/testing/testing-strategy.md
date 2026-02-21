@@ -91,7 +91,7 @@ fun `TST-AND-0001 PatientEntity roundtrip mapping`() { ... }
 
 ### When Implementing a Requirement
 
-1. **Read** the requirement in `docs/specs/requirements/SUB-*.md`.
+1. **Read** the requirement in `docs/specs/requirements/domain/SUB-*.md` (domain) or `docs/specs/requirements/platform/SUB-*-{PLATFORM}.md` (platform).
 2. **Implement** the feature using speckit: `/specify` → `/plan` → `/speckit.tasks`.
 3. **Write test(s)** with `@requirement` annotation linking to the **platform requirement ID** (e.g., `SUB-PR-0003-BE`). Use the `TST-{domain}-{NNNN}-{platform}` naming convention for new test IDs.
 4. **Update** the Platform Decomposition table in the subsystem requirements doc.

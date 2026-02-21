@@ -14,10 +14,10 @@ UI design tools, component libraries, design systems, and prototyping workflows 
 | Document | Summary |
 |----------|---------|
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | SYS-08 (web UI), SYS-09 (Android) requirements |
-| [SUB-PR](../specs/requirements/SUB-PR.md) | WEB and AND platform requirements for patient records UI |
-| [SUB-CW](../specs/requirements/SUB-CW.md) | WEB and AND platform requirements for clinical workflow UI |
-| [SUB-MM](../specs/requirements/SUB-MM.md) | WEB and AND platform requirements for medication management UI |
-| [SUB-RA](../specs/requirements/SUB-RA.md) | WEB and AND platform requirements for reporting dashboards |
+| [SUB-PR](../specs/requirements/domain/SUB-PR.md) | WEB and AND platform requirements for patient records UI |
+| [SUB-CW](../specs/requirements/domain/SUB-CW.md) | WEB and AND platform requirements for clinical workflow UI |
+| [SUB-MM](../specs/requirements/domain/SUB-MM.md) | WEB and AND platform requirements for medication management UI |
+| [SUB-RA](../specs/requirements/domain/SUB-RA.md) | WEB and AND platform requirements for reporting dashboards |
 
 ## Tool Evaluations & Tutorials
 

@@ -187,15 +187,26 @@ Browse documentation organized by deployment platform — [full index](platform/
 
 ## Specifications & Requirements
 
-The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 12 system requirements, 48 domain requirements, and 95 platform requirements across 4 platforms.
+The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 12 system requirements, 48 domain requirements, and 95 platform requirements across 4 platforms. Domain requirements live in `specs/requirements/domain/` and platform requirements in `specs/requirements/platform/`.
 
 - [System Specification](specs/system-spec.md) — System-level scope, context, subsystem decomposition, and platform codes
 - [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 12 system-level requirements with platform annotations
-- [Patient Records (SUB-PR)](specs/requirements/SUB-PR.md) — 16 domain requirements, 36 platform requirements (BE=15, WEB=8, AND=8, AI=5)
-- [Clinical Workflow (SUB-CW)](specs/requirements/SUB-CW.md) — 8 domain requirements, 14 platform requirements (BE=8, WEB=3, AND=3)
-- [Medication Management (SUB-MM)](specs/requirements/SUB-MM.md) — 9 domain requirements, 13 platform requirements (BE=9, WEB=2, AND=2)
-- [Reporting & Analytics (SUB-RA)](specs/requirements/SUB-RA.md) — 8 domain requirements, 19 platform requirements (BE=8, WEB=6, AND=5)
-- [Prompt Management (SUB-PM)](specs/requirements/SUB-PM.md) — 7 domain requirements, 13 platform requirements (BE=7, WEB=5, AI=1)
+
+### Domain Requirements
+
+- [Patient Records (SUB-PR)](specs/requirements/domain/SUB-PR.md) — 16 domain requirements
+- [Clinical Workflow (SUB-CW)](specs/requirements/domain/SUB-CW.md) — 8 domain requirements
+- [Medication Management (SUB-MM)](specs/requirements/domain/SUB-MM.md) — 9 domain requirements
+- [Reporting & Analytics (SUB-RA)](specs/requirements/domain/SUB-RA.md) — 8 domain requirements
+- [Prompt Management (SUB-PM)](specs/requirements/domain/SUB-PM.md) — 7 domain requirements
+
+### Platform Requirements
+
+- **Patient Records:** [BE](specs/requirements/platform/SUB-PR-BE.md) (15) | [WEB](specs/requirements/platform/SUB-PR-WEB.md) (8) | [AND](specs/requirements/platform/SUB-PR-AND.md) (8) | [AI](specs/requirements/platform/SUB-PR-AI.md) (5)
+- **Clinical Workflow:** [BE](specs/requirements/platform/SUB-CW-BE.md) (8) | [WEB](specs/requirements/platform/SUB-CW-WEB.md) (3) | [AND](specs/requirements/platform/SUB-CW-AND.md) (3)
+- **Medication Management:** [BE](specs/requirements/platform/SUB-MM-BE.md) (9) | [WEB](specs/requirements/platform/SUB-MM-WEB.md) (2) | [AND](specs/requirements/platform/SUB-MM-AND.md) (2)
+- **Reporting & Analytics:** [BE](specs/requirements/platform/SUB-RA-BE.md) (8) | [WEB](specs/requirements/platform/SUB-RA-WEB.md) (6) | [AND](specs/requirements/platform/SUB-RA-AND.md) (5)
+- **Prompt Management:** [BE](specs/requirements/platform/SUB-PM-BE.md) (7) | [WEB](specs/requirements/platform/SUB-PM-WEB.md) (5) | [AI](specs/requirements/platform/SUB-PM-AI.md) (1)
 
 ## Testing & Traceability
 

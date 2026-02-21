@@ -283,7 +283,7 @@ Existing test IDs are preserved as-is in the backward traceability section. The 
 
 ## How to Update This Matrix
 
-1. After implementing a requirement, add the source module to the "Implementation Mapping" section of the subsystem requirements doc.
+1. After implementing a requirement, add the source module to the platform requirements file in `docs/specs/requirements/platform/SUB-*-{PLATFORM}.md`.
 2. After writing a test, add the test case row to the "Backward Traceability" section above. Include the `Test Function` name.
 3. After each test run, add a row to the "Test Run Log" and update "Last Result" and "Run ID" columns.
 4. Re-generate the "Coverage Summary" by counting requirements with/without passing tests.

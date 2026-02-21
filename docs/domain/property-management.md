@@ -15,10 +15,10 @@ Core clinical and patient management functionality — the primary business doma
 
 | Document | Subsystem | Domain Reqs | Platform Reqs |
 |----------|-----------|-------------|---------------|
-| [SUB-PR](../specs/requirements/SUB-PR.md) | Patient Records | 11 | 25 (BE=11, WEB=4, AND=7, AI=3) |
-| [SUB-CW](../specs/requirements/SUB-CW.md) | Clinical Workflow | 8 | 14 (BE=8, WEB=3, AND=3) |
-| [SUB-MM](../specs/requirements/SUB-MM.md) | Medication Management | 9 | 13 (BE=9, WEB=2, AND=2) |
-| [SUB-RA](../specs/requirements/SUB-RA.md) | Reporting & Analytics | 7 | 17 (BE=7, WEB=5, AND=5) |
+| [SUB-PR](../specs/requirements/domain/SUB-PR.md) | Patient Records | 11 | 25 (BE=11, WEB=4, AND=7, AI=3) |
+| [SUB-CW](../specs/requirements/domain/SUB-CW.md) | Clinical Workflow | 8 | 14 (BE=8, WEB=3, AND=3) |
+| [SUB-MM](../specs/requirements/domain/SUB-MM.md) | Medication Management | 9 | 13 (BE=9, WEB=2, AND=2) |
+| [SUB-RA](../specs/requirements/domain/SUB-RA.md) | Reporting & Analytics | 7 | 17 (BE=7, WEB=5, AND=5) |
 
 ## API & Implementation
 

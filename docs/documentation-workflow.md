@@ -47,11 +47,16 @@ flowchart TB
 
         subgraph REQ["specs/requirements/"]
             SysReq["SYS-REQ.md<br/>12 System Requirements"]
-            SubPR["SUB-PR.md<br/>Patient Records<br/>16 domain / 36 platform"]
-            SubCW["SUB-CW.md<br/>Clinical Workflow<br/>8 domain / 14 platform"]
-            SubMM["SUB-MM.md<br/>Medication Mgmt<br/>9 domain / 13 platform"]
-            SubRA["SUB-RA.md<br/>Reporting & Analytics<br/>8 domain / 19 platform"]
-            SubPM["SUB-PM.md<br/>Prompt Mgmt<br/>7 domain / 13 platform"]
+            subgraph DOMREQ["domain/"]
+                SubPR["SUB-PR.md<br/>Patient Records<br/>16 domain reqs"]
+                SubCW["SUB-CW.md<br/>Clinical Workflow<br/>8 domain reqs"]
+                SubMM["SUB-MM.md<br/>Medication Mgmt<br/>9 domain reqs"]
+                SubRA["SUB-RA.md<br/>Reporting & Analytics<br/>8 domain reqs"]
+                SubPM["SUB-PM.md<br/>Prompt Mgmt<br/>7 domain reqs"]
+            end
+            subgraph PLATREQ["platform/"]
+                PlatFiles["16 platform files<br/>SUB-*-BE/WEB/AND/AI.md<br/>95 platform reqs"]
+            end
         end
 
         SysSpec --> SysReq
@@ -344,16 +349,16 @@ Increment version numbers and dates in all modified file headers.
 
 **Checklist:**
 - [ ] Identify which subsystem(s) the feature belongs to (PR, CW, MM, RA, PM)
-- [ ] Read the target `docs/specs/requirements/SUB-{code}.md` — note version, highest req ID, platform counts
+- [ ] Read the target `docs/specs/requirements/domain/SUB-{code}.md` — note version, highest req ID, platform counts
 - [ ] Add domain requirement rows to the Requirements table: `SUB-{code}-XXXX`
-- [ ] Add platform requirement rows to each applicable platform section (BE, WEB, AND, AI):
-  - [ ] `SUB-{code}-XXXX-BE` — Backend API endpoint, service, model
-  - [ ] `SUB-{code}-XXXX-WEB` — Web UI component, page, form
-  - [ ] `SUB-{code}-XXXX-AND` — Android screen, ViewModel, repository
-  - [ ] `SUB-{code}-XXXX-AI` — ML model, inference service, embedding pipeline
-- [ ] Update platform section counts (e.g., "Backend (BE) — N requirements")
+- [ ] Add platform requirement rows to the applicable platform files in `docs/specs/requirements/platform/`:
+  - [ ] `SUB-{code}-XXXX-BE` in `SUB-{code}-BE.md` — Backend API endpoint, service, model
+  - [ ] `SUB-{code}-XXXX-WEB` in `SUB-{code}-WEB.md` — Web UI component, page, form
+  - [ ] `SUB-{code}-XXXX-AND` in `SUB-{code}-AND.md` — Android screen, ViewModel, repository
+  - [ ] `SUB-{code}-XXXX-AI` in `SUB-{code}-AI.md` — ML model, inference service, embedding pipeline
+- [ ] Update Platform Decomposition index table in the domain file (req counts)
 - [ ] Update status rollup note at bottom of Requirements table
-- [ ] Increment version number and update date in SUB-*.md header
+- [ ] Increment version number and update date in domain file header
 - [ ] Read `docs/api/backend-endpoints.md` — add new API endpoint definitions
 - [ ] Read `docs/specs/subsystem-versions.md` — update if version changes
 - [ ] Update `docs/index.md` requirement counts in "Specifications & Requirements" section
@@ -362,15 +367,18 @@ Increment version numbers and dates in all modified file headers.
 **AI Agent Prompt:**
 ```
 Read these files to understand current state and conventions:
-- docs/specs/requirements/SUB-{CODE}.md (the target subsystem)
+- docs/specs/requirements/domain/SUB-{CODE}.md (the target domain file)
+- docs/specs/requirements/platform/SUB-{CODE}-BE.md (example platform file)
 - docs/specs/requirements/SYS-REQ.md (to see the parent requirement)
 - docs/api/backend-endpoints.md
 - docs/index.md (Specifications & Requirements section)
 
 Decompose SYS-REQ-{ID} into subsystem requirements for SUB-{CODE}.
-Follow the exact table format of existing requirements in the file.
+Follow the exact table format of existing requirements in the files.
 
-For each domain requirement (SUB-{CODE}-XXXX), create platform requirements:
+Add domain requirements to docs/specs/requirements/domain/SUB-{CODE}.md.
+For each domain requirement (SUB-{CODE}-XXXX), create platform requirements
+in the corresponding platform file (docs/specs/requirements/platform/SUB-{CODE}-{PLATFORM}.md):
 - BE: API endpoint with router, service, model modules and test case ID
 - WEB: UI component/page with module path and test case ID
 - AND: Screen/ViewModel with module path and test case ID (if applicable)
@@ -380,9 +388,9 @@ Use the naming convention: SUB-{CODE}-XXXX-{PLATFORM}
 Test case IDs follow: TST-{CODE}-XXXX-{PLATFORM}
 
 Update:
-- Platform section counts in the subsystem doc
-- Status rollup note
-- Version and date in the file header
+- Platform Decomposition index table in the domain file (req counts)
+- Status rollup note in the domain file
+- Version and date in the domain file header
 - docs/api/backend-endpoints.md with new endpoint definitions
 - docs/index.md requirement counts
 ```
@@ -409,7 +417,7 @@ Update:
 ```
 Read these files:
 - docs/quality/processes/requirements-governance.md
-- docs/specs/requirements/SUB-{CODE}.md (the newly updated subsystem)
+- docs/specs/requirements/domain/SUB-{CODE}.md (the newly updated domain file)
 - docs/quality/processes/PMS_Developer_Working_Instructions.md
 
 Analyze the new requirements (SUB-{CODE}-{IDs}) for:
@@ -461,7 +469,7 @@ Follow the exact format of existing conflict entries in the file.
 Read these files:
 - docs/testing/traceability-matrix.md
 - docs/testing/testing-strategy.md
-- docs/specs/requirements/SUB-{CODE}.md (to get the new requirement IDs)
+- docs/specs/requirements/domain/SUB-{CODE}.md (to get the new requirement IDs)
 - docs/specs/requirements/SYS-REQ.md (to get the parent SYS-REQ ID)
 
 Update the traceability matrix for the new requirements:
@@ -610,7 +618,7 @@ Prepare the release for {FEATURE} (branch: feature/{BRANCH_NAME}):
 | 1. Research | `experiments/NN-*` (3 new files), `index.md` |
 | 2. Architecture | `architecture/NNNN-*.md` (1 new file), `index.md` |
 | 3. System Reqs | `SYS-REQ.md`, `system-spec.md`, `PMS_Project_Overview.md` |
-| 4. Subsystem | `SUB-*.md` (1-2 files), `backend-endpoints.md`, `subsystem-versions.md`, `index.md` |
+| 4. Subsystem | `domain/SUB-*.md`, `platform/SUB-*-{PLATFORM}.md`, `backend-endpoints.md`, `subsystem-versions.md`, `index.md` |
 | 5. Governance | `requirements-governance.md` |
 | 6. Testing | `traceability-matrix.md` |
 | 7. Config | `dependencies.md`, `feature-flags.md`, `environments.md`, `project-setup.md` |
@@ -626,7 +634,7 @@ Prepare the release for {FEATURE} (branch: feature/{BRANCH_NAME}):
 |---|---|---|
 | `experiments/` | 58 (55 .md + 3 .docx) | Technology research: PRDs, setup guides, tutorials |
 | `architecture/` | 7 | Architecture Decision Records |
-| `specs/requirements/` | 6 | System and subsystem requirement documents |
+| `specs/requirements/` | 1 + 5 domain + 16 platform = 22 | System, domain, and platform requirement documents |
 | `specs/` | 3 (+ requirements/) | System spec, versions, compatibility matrix |
 | `config/` | 7 | Setup, dependencies, environments, deployment |
 | `testing/` | 2 (+ evidence/) | Test strategy, traceability matrix, run records |

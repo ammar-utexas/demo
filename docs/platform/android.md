@@ -13,10 +13,10 @@
 
 | Document | AND Reqs | Summary |
 |----------|----------|---------|
-| [SUB-PR](../specs/requirements/SUB-PR.md) | 7 | Patient record forms, offline sync, camera integration |
-| [SUB-CW](../specs/requirements/SUB-CW.md) | 3 | Encounter management on mobile |
-| [SUB-MM](../specs/requirements/SUB-MM.md) | 2 | Medication management on mobile |
-| [SUB-RA](../specs/requirements/SUB-RA.md) | 5 | Mobile dashboards and report views |
+| [SUB-PR-AND](../specs/requirements/platform/SUB-PR-AND.md) | 8 | Patient record forms, offline sync, camera integration, dermoscopy |
+| [SUB-CW-AND](../specs/requirements/platform/SUB-CW-AND.md) | 3 | Encounter management on mobile |
+| [SUB-MM-AND](../specs/requirements/platform/SUB-MM-AND.md) | 2 | Medication management on mobile |
+| [SUB-RA-AND](../specs/requirements/platform/SUB-RA-AND.md) | 5 | Mobile dashboards and report views |
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | — | SYS-09: Android app system requirement |
 
 ## Features & Implementation

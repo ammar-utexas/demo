@@ -6,7 +6,7 @@ Computer vision capabilities including wound assessment, patient identification,
 
 | Document | Summary |
 |----------|---------|
-| [SUB-PR](../specs/requirements/SUB-PR.md) | 3 AI platform requirements for vision endpoints (wound assessment, patient ID, document OCR) |
+| [SUB-PR](../specs/requirements/domain/SUB-PR.md) | 3 AI platform requirements for vision endpoints (wound assessment, patient ID, document OCR) |
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | System-level requirements governing AI inference performance |
 
 ## Implementation
