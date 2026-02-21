@@ -13,6 +13,23 @@ This directory is the single source of truth for all project context, decisions,
 - [ADR-0004: Frontend Tech Stack — Next.js with Tailwind CSS](architecture/0004-frontend-tech-stack.md)
 - [ADR-0005: Android Tech Stack — Kotlin with Jetpack Compose](architecture/0005-android-tech-stack.md)
 
+### ISIC Dermatology CDS (SYS-REQ-0012)
+
+- [ADR-0008: CDS Microservice Architecture](architecture/0008-derm-cds-microservice-architecture.md) — Separate Docker service (`pms-derm-cds` :8090) for AI inference
+- [ADR-0009: AI Inference Runtime Selection](architecture/0009-ai-inference-runtime.md) — ONNX Runtime (server) + TensorRT (Jetson) + TFLite (Android)
+- [ADR-0010: Patient Image Storage Strategy](architecture/0010-dermoscopic-image-storage.md) — AES-256-GCM encrypted BYTEA in PostgreSQL
+- [ADR-0011: Vector Database Strategy](architecture/0011-vector-database-pgvector.md) — pgvector extension for similarity search
+- [ADR-0012: Android On-Device Inference](architecture/0012-android-on-device-inference.md) — TFLite with MobileNetV3 for offline skin lesion triage
+- [ADR-0013: AI Model Lifecycle Management](architecture/0013-ai-model-lifecycle.md) — Versioned model artifacts with provenance tracking
+- [ADR-0014: Image Preprocessing & Quality Validation](architecture/0014-image-preprocessing-pipeline.md) — Resize/normalize pipeline with blur/exposure quality gates
+- [ADR-0015: Risk Scoring Engine Design](architecture/0015-risk-scoring-engine.md) — Configurable threshold-based rules for clinical risk assessment
+- [ADR-0016: Encryption Key Management](architecture/0016-image-encryption-key-management.md) — Unified versioned-envelope key management
+- [ADR-0017: ISIC Reference Cache Management](architecture/0017-isic-reference-cache.md) — S3 bulk population, model-version coupling, incremental updates
+- [ADR-0018: Backend-to-CDS Communication](architecture/0018-inter-service-communication.md) — HTTP client pooling, circuit breaking, timeout configuration
+- [ADR-0019: Lesion Longitudinal Tracking](architecture/0019-lesion-longitudinal-tracking.md) — Persistent lesion identity with embedding cosine distance change detection
+- [ADR-0020: Feature Flag Strategy](architecture/0020-derm-cds-feature-flags.md) — Granular per-requirement flags for phased rollout
+- [ADR-0021: Database Migration Strategy](architecture/0021-derm-database-migration.md) — Alembic-managed migrations for pgvector tables
+
 ## Features
 
 - [Initial Project Scaffolds](features/initial-project-scaffolds.md) — Backend, frontend, and Android app scaffolding
