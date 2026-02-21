@@ -2,7 +2,7 @@
 
 **Base URL:** `http://localhost:8000`
 **Docs:** `http://localhost:8000/docs` (Swagger UI)
-**Last Updated:** 2026-02-16
+**Last Updated:** 2026-02-21
 
 ## Authentication
 
@@ -160,6 +160,194 @@ All report endpoints currently return stub data:
 ```json
 { "report": "report_name", "data": [] }
 ```
+
+---
+
+## Lesions — Dermatology CDS (SUB-PR-0013, SUB-PR-0014, SUB-PR-0015, SUB-PR-0016)
+
+All lesion endpoints require authentication and are gated behind feature flags (ADR-0020). When a feature flag is disabled, the endpoint returns `404 Not Found`. The backend forwards image data to the `pms-derm-cds` service (:8090) via HTTP with circuit breaking (ADR-0018). All endpoints currently return stub data until the CDS service is deployed.
+
+| Method | Path | Description | Auth | Feature Flag |
+|--------|------|-------------|------|-------------|
+| POST | `/api/lesions/upload` | Upload dermoscopic image for AI classification | Yes | `DERM_CLASSIFICATION` |
+| GET | `/api/lesions/history/{patient_id}` | Lesion classification history for a patient | Yes | `DERM_CLASSIFICATION` |
+| POST | `/api/lesions/similar` | Find similar ISIC reference images | Yes | `DERM_SIMILARITY_SEARCH` |
+| GET | `/api/lesions/{lesion_id}/timeline` | Longitudinal timeline for a specific lesion | Yes | `DERM_LONGITUDINAL_TRACKING` |
+| GET | `/reports/dermatology` | Dermatology classification analytics | Yes | `DERM_REPORTING_DASHBOARD` |
+
+### POST `/api/lesions/upload`
+
+Upload a dermoscopic image for AI classification, risk scoring, and similarity search. The image is encrypted with AES-256-GCM (ADR-0010, ADR-0016) before storage.
+
+**Request:** `multipart/form-data`
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `image` | file | Yes | JPEG or PNG dermoscopic image (max 20 MB) |
+| `patient_id` | UUID | Yes | Patient to associate the lesion with |
+| `encounter_id` | UUID | No | Encounter to link assessment to |
+| `anatomical_site` | string | No | Body location (e.g., `back`, `scalp`, `trunk`, `lower_extremity`) |
+
+**Response (200):**
+```json
+{
+  "lesion_image_id": "uuid",
+  "classification": {
+    "predictions": [
+      { "class": "melanocytic_nevus", "probability": 0.7234 },
+      { "class": "melanoma", "probability": 0.1102 },
+      { "class": "benign_keratosis", "probability": 0.0891 }
+    ],
+    "top_prediction": "melanocytic_nevus",
+    "confidence": 0.7234,
+    "model_name": "efficientnet_b4",
+    "model_version": "isic-2024-v1"
+  },
+  "similar_images": [
+    {
+      "isic_id": "ISIC_0024306",
+      "diagnosis": "melanocytic_nevus",
+      "similarity_score": 0.9412,
+      "image_url": "https://api.isic-archive.com/api/v2/images/ISIC_0024306/thumbnail",
+      "metadata": { "age": 45, "sex": "male", "site": "back" }
+    }
+  ],
+  "risk_assessment": {
+    "risk_level": "low",
+    "referral_urgency": "routine",
+    "risk_factors": [],
+    "malignant_probability": 0.1521
+  }
+}
+```
+
+**Error Responses:**
+- `400` — Invalid image file (corrupt, wrong format, or too small)
+- `422` — Image quality validation failed (blur, exposure). Body: `{"detail": "Image too blurry (score: 45.3, threshold: 100.0)."}`
+- `503` — CDS service unavailable (circuit breaker open). Body: `{"detail": "CDS service unavailable", "cds_status": "circuit_open"}`
+
+### GET `/api/lesions/history/{patient_id}`
+
+Returns lesion classification history for a patient, ordered by most recent first.
+
+**Query Parameters:**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `limit` | int | 50 | Max results to return |
+
+**Response (200):**
+```json
+[
+  {
+    "id": "uuid",
+    "lesion_image_id": "uuid",
+    "classified_at": "ISO 8601",
+    "top_prediction": "melanocytic_nevus",
+    "confidence": 0.7234,
+    "risk_level": "low",
+    "referral_urgency": "routine",
+    "anatomical_site": "back",
+    "model_version": "isic-2024-v1"
+  }
+]
+```
+
+### POST `/api/lesions/similar`
+
+Find visually similar ISIC reference images for a dermoscopic image via pgvector cosine similarity (ADR-0011).
+
+**Request:** `multipart/form-data`
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `image` | file | Yes | JPEG or PNG dermoscopic image |
+| `top_k` | int | No | Number of results (default: 10, max: 50) |
+
+**Response (200):**
+```json
+[
+  {
+    "isic_id": "ISIC_0024306",
+    "diagnosis": "melanocytic_nevus",
+    "similarity_score": 0.9412,
+    "image_url": "https://api.isic-archive.com/api/v2/images/ISIC_0024306/thumbnail",
+    "metadata": { "age": 45, "sex": "male", "site": "back" }
+  }
+]
+```
+
+### GET `/api/lesions/{lesion_id}/timeline`
+
+Returns longitudinal timeline for a persistent lesion, including change detection scores (ADR-0019).
+
+**Response (200):**
+```json
+{
+  "lesion_id": "uuid",
+  "patient_id": "uuid",
+  "anatomical_site": "back",
+  "status": "active",
+  "assessments": [
+    {
+      "lesion_image_id": "uuid",
+      "captured_at": "ISO 8601",
+      "top_prediction": "melanocytic_nevus",
+      "confidence": 0.7234,
+      "risk_level": "low",
+      "change_score": null
+    },
+    {
+      "lesion_image_id": "uuid",
+      "captured_at": "ISO 8601",
+      "top_prediction": "melanocytic_nevus",
+      "confidence": 0.6890,
+      "risk_level": "medium",
+      "change_score": 0.35
+    }
+  ]
+}
+```
+
+### GET `/reports/dermatology`
+
+Dermatology classification analytics report (SUB-RA-0008).
+
+**Query Parameters:**
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `start_date` | date | 30 days ago | Report start date |
+| `end_date` | date | today | Report end date |
+
+**Response (200):**
+```json
+{
+  "report": "dermatology",
+  "period": { "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
+  "classification_volume": {
+    "total": 142,
+    "by_diagnosis": { "melanocytic_nevus": 68, "melanoma": 12, "basal_cell_carcinoma": 8 }
+  },
+  "risk_distribution": { "low": 98, "medium": 32, "high": 12 },
+  "referral_trends": { "routine": 98, "expedited": 32, "urgent": 12 },
+  "model_confidence": { "mean": 0.74, "median": 0.78, "p95": 0.93 }
+}
+```
+
+---
+
+## Dermatology CDS Service (Internal — :8090)
+
+The `pms-derm-cds` service (ADR-0008) runs on port 8090 and is called by the PMS backend only. It is **not** exposed to clients directly.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | CDS service health check |
+| POST | `/classify` | Classify a dermoscopic image |
+| POST | `/similar` | Find similar ISIC reference images |
+
+See [ISICArchive Setup Guide](../experiments/18-ISICArchive-PMS-Developer-Setup-Guide.md) for full CDS API details.
 
 ---
 

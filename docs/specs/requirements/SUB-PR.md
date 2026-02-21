@@ -1,7 +1,7 @@
 # Subsystem Requirements: Patient Records (SUB-PR)
 
 **Document ID:** PMS-SUB-PR-001
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2026-02-21
 **Parent:** [System Requirements](SYS-REQ.md)
 
@@ -10,6 +10,8 @@
 ## Scope
 
 The Patient Records subsystem manages patient demographics, contact information, encrypted PHI, and consent records. It is the foundational data layer for all other subsystems.
+
+Starting with SYS-REQ-0012, this subsystem also encompasses **dermatology clinical decision support**: skin lesion image capture, AI classification via the `pms-derm-cds` microservice (ADR-0008), pgvector similarity search (ADR-0011), threshold-based risk scoring (ADR-0015), and longitudinal lesion tracking (ADR-0019). Patient dermoscopic images are stored as AES-256-GCM encrypted BYTEA (ADR-0010) with versioned-envelope key management (ADR-0016). Architecture is fully defined via 14 ADRs (ADR-0008 through ADR-0021).
 
 ## Requirements
 
@@ -32,7 +34,7 @@ The Patient Records subsystem manages patient demographics, contact information,
 | SUB-PR-0015 | SYS-REQ-0012 | Calculate structured risk scores (low/medium/high) for classified skin lesions with referral urgency recommendations (routine/expedited/urgent) based on malignant class probabilities, patient age, and anatomical site | Test | Not Started |
 | SUB-PR-0016 | SYS-REQ-0012 | Track skin lesion assessments over time with longitudinal change detection by comparing current and prior image embeddings at the same anatomical site | Test | Not Started |
 
-> **Status rollup rule (v1.5):** Domain status reflects strict rollup from platform requirements — a domain requirement is "Verified" only when ALL of its platform requirements are verified. SUB-PR-0001 downgraded from Implemented → Partial (WEB/AND scaffolded only). SUB-PR-0002 downgraded from Implemented → Partial (BE implemented, explicit verification tests deferred). SUB-PR-0003 downgraded from Verified → Partial (WEB/AND not started). SUB-PR-0004 changed from Verified → Verified (dev) pending AES-256-GCM migration (DC-PR-01). SUB-PR-0006 remains Verified (BE-only). SUB-PR-0005 remains Implemented (BE-only). SUB-PR-0012 added for AI inference queuing (DC-PR-03). SUB-PR-0013 through SUB-PR-0016 added for ISIC Archive dermatology CDS (SYS-REQ-0012).
+> **Status rollup rule (v1.6):** Domain status reflects strict rollup from platform requirements — a domain requirement is "Verified" only when ALL of its platform requirements are verified. SUB-PR-0001 downgraded from Implemented → Partial (WEB/AND scaffolded only). SUB-PR-0002 downgraded from Implemented → Partial (BE implemented, explicit verification tests deferred). SUB-PR-0003 downgraded from Verified → Partial (WEB/AND not started). SUB-PR-0004 changed from Verified → Verified (dev) pending AES-256-GCM migration (DC-PR-01). SUB-PR-0006 remains Verified (BE-only). SUB-PR-0005 remains Implemented (BE-only). SUB-PR-0012 added for AI inference queuing (DC-PR-03). SUB-PR-0013 through SUB-PR-0016 added for ISIC Archive dermatology CDS (SYS-REQ-0012). Architecture for SUB-PR-0013–0016 fully defined via 14 ADRs (ADR-0008–0021); implementation not started.
 
 ## Platform Decomposition
 

@@ -1,7 +1,7 @@
 # Subsystem Requirements: Reporting & Analytics (SUB-RA)
 
 **Document ID:** PMS-SUB-RA-001
-**Version:** 1.4
+**Version:** 1.5
 **Date:** 2026-02-21
 **Parent:** [System Requirements](SYS-REQ.md)
 
@@ -10,6 +10,8 @@
 ## Scope
 
 The Reporting & Analytics subsystem provides dashboards, compliance reports, and audit log queries for administrators and compliance officers. It operates in read-only mode against the data created by other subsystems.
+
+SUB-RA-0008 adds **dermatology classification analytics** — aggregating lesion classification volumes, risk score distributions, referral urgency trends, and model confidence metrics from the Dermatology CDS service (SYS-REQ-0012). Architecture defined via ADR-0008 (CDS microservice) and ADR-0020 (feature flags).
 
 ## Requirements
 
