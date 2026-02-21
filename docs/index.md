@@ -219,3 +219,12 @@ The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → D
 - [PMS Developer Working Instructions](quality/processes/PMS_Developer_Working_Instructions.md) — Development process guide
 - [Development Pipeline Tutorial](quality/processes/Development_Pipeline_Tutorial.md) — CI/CD pipeline tutorial
 - [ISO 13485:2016 Standard](quality/standards/iso-13485-2016.pdf) — Medical device QMS standard
+
+### Design History File (DHF)
+
+- [DHF Master Index](quality/DHF/DHF-index.md) — ISO 13485:2016 Clause 7.3 traceability matrix mapping all deliverables
+
+### Risk Management
+
+- Risk assessment files are created per feature using Step 5b of the [Documentation Workflow](documentation-workflow.md)
+- Location: `quality/risk-management/RA-{CODE}-{FEATURE}.md`
