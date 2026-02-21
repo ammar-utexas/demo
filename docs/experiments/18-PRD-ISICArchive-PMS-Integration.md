@@ -36,6 +36,11 @@ Build an **ISIC-Powered Dermatology CDS Module** in the PMS that combines ISIC A
 
 ### 3.1 Architecture Overview
 
+![ISIC Archive PMS Integration Architecture](assets/18-isic-architecture.png)
+
+<details>
+<summary>Mermaid source (click to expand)</summary>
+
 ```mermaid
 flowchart TB
     subgraph External["External Resources"]
@@ -100,6 +105,8 @@ flowchart TB
     style REFDB fill:#2ecc71,color:#fff
     style PG fill:#1abc9c,color:#fff
 ```
+
+</details>
 
 ### 3.2 Deployment Model
 
