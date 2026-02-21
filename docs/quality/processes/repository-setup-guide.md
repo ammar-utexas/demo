@@ -654,3 +654,470 @@ The workflow steps are sequential for a reason (each step's output feeds the nex
 | Dependency update | 8 (config) → 9 (verify) → 10b (version & publish) |
 | New experiment/POC | 1 (research) only |
 | Architecture decision | 2 (ADR) only |
+
+---
+
+## Appendix D: Bootstrap Prompts
+
+Run these prompts **in order** inside a new repository to scaffold the entire documentation system. Each prompt is self-contained — copy-paste it into Claude Code (or any AI agent with file-writing tools).
+
+Before starting, replace these placeholders in each prompt with your project's values:
+
+| Placeholder | Replace With | Example |
+|-------------|-------------|---------|
+| `{PROJECT_NAME}` | Your project name | Patient Management System |
+| `{PROJECT_ACRONYM}` | Short project acronym | PMS |
+| `{PROJECT_DESCRIPTION}` | One-paragraph description | A HIPAA-compliant software suite for managing patient records... |
+| `{SUBSYSTEMS}` | Comma-separated list of subsystem code:name pairs | PR:Patient Records, CW:Clinical Workflow, MM:Medication Management |
+| `{PLATFORMS}` | Comma-separated list of platform code:name:repo:tech tuples | BE:Backend API:my-backend:FastAPI, WEB:Web Frontend:my-frontend:Next.js |
+| `{REGULATIONS}` | Applicable regulatory standards | HIPAA, ISO 13485, 21 CFR Part 11 |
+| `{ROLES}` | User roles with access levels | Physician:Full clinical, Nurse:Clinical read/write, Admin:System management |
+| `{TECH_DECISION}` | Your first real technology decision for ADR-0002 | Backend framework: FastAPI over Django and Express |
+
+---
+
+### Prompt 0: Directory Skeleton + Root Files
+
+```
+I am bootstrapping a new repository called {PROJECT_NAME} with a
+documentation-as-source-of-truth process.
+
+STEP 1 — Create these root files:
+
+1. README.md with:
+   - Project name: {PROJECT_NAME}
+   - Description: {PROJECT_DESCRIPTION}
+   - A "Documentation" section linking to docs/index.md
+   - A "Quick Start" section with placeholder setup instructions
+
+2. .gitignore with standard ignores for the project's tech stack plus:
+   .DS_Store, Thumbs.db, .idea/, .vscode/, *.swp, .env, .env.local
+
+3. CLAUDE.md — an agent instruction file that declares docs/ as the
+   single source of truth. Include these sections:
+   - "Repository Docs as Single Source of Truth" header
+   - Directory Structure: show the full docs/ tree (architecture, api,
+     bugs, config, domain, experiments, features, platform,
+     quality/{audits,capa,processes,risk-management,standards},
+     specs/{requirements/{domain,platform}}, testing/evidence)
+   - What to Store: describe what goes in each directory
+   - When to Update Docs: list trigger conditions
+   - Rules: include these six rules:
+     1. Never rely on memory alone
+     2. Read before you build
+     3. Keep docs focused (one topic per file)
+     4. Update, don't duplicate
+     5. Docs are authoritative
+     6. Commit and push
+
+STEP 2 — Create the directory skeleton by creating a .gitkeep file
+in each empty directory:
+
+  docs/architecture/
+  docs/api/
+  docs/bugs/
+  docs/config/
+  docs/domain/
+  docs/experiments/
+  docs/features/
+  docs/platform/
+  docs/quality/audits/
+  docs/quality/capa/
+  docs/quality/processes/
+  docs/quality/risk-management/
+  docs/quality/standards/
+  docs/specs/requirements/domain/
+  docs/specs/requirements/platform/
+  docs/testing/evidence/
+```
+
+---
+
+### Prompt 1: System Specification
+
+```
+Read the CLAUDE.md file to understand the documentation structure.
+
+Create docs/specs/system-spec.md for {PROJECT_NAME}.
+
+The system spec must include these sections:
+
+1. Purpose — one paragraph: {PROJECT_DESCRIPTION}
+
+2. Scope — table of components:
+   {PLATFORMS}
+   (columns: Component, Repository, Technology)
+
+3. System Context — Mermaid flowchart showing all components and
+   external systems they interact with
+
+4. Subsystem Decomposition — table with columns:
+   Code | Subsystem | Scope | Primary Actor
+   Subsystems: {SUBSYSTEMS}
+
+5. User Roles — table with columns: Role | Access Level | Description
+   Roles: {ROLES}
+
+6. Regulatory Constraints — list: {REGULATIONS}
+
+7. Quality Attributes — table with targets for: Availability,
+   Response Time, Concurrent Users, Data Integrity, Security, Auditability
+
+8. Requirement ID Convention — use this exact table:
+   | Level | Format | Example |
+   | System | SYS-REQ-XXXX | SYS-REQ-0001 |
+   | Subsystem (Domain) | SUB-{code}-XXXX | SUB-XX-0001 |
+   | Platform | SUB-{code}-XXXX-{platform} | SUB-XX-0001-BE |
+   | Test Case (Domain) | TST-{code}-XXXX | TST-XX-0001 |
+   | Test Case (Platform) | TST-{code}-XXXX-{platform} | TST-XX-0001-BE |
+   | Test Run | RUN-{YYYY-MM-DD}-{NNN} | RUN-2026-01-01-001 |
+   Replace XX with the first subsystem code.
+
+8.1 Platform Codes — table mapping platform codes to repos and tech:
+   {PLATFORMS}
+
+9. Traceability Policy — three-tier decomposition
+   (System → Domain → Platform), strict rollup rule, every requirement
+   must trace to design + implementation + test case + test result.
+
+Include document header: Document ID, Version 1.0, today's date, Status: Approved.
+```
+
+---
+
+### Prompt 2: System Requirements
+
+```
+Read docs/specs/system-spec.md to understand the subsystem decomposition
+and requirement ID convention.
+
+Create docs/specs/requirements/SYS-REQ.md with 3-5 initial system
+requirements for {PROJECT_NAME}.
+
+Structure:
+- Document header: Document ID, Version 1.0, today's date
+- Summary table with columns: Req ID | Title | Priority | Status | Platforms
+  (status should be "Not Started" for all)
+- For each requirement, a detailed section with:
+  - Rationale (cite applicable regulations from {REGULATIONS})
+  - Acceptance Criteria (3-7 numbered, testable items)
+  - Current Implementation: Not started
+  - Decomposes To: list which SUB-{code} requirements it will produce,
+    with platform annotations (→ BE, WEB, AND, etc.)
+
+Start with cross-cutting requirements that apply to every project:
+- SYS-REQ-0001: Authentication and access control
+- SYS-REQ-0002: Data encryption (at rest and in transit)
+- SYS-REQ-0003: Audit trail for all data access
+Then add 1-2 domain-specific requirements based on {PROJECT_DESCRIPTION}.
+
+Use the subsystem codes from system-spec.md for the "Decomposes To" field.
+```
+
+---
+
+### Prompt 3: Testing Strategy + Traceability Matrix
+
+```
+Read docs/specs/system-spec.md (for requirement ID and test naming
+conventions) and docs/specs/requirements/SYS-REQ.md (for the requirements
+that need test coverage).
+
+Create TWO files:
+
+FILE 1: docs/testing/testing-strategy.md
+- Document header: Document ID, Version 1.0, today's date
+- Section 1: Testing Levels — Unit, Integration, System (include ASCII
+  pyramid). Table with columns: Level | Scope | Runs In | Frequency | Traces To
+- Section 2: Test Naming Convention — format:
+  TST-{code}-XXXX-{platform} (platform-scoped, preferred)
+  TST-{code}-XXXX (domain-level)
+  TST-SYS-XXXX (system-level)
+  Platform codes: {PLATFORMS} (just the codes)
+- Section 3: Requirement Annotations — show how to annotate tests in
+  each language used by the project (based on {PLATFORMS} tech stacks).
+  Use @requirement and @verification-method annotations.
+- Section 4: Subsystem Testing — commands per repository
+- Section 5: System-Level Testing — Docker Compose full-stack setup
+- Section 6: Test Run Record Format — template for RUN-YYYY-MM-DD-NNN.md
+  with fields: Date, Repository, Commit, Branch, Runner, Results table
+  (Test Case | Requirement | Result | Duration), Summary (Total/Passed/Failed/Skipped)
+- Section 7: Consistency Verification — pre-release checklist
+
+FILE 2: docs/testing/traceability-matrix.md
+- Document header: Document ID, Version 1.0, today's date
+- Forward Traceability table (empty template): SYS-REQ | Subsystem Reqs | Modules | Test Cases | Status
+- Backward Traceability table (empty template): Test Case ID | Description | Repository | Test Function | Traces To | Last Result | Run ID
+- Platform Traceability Summary (empty template, one section per subsystem)
+- Coverage Summary by Platform table (empty template): Platform | Total Reqs | Implemented | Verified | Not Started
+- Coverage Summary table (empty template): Subsystem | Domain Reqs | Platform Reqs | Tests | Coverage %
+- Test Run Log (empty): Run ID | Date | Repository | Branch | Commit | Total | Passed | Failed
+```
+
+---
+
+### Prompt 4: Governance + Config Docs
+
+```
+Read docs/specs/system-spec.md and docs/specs/requirements/SYS-REQ.md
+to understand the project structure.
+
+Create THREE files:
+
+FILE 1: docs/quality/processes/requirements-governance.md
+- Requirement lifecycle: Not Started → Scaffolded → Implemented → Verified
+- Strict rollup rule: domain req is Verified only when ALL platform reqs are Verified
+- Conflict analysis categories with ID formats:
+  - Domain Conflicts: DC-{code}-NN
+  - Platform Conflicts: PC-{platform}-NN
+  - Race Conditions: RC-{platform}-NN
+- Resolution process: how conflicts are documented and resolved
+- Branching & Release Strategy:
+  - main branch: always deployable
+  - feature/{name}: one branch per feature
+  - Merge requires PR with documentation review
+- Empty conflict tables (to be populated as requirements are added)
+
+FILE 2: docs/config/project-setup.md
+- Prerequisites section listing required tools for {PLATFORMS}
+- Clone instructions
+- Install steps per component
+- Run commands per component
+- Docker Compose setup (if applicable)
+- Common troubleshooting section (empty, to be populated)
+
+FILE 3: docs/config/dependencies.md
+- Table format per dependency: Name | Version | Purpose | Alternatives Rejected | Rationale
+- Group by component/platform
+- Start with the core framework for each platform from {PLATFORMS}
+```
+
+---
+
+### Prompt 5: Architecture Decision Records
+
+```
+Read docs/specs/system-spec.md to understand the project architecture.
+
+Create TWO ADR files:
+
+FILE 1: docs/architecture/0001-repo-based-knowledge-management.md
+- Date: today
+- Status: Accepted
+- Context: The project needs a knowledge management approach that keeps
+  documentation version-controlled, accessible to AI agents, and
+  co-located with code.
+- Options Considered:
+  1. Confluence/Notion (external wiki)
+  2. GitHub Wiki
+  3. Repository-based markdown in docs/
+- Decision: Use markdown files in a docs/ directory as the single source
+  of truth.
+- Rationale: Version-controlled with code, no external tool dependency,
+  AI agents can read/update directly, searchable with standard tools,
+  supports three-tier requirements decomposition.
+- Consequences: Every decision must be documented in docs/, index.md must
+  be kept current, team must read docs before starting work.
+
+FILE 2: docs/architecture/0002-{TECH_DECISION_SLUG}.md
+- Date: today
+- Status: Accepted
+- Context: Explain why {TECH_DECISION} was needed
+- Options Considered: at least 3 alternatives with pros/cons
+- Decision: what was chosen
+- Rationale: why this option won
+- Consequences: what this means for the project going forward
+```
+
+---
+
+### Prompt 6: Domain + Platform Requirement Templates
+
+```
+Read these files to understand the structure:
+- docs/specs/system-spec.md (subsystem codes and platform codes)
+- docs/specs/requirements/SYS-REQ.md (system requirements to decompose)
+
+For each subsystem in {SUBSYSTEMS}, create:
+
+1. docs/specs/requirements/domain/SUB-{CODE}.md with:
+   - Document header: Version 0.1, today's date, Parent: SYS-REQ.md
+   - Empty Requirements table: Req ID | Title | Priority | Status | Parent SYS-REQ
+   - Platform Decomposition index table: Domain Req | (one column per applicable platform)
+   - Status rollup note explaining the strict rollup rule
+
+2. For each applicable platform in {PLATFORMS}, create:
+   docs/specs/requirements/platform/SUB-{CODE}-{PLATFORM}.md with:
+   - Document header: Version 0.1, today's date
+   - Empty Requirements table: Req ID | Description | Parent Domain Req | Module(s) | Test Case ID | Status
+
+Only create platform files for subsystem+platform combinations that
+make sense for the project. Not every subsystem needs every platform.
+
+Also create placeholder files:
+- docs/specs/subsystem-versions.md — empty version tracking table
+- docs/specs/release-compatibility-matrix.md — empty compatibility table
+```
+
+---
+
+### Prompt 7: Documentation Views
+
+```
+Read docs/index.md and docs/specs/system-spec.md to understand the
+project's subsystems and platforms.
+
+Create documentation view files:
+
+1. docs/domain/index.md — list all business domain views with links
+   and one-line descriptions
+
+2. One file per business domain (e.g., docs/domain/{domain-slug}.md)
+   that aggregates links to relevant:
+   - Architecture decisions
+   - Requirements (SYS-REQ, domain, platform)
+   - Config docs
+   - Testing docs
+   Group by section. Do not duplicate content — link to existing files.
+
+3. docs/platform/index.md — list all platform views with links
+   and one-line descriptions
+
+4. One file per platform (e.g., docs/platform/{platform-slug}.md)
+   that aggregates links to relevant docs for that platform.
+
+Base the domain list on {SUBSYSTEMS} and the platform list on {PLATFORMS}.
+```
+
+---
+
+### Prompt 8: Documentation Workflow
+
+```
+Read ALL files in docs/ to understand what has been created so far.
+
+Create docs/documentation-workflow.md that defines the 10-step workflow
+for how features flow through the documentation system.
+
+Structure:
+- Title, date, purpose
+- Flow diagram (Mermaid flowchart showing all docs/ directories and
+  how they connect)
+- 10 workflow steps, each with:
+  - When: trigger condition
+  - Checklist: ordered actions
+  - AI Agent Prompt: reusable prompt for AI-assisted execution
+  - Files Modified: which docs are touched
+
+Steps:
+1. Research & Discovery — create experiment docs in experiments/
+2. Architecture Decision — create ADR in architecture/
+3. System Requirements — update SYS-REQ.md, system-spec.md
+4. Subsystem Decomposition — create/update domain + platform req files
+5. Governance, Quality & Risk — conflict analysis (5a) + risk assessment (5b)
+6. Testing & Traceability — update traceability matrix
+7. Development & Implementation — write code (speckit cycle)
+8. Configuration & Deployment — update config docs
+9. Verification & Evidence — run full test suite, record evidence
+10. Release — release evidence (10a) + version & publish (10b)
+
+Include a Quick Reference table mapping steps to files and a File
+Inventory table counting files per directory.
+
+Reference the actual files that exist in this repository.
+```
+
+---
+
+### Prompt 9: Index + Final Assembly
+
+```
+Read ALL files in docs/ to build a complete picture of what exists.
+
+Create (or overwrite) docs/index.md as the master table of contents.
+
+Structure:
+- Title: "Project Knowledge Base"
+- Link to documentation-workflow.md
+- Sections matching the docs/ directories:
+  - Architecture Decisions (link each ADR)
+  - Features (placeholder)
+  - Bug Fixes (placeholder)
+  - API Contracts (placeholder)
+  - Configuration & Dependencies (link config files)
+  - Release Management (link relevant ADRs + config docs)
+  - Experiments & Tool Evaluations (placeholder)
+  - Documentation Views (By Domain + By Platform, link view indexes)
+  - Specifications & Requirements (describe three-tier decomposition,
+    link SYS-REQ, each domain file with req count, each platform file
+    with req count)
+  - Testing & Traceability (link testing-strategy.md, traceability-matrix.md)
+  - Quality Management (link governance, processes)
+
+Every file in docs/ must be linked from index.md. Verify no orphan files.
+```
+
+---
+
+### Prompt 10: DHF Setup (ISO 13485 Only)
+
+> **Skip this prompt** if your project does not require ISO 13485 compliance.
+
+```
+Read docs/specs/system-spec.md and docs/index.md.
+
+Create the Design History File structure:
+
+1. Create these directories (with .gitkeep files):
+   docs/quality/DHF/01-design-planning/
+   docs/quality/DHF/02-design-input/
+   docs/quality/DHF/03-design-output/
+   docs/quality/DHF/04-design-review/
+   docs/quality/DHF/05-design-verification/
+   docs/quality/DHF/06-design-validation/
+   docs/quality/DHF/07-design-transfer/
+   docs/quality/DHF/08-design-changes/
+   docs/quality/DHF/09-risk-management/
+   docs/quality/DHF/10-release-evidence/
+
+2. Create docs/quality/DHF/DHF-index.md with:
+   - Purpose: declares this as the DHF per ISO 13485:2016
+   - ISO 13485 Clause 7.3 Traceability Matrix table:
+     | Clause | DHF Deliverable | DHF Folder | PMS Artifact(s) | Status |
+     Map each clause (7.3.2 through 7.3.9 + ISO 14971 + 4.2.5) to the
+     corresponding folder and list which project files belong there.
+   - Mermaid diagram showing the DHF structure
+   - Gap Analysis table: list any missing deliverables
+   - Refresh Process: DHF copies are refreshed at each release
+   - File Manifest: folder → file count → source directory
+
+3. Update docs/index.md to add a "Design History File (DHF)" subsection
+   under Quality Management with a link to DHF-index.md.
+```
+
+---
+
+### Execution Order
+
+| Order | Prompt | Creates | Depends On |
+|-------|--------|---------|------------|
+| 1st | Prompt 0 | Root files + directory skeleton | Nothing |
+| 2nd | Prompt 1 | `system-spec.md` | CLAUDE.md |
+| 3rd | Prompt 2 | `SYS-REQ.md` | system-spec.md |
+| 4th | Prompt 3 | `testing-strategy.md`, `traceability-matrix.md` | system-spec.md, SYS-REQ.md |
+| 5th | Prompt 4 | `requirements-governance.md`, `project-setup.md`, `dependencies.md` | system-spec.md, SYS-REQ.md |
+| 6th | Prompt 5 | ADR-0001, ADR-0002 | system-spec.md |
+| 7th | Prompt 6 | Domain + platform requirement templates | system-spec.md, SYS-REQ.md |
+| 8th | Prompt 7 | Documentation views | All prior files |
+| 9th | Prompt 8 | `documentation-workflow.md` | All prior files |
+| 10th | Prompt 9 | `index.md` (final) | All prior files |
+| 11th | Prompt 10 | DHF structure (optional) | All prior files |
+
+After running all prompts, commit everything:
+
+```bash
+git add -A
+git commit -m "docs: bootstrap documentation-as-source-of-truth structure"
+git remote add origin <your-repo-url>
+git push -u origin main
+```
