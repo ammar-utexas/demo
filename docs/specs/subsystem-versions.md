@@ -19,12 +19,13 @@
 | Clinical Workflow (SUB-CW) | SUB-CW-v0.0 | 0 | 8 | 2026-02-16 |
 | Medication Management (SUB-MM) | SUB-MM-v0.0 | 0 | 9 | 2026-02-16 |
 | Reporting & Analytics (SUB-RA) | SUB-RA-v0.0 | 0 | 7 | 2026-02-16 |
+| Prompt Management (SUB-PM) | SUB-PM-v0.0 | 0 | 7 | 2026-02-22 |
 
-**Note:** SUB-PR has 6 of 11 domain requirements with BE platform work (001-patient-crud feature), but strict rollup reduces domain-level "Verified" count since WEB/AND platform reqs are not started. SUB-CW, SUB-MM, and SUB-RA remain at v0.0 with scaffold-only implementations.
+**Note:** SUB-PR has 6 of 11 domain requirements with BE platform work (001-patient-crud feature), but strict rollup reduces domain-level "Verified" count since WEB/AND platform reqs are not started. SUB-CW, SUB-MM, SUB-RA, and SUB-PM remain at v0.0 with scaffold-only implementations.
 
 ## Platform Progress
 
-### SUB-PR — Patient Records (25 platform reqs)
+### SUB-PR — Patient Records (38 platform reqs)
 
 | Platform | Total Reqs | Verified | Implemented | Scaffolded | Not Started | Completion |
 |---|---|---|---|---|---|---|
@@ -33,7 +34,7 @@
 | AND | 7 | 0 | 0 | 1 | 6 | 0.0% |
 | AI | 3 | 0 | 0 | 0 | 3 | 0.0% |
 
-### SUB-CW — Clinical Workflow (14 platform reqs)
+### SUB-CW — Clinical Workflow (17 platform reqs)
 
 | Platform | Total Reqs | Verified | Implemented | Scaffolded | Not Started | Completion |
 |---|---|---|---|---|---|---|
@@ -49,13 +50,21 @@
 | WEB | 2 | 0 | 0 | 1 | 1 | 0.0% |
 | AND | 2 | 0 | 0 | 1 | 1 | 0.0% |
 
-### SUB-RA — Reporting & Analytics (17 platform reqs)
+### SUB-RA — Reporting & Analytics (19 platform reqs)
 
 | Platform | Total Reqs | Verified | Implemented | Scaffolded | Not Started | Completion |
 |---|---|---|---|---|---|---|
 | BE | 7 | 0 | 0 | 0 | 7 | 0.0% |
 | WEB | 5 | 0 | 0 | 1 | 4 | 0.0% |
 | AND | 5 | 0 | 0 | 1 | 4 | 0.0% |
+
+### AI Infrastructure (SUB-*-AI)
+
+| Subsystem | AI Reqs | Verified | Not Started | Repository | Completion |
+|---|---|---|---|---|---|
+| Patient Records (PR) | 6 | 0 | 6 | pms-ai | 0.0% |
+| Prompt Management (PM) | 1 | 0 | 1 | pms-ai | 0.0% |
+| **Total** | **7** | **0** | **7** | | **0.0%** |
 
 ## Version History
 
