@@ -13,10 +13,7 @@
 
 | Document | WEB Reqs | Summary |
 |----------|----------|---------|
-| [SUB-PR](../specs/requirements/SUB-PR.md) | 4 | Patient record forms, search, list views |
-| [SUB-CW](../specs/requirements/SUB-CW.md) | 3 | Encounter management UI |
-| [SUB-MM](../specs/requirements/SUB-MM.md) | 2 | Medication management UI |
-| [SUB-RA](../specs/requirements/SUB-RA.md) | 5 | Dashboards, charts, audit log viewer, CSV export |
+| [SUB-WEB](../specs/requirements/platform/SUB-WEB.md) | 24 | All web frontend platform requirements across 5 domains |
 | [SYS-REQ](../specs/requirements/SYS-REQ.md) | — | SYS-08: Web UI system requirement |
 
 ## Features & Implementation

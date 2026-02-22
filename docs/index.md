@@ -2,6 +2,9 @@
 
 This directory is the single source of truth for all project context, decisions, and implementation details.
 
+- [Documentation Workflow](documentation-workflow.md) — How features flow through requirements, testing, and release across all docs
+- [PMS Project Overview](PMS_Project_Overview.md) — Bird's eye view of all repositories, requirements, and coverage
+
 ## Architecture Decisions
 
 - [ADR-0001: Use Repository-Based Knowledge Management](architecture/0001-repo-based-knowledge-management.md)
@@ -9,6 +12,24 @@ This directory is the single source of truth for all project context, decisions,
 - [ADR-0003: Backend Tech Stack — FastAPI with Async SQLAlchemy](architecture/0003-backend-tech-stack.md)
 - [ADR-0004: Frontend Tech Stack — Next.js with Tailwind CSS](architecture/0004-frontend-tech-stack.md)
 - [ADR-0005: Android Tech Stack — Kotlin with Jetpack Compose](architecture/0005-android-tech-stack.md)
+
+### ISIC Dermatology CDS (SYS-REQ-0012)
+
+- [ADR-0008: CDS Microservice Architecture](architecture/0008-derm-cds-microservice-architecture.md) — Separate Docker service (`pms-derm-cds` :8090) for AI inference
+- [ADR-0009: AI Inference Runtime Selection](architecture/0009-ai-inference-runtime.md) — ONNX Runtime (server) + TensorRT (Jetson) + TFLite (Android)
+- [ADR-0010: Patient Image Storage Strategy](architecture/0010-dermoscopic-image-storage.md) — AES-256-GCM encrypted BYTEA in PostgreSQL
+- [ADR-0011: Vector Database Strategy](architecture/0011-vector-database-pgvector.md) — pgvector extension for similarity search
+- [ADR-0012: Android On-Device Inference](architecture/0012-android-on-device-inference.md) — TFLite with MobileNetV3 for offline skin lesion triage
+- [ADR-0013: AI Model Lifecycle Management](architecture/0013-ai-model-lifecycle.md) — Versioned model artifacts with provenance tracking
+- [ADR-0014: Image Preprocessing & Quality Validation](architecture/0014-image-preprocessing-pipeline.md) — Resize/normalize pipeline with blur/exposure quality gates
+- [ADR-0015: Risk Scoring Engine Design](architecture/0015-risk-scoring-engine.md) — Configurable threshold-based rules for clinical risk assessment
+- [ADR-0016: Encryption Key Management](architecture/0016-image-encryption-key-management.md) — Unified versioned-envelope key management
+- [ADR-0017: ISIC Reference Cache Management](architecture/0017-isic-reference-cache.md) — S3 bulk population, model-version coupling, incremental updates
+- [ADR-0018: Backend-to-CDS Communication](architecture/0018-inter-service-communication.md) — HTTP client pooling, circuit breaking, timeout configuration
+- [ADR-0019: Lesion Longitudinal Tracking](architecture/0019-lesion-longitudinal-tracking.md) — Persistent lesion identity with embedding cosine distance change detection
+- [ADR-0020: Feature Flag Strategy](architecture/0020-derm-cds-feature-flags.md) — Granular per-requirement flags for phased rollout
+- [ADR-0021: Database Migration Strategy](architecture/0021-derm-database-migration.md) — Alembic-managed migrations for pgvector tables
+- [ADR-0022: DermaCheck Core Workflow Orchestration](architecture/0022-dermacheck-workflow-orchestration.md) — Parallel fan-out pipeline for Journey 1 capture-classify-review flow
 
 ## Features
 
@@ -167,15 +188,25 @@ Browse documentation organized by deployment platform — [full index](platform/
 
 ## Specifications & Requirements
 
-The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 11 system requirements, 43 domain requirements, and 82 platform requirements across 4 platforms.
+The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 13 system requirements, 50 domain requirements, and 100 platform requirements across 4 platforms. Domain requirements live in `specs/requirements/domain/` and platform requirements in `specs/requirements/platform/`.
 
 - [System Specification](specs/system-spec.md) — System-level scope, context, subsystem decomposition, and platform codes
-- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 11 system-level requirements with platform annotations
-- [Patient Records (SUB-PR)](specs/requirements/SUB-PR.md) — 12 domain requirements, 25 platform requirements (BE=11, WEB=4, AND=7, AI=3)
-- [Clinical Workflow (SUB-CW)](specs/requirements/SUB-CW.md) — 8 domain requirements, 14 platform requirements (BE=8, WEB=3, AND=3)
-- [Medication Management (SUB-MM)](specs/requirements/SUB-MM.md) — 9 domain requirements, 13 platform requirements (BE=9, WEB=2, AND=2)
-- [Reporting & Analytics (SUB-RA)](specs/requirements/SUB-RA.md) — 7 domain requirements, 17 platform requirements (BE=7, WEB=5, AND=5)
-- [Prompt Management (SUB-PM)](specs/requirements/SUB-PM.md) — 7 domain requirements, 13 platform requirements (BE=7, WEB=5, AI=1)
+- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 13 system-level requirements with platform annotations
+
+### Domain Requirements
+
+- [Patient Records (SUB-PR)](specs/requirements/domain/SUB-PR.md) — 17 domain requirements
+- [Clinical Workflow (SUB-CW)](specs/requirements/domain/SUB-CW.md) — 9 domain requirements
+- [Medication Management (SUB-MM)](specs/requirements/domain/SUB-MM.md) — 9 domain requirements
+- [Reporting & Analytics (SUB-RA)](specs/requirements/domain/SUB-RA.md) — 8 domain requirements
+- [Prompt Management (SUB-PM)](specs/requirements/domain/SUB-PM.md) — 7 domain requirements
+
+### Platform Requirements
+
+- [Backend (SUB-BE)](specs/requirements/platform/SUB-BE.md) — 49 requirements across 5 domains
+- [Web Frontend (SUB-WEB)](specs/requirements/platform/SUB-WEB.md) — 25 requirements across 5 domains
+- [Android (SUB-AND)](specs/requirements/platform/SUB-AND.md) — 19 requirements across 4 domains
+- [AI Infrastructure (SUB-AI)](specs/requirements/platform/SUB-AI.md) — 7 requirements across 2 domains
 
 ## Testing & Traceability
 
@@ -187,4 +218,16 @@ The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → D
 - [Requirements Governance & Conflict Analysis](quality/processes/requirements-governance.md) — Governance procedures, feature branching & release strategy, 14 domain conflicts, 12 platform conflicts, 14 race conditions
 - [PMS Developer Working Instructions](quality/processes/PMS_Developer_Working_Instructions.md) — Development process guide
 - [Development Pipeline Tutorial](quality/processes/Development_Pipeline_Tutorial.md) — CI/CD pipeline tutorial
+- [Repository Setup Guide](quality/processes/repository-setup-guide.md) — Step-by-step guide to bootstrap a new repository with this documentation process
 - [ISO 13485:2016 Standard](quality/standards/iso-13485-2016.pdf) — Medical device QMS standard
+
+### Design History File (DHF)
+
+- [DHF Master Index](quality/DHF/DHF-index.md) — ISO 13485:2016 Clause 7.3 traceability matrix mapping all deliverables
+- [Release Evidence: v0.2.0-arch](quality/DHF/10-release-evidence/DHF-release-2026-02-21-v0.2.0-arch.md) — Documentation & Architecture release conformity record
+
+### Risk Management
+
+- Risk assessment files are created per feature using Step 5b of the [Documentation Workflow](documentation-workflow.md)
+- Location: `quality/risk-management/RA-{CODE}-{FEATURE}.md`
+- [RA-DERM-DermaCheckOrchestration](quality/risk-management/RA-DERM-DermaCheckOrchestration.md) — DermaCheck Workflow Orchestration (SYS-REQ-0013): 20 risks across Clinical Safety, Data Integrity, Availability, and Concurrency categories; 0 residual unacceptable

@@ -19,10 +19,7 @@
 
 | Document | BE Reqs | Summary |
 |----------|---------|---------|
-| [SUB-PR](../specs/requirements/SUB-PR.md) | 11 | Patient CRUD, encryption, audit, search, pagination |
-| [SUB-CW](../specs/requirements/SUB-CW.md) | 8 | Encounter lifecycle, auth, RBAC, alerts, audit |
-| [SUB-MM](../specs/requirements/SUB-MM.md) | 9 | Drug interactions, encryption, FHIR, RBAC, refill tracking |
-| [SUB-RA](../specs/requirements/SUB-RA.md) | 7 | Dashboard data, audit log queries, CSV export |
+| [SUB-BE](../specs/requirements/platform/SUB-BE.md) | 47 | All backend platform requirements across 5 domains |
 
 ## Features & Implementation
 
