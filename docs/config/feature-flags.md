@@ -34,6 +34,16 @@ Examples:
 | `FEATURE_SUB_PR_0010_PATIENT_ID_VERIFY` | SUB-PR-0010 | Patient identity verification via ArcFace + TensorRT | Create | off | off | off | off |
 | `FEATURE_SUB_PR_0011_DOCUMENT_OCR` | SUB-PR-0011 | Document OCR text extraction via PaddleOCR + TensorRT | Create | off | off | off | off |
 
+## Always-On Features (No Flag)
+
+Some features are foundational security or infrastructure requirements that must never be disabled in any environment. These do **not** use feature flags.
+
+| Feature | Req IDs | Reason | Dev Workaround |
+|---|---|---|---|
+| Authentication & User Management | SUB-AU-0001 – SUB-AU-0016 | Core security gate; disabling would expose PHI | Auth bypass mode (`NEXT_PUBLIC_AUTH_BYPASS_ENABLED`) — see [environments.md](environments.md) |
+
+**Auth Bypass Mode (SUB-AU-0016):** The frontend provides a dev-only bypass that injects a mock user and shows a non-dismissible yellow warning banner. This is controlled by `NEXT_PUBLIC_AUTH_BYPASS_*` environment variables, **not** by the feature flag system. It must never be enabled outside local development.
+
 ## Flag Lifecycle
 
 ```

@@ -76,6 +76,9 @@ CodeRabbit is instructed to verify:
 - **SYS-REQ-0002:** Encryption on PHI fields (models, data layer)
 - **SYS-REQ-0003:** Audit logging on patient data access (routers, services)
 - **SYS-REQ-0005:** RBAC checks precede data access (routers, UI)
+- **SYS-REQ-0014:** JWT validation on all protected endpoints (auth middleware, API routes)
+- **SYS-REQ-0015:** Session timeout and token refresh logic (auth providers, API client)
+- **SYS-REQ-0016:** Auth bypass restricted to development environments only (env var guards, warning banners)
 
 ### Setup Steps
 

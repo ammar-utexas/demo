@@ -62,7 +62,14 @@
 | `SECRET_KEY` | Dev key | Rotated monthly | Rotated monthly | Rotated monthly |
 | `ENCRYPTION_KEY` | Dev key | Per-env key | Per-env key | HSM-managed |
 | `LOG_LEVEL` | `DEBUG` | `INFO` | `INFO` | `INFO` |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | QA backend URL | Staging backend URL | Prod backend URL |
+| `NEXT_PUBLIC_AUTH_BYPASS_ENABLED` | `true` (optional) | **never** | **never** | **never** |
+| `NEXT_PUBLIC_AUTH_BYPASS_ROLE` | `admin` (optional) | — | — | — |
+| `NEXT_PUBLIC_AUTH_BYPASS_EMAIL` | `dev@localhost` (optional) | — | — | — |
+| `NEXT_PUBLIC_AUTH_BYPASS_NAME` | `Dev User` (optional) | — | — | — |
 | `FEATURE_*` | Per developer | QA-controlled | PO-controlled | CCB-controlled |
+
+> **Warning:** `NEXT_PUBLIC_AUTH_BYPASS_ENABLED` must **never** be set to `true` outside local development. The `NEXT_PUBLIC_` prefix exposes these values in the browser bundle. The frontend displays a non-dismissible yellow warning banner when bypass mode is active (SUB-AU-0016).
 
 ## Jetson Thor (Edge)
 

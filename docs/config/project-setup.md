@@ -107,7 +107,26 @@ docker compose down -v     # stop and remove volumes (resets database)
 
 ## Authentication (Dev Workaround)
 
-The login endpoint (`POST /auth/token`) is currently a stub — it does not issue real JWTs. To access protected API routes during development, generate a valid token manually:
+The login endpoint (`POST /auth/token`) is currently a stub — it does not issue real JWTs. Two options exist for development:
+
+### Option A: Frontend Auth Bypass (Recommended for UI Work)
+
+Enable auth bypass mode to skip the login page and inject a mock user. Add to `pms-frontend/.env.local`:
+
+```bash
+NEXT_PUBLIC_AUTH_BYPASS_ENABLED=true
+NEXT_PUBLIC_AUTH_BYPASS_ROLE=admin        # admin | physician | nurse
+NEXT_PUBLIC_AUTH_BYPASS_EMAIL=dev@localhost
+NEXT_PUBLIC_AUTH_BYPASS_NAME=Dev User
+```
+
+This injects a mock user into the AuthProvider and displays a **non-dismissible yellow warning banner** at the top of every page. The banner disappears when bypass mode is disabled.
+
+> **Warning:** Never enable auth bypass outside local development. The `NEXT_PUBLIC_` prefix exposes these values in the browser bundle.
+
+### Option B: Manual JWT Token (for API Testing)
+
+Generate a valid token from the backend to test protected API routes:
 
 ```bash
 # From inside the running backend container:
