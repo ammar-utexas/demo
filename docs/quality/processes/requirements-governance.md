@@ -1,15 +1,15 @@
 # Requirements Governance & Conflict Analysis
 
 **Document ID:** PMS-GOV-001
-**Version:** 1.6
-**Date:** 2026-02-21
+**Version:** 1.7
+**Date:** 2026-02-23
 **Parent:** [System Specification](../../specs/system-spec.md)
 
 ---
 
 ## 1. Purpose
 
-This document defines the governance procedures for evolving the PMS three-tier requirements decomposition (System → Domain → Platform) and provides a systematic conflict and race condition analysis across all 48 domain requirements and 95 platform requirements.
+This document defines the governance procedures for evolving the PMS three-tier requirements decomposition (System → Domain → Platform) and provides a systematic conflict and race condition analysis across all 62 domain requirements and 131 platform requirements.
 
 ---
 
@@ -285,7 +285,14 @@ Conflicts where two or more requirements within the same domain subsystem impose
 | DC-PM-02 | **Concurrent version creation** — SUB-PM-0004 requires auto-incrementing version numbers for each prompt. Two concurrent save operations may both read `MAX(version) = N` and both attempt to create version `N+1`, causing a duplicate or overwrite. | SUB-PM-0004 | High | Use `SELECT MAX(version) FROM prompt_versions WHERE prompt_id = ? FOR UPDATE` to serialize concurrent version creation at the database row level. The `FOR UPDATE` lock ensures only one transaction reads and increments at a time. This mirrors the RC-BE-01 / RC-BE-02 pattern. | **Resolved** — SUB-PM-0004 and SUB-PM-0004-BE specify `FOR UPDATE` serialization. |
 | DC-PM-03 | **Cross-prompt comparison** — SUB-PM-0007 provides LLM-powered version comparison. A malicious or buggy request could attempt to compare versions across different prompts by supplying version IDs from different prompt records, potentially leaking prompt content across authorization boundaries. | SUB-PM-0007 | Medium | The comparison endpoint must validate that both requested versions belong to the same prompt ID specified in the URL path. Reject with 400 Bad Request if either version does not belong to the path-scoped prompt. | **Resolved** — SUB-PM-0007-BE specifies path-scoped endpoint validation for both versions. |
 
-**Total intra-domain conflicts: 17 (17 resolved, 0 open)**
+### SUB-AU — Authentication & User Management (2 conflicts)
+
+| ID | Conflict | Requirements | Severity | Resolution | Status |
+|---|---|---|---|---|---|
+| DC-AU-01 | **Auth bypass skips audit trail for authentication events** — SUB-AU-0016 bypasses the entire authentication flow (no login, logout, failed attempts, or lockout events occur). SUB-AU-0011 requires audit logging of all authentication events. When bypass is active, the auth audit trail contains zero entries, creating an observability gap. While dev/CI environments contain no PHI, the requirements do not explicitly scope SUB-AU-0011 to "when authentication is active." | SUB-AU-0016 vs SUB-AU-0011 | Low | SUB-AU-0016-BE must log a single `AUTH_BYPASS_ACTIVE` event at startup (action: `AUTH_BYPASS_ACTIVE`, resource_type: `system`, details: role/email of mock user). This preserves audit trail continuity in dev/CI environments. SUB-AU-0011 audit logging of runtime auth events (login, logout, lockout, etc.) applies only when bypass is disabled — this is inherent since those events cannot occur when bypass is active. | **Resolved** — AUTH_BYPASS_ACTIVE startup audit event specified. Runtime auth audit logging is inherently scoped to non-bypass operation. |
+| DC-AU-02 | **Backend-frontend bypass flag inconsistency** — SUB-AU-0016 decomposes to independent environment variables: `AUTH_BYPASS_ENABLED` (backend) and `NEXT_PUBLIC_AUTH_BYPASS_ENABLED` (frontend). If flags are mismatched (one true, one false), the system enters an inconsistent state: (a) frontend bypass + backend auth → frontend sends no JWT, backend rejects all requests with 401; (b) frontend auth + backend bypass → frontend sends a real JWT, backend ignores it and injects a mock user with a potentially different role/identity than the authenticated user. Neither failure mode produces a clear error message. | SUB-AU-0016-BE vs SUB-AU-0016-WEB | Medium | Document in `.env.example` and project setup guide that both flags must be set consistently. SUB-AU-0016-WEB should detect the mismatch at runtime: when bypass is active on the frontend, the first API call should verify that the backend also responds with the mock user identity (compare `email` from the response against `NEXT_PUBLIC_AUTH_BYPASS_EMAIL`). On mismatch, display a configuration error banner: "Backend auth bypass is not enabled — check AUTH_BYPASS_ENABLED." | **Resolved** — Mismatch detection specified for SUB-AU-0016-WEB. Documentation requirement added for `.env.example`. |
+
+**Total intra-domain conflicts: 19 (19 resolved, 0 open)**
 
 ---
 
@@ -293,7 +300,7 @@ Conflicts where two or more requirements within the same domain subsystem impose
 
 Conflicts where platform-specific requirements across different subsystems or platforms impose contradictory obligations on a shared component, API, or resource.
 
-### Backend (BE) — 8 conflicts
+### Backend (BE) — 9 conflicts
 
 | ID | Conflict | Requirements | Severity | Resolution | Status |
 |---|---|---|---|---|---|
@@ -305,14 +312,16 @@ Conflicts where platform-specific requirements across different subsystems or pl
 | PC-BE-06 | **Shared auth middleware (prompt endpoints)** — SUB-PM-0001-BE enforces JWT auth through the same `middleware/auth.py` shared by SUB-PR-0001-BE, SUB-CW-0001-BE, SUB-MM-0006-BE, and SUB-RA-0004-BE. A change to the auth middleware affects all subsystems simultaneously. | SUB-PM-0001-BE vs SUB-PR-0001-BE, SUB-CW-0001-BE, SUB-MM-0006-BE, SUB-RA-0004-BE | Low | Follows PC-BE-02 precedent — shared auth middleware is acceptable for the monolithic backend (DRY principle). Mitigate regression risk by maintaining TST-AUTH-0001 as a cross-cutting system test. No requirements change needed. | **Resolved** — Accepted as designed, following PC-BE-02 precedent. |
 | PC-BE-07 | **Audit catalog extension** — SUB-PM-0005-BE introduces new audit action strings (PROMPT_CREATE, PROMPT_READ, PROMPT_UPDATE, PROMPT_DELETE, VERSION_CREATE, VERSION_COMPARE) and resource type `prompt`. These must be added to the audit event catalog established by PC-BE-03 without conflicting with existing action strings. | SUB-PM-0005-BE vs SUB-PR-0005-BE, SUB-CW-0004-BE, SUB-MM-0004-BE | Medium | Add the new action strings and resource type to the audit event catalog. The PROMPT_* and VERSION_* prefixes are unique and do not collide with existing CREATE/READ/UPDATE/DELETE/DEACTIVATE action strings used by other subsystems. | **Resolved** — SUB-PM-0005-BE specifies the new action strings. Audit event catalog updated. |
 | PC-BE-08 | **Encryption module path divergence** — SUB-PR-0013-BE lists `core/encryption.py` as its encryption module, while SUB-PR-0004-BE uses `services/encryption_service.py`. Both reside in pms-backend. ADR-0016 mandates a unified versioned-envelope key management approach, but if two separate modules implement encryption, the shared KEK/DEK hierarchy cannot be enforced consistently. Key rotation would need to update both modules independently. | SUB-PR-0013-BE vs SUB-PR-0004-BE | Medium | Designate `services/encryption_service.py` as the single authoritative encryption module for all PHI (consistent with existing implementation). When AES-256-GCM support is added (per DC-PR-01/PC-BE-01 migration), both SSN and image encryption use the same module and key hierarchy. Update SUB-PR-0013-BE module reference from `core/encryption.py` to `services/encryption_service.py`. | **Resolved** — SUB-PR-0013-BE module reference updated from `core/encryption.py` to `services/encryption_service.py`. Single authoritative encryption module for all PHI. |
+| PC-BE-09 | **Shared auth middleware — bypass addition** — SUB-AU-0016-BE adds auth bypass logic to `middleware/auth.py`, the same shared module referenced by PC-BE-02 (SUB-PR-0001-BE, SUB-CW-0001-BE, SUB-MM-0006-BE, SUB-RA-0004-BE) and PC-BE-06 (SUB-PM-0001-BE). The bypass middleware must be registered before `require_auth` / `require_role` in the middleware chain. When bypass is active, all 6 subsystem auth guards are effectively disabled — a single flag controls authentication for the entire backend. This expands the shared middleware's responsibility from "enforce auth" to "enforce or bypass auth." | SUB-AU-0016-BE vs SUB-PR-0001-BE, SUB-CW-0001-BE, SUB-MM-0006-BE, SUB-RA-0004-BE, SUB-PM-0001-BE | Low | Follows PC-BE-02 / PC-BE-06 precedent — shared auth middleware is intentional for the monolithic backend (DRY principle). The bypass is an additional mode of the same module, not a separate module. Mitigate regression risk: TST-AU-0016-BE must include an integration test verifying that when `AUTH_BYPASS_ENABLED=false`, the auth flow is identical to the pre-bypass code path (zero behavioral change). The environment guard (500 on production/staging/qa) provides defense-in-depth. | **Resolved** — Follows PC-BE-02/PC-BE-06 precedent. Integration test requirement added. Environment guard provides safety. |
 
-### Web Frontend (WEB) — 3 conflicts
+### Web Frontend (WEB) — 4 conflicts
 
 | ID | Conflict | Requirements | Severity | Resolution | Status |
 |---|---|---|---|---|---|
 | PC-WEB-01 | **Shared auth guard module** — SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, and SUB-RA-0004-WEB all reference `lib/auth.ts` for auth guards. Different subsystems may need different guard behaviors (e.g., reports require admin/billing role check in the guard, while patient pages allow nurse access). A single auth guard implementation risks either over-permitting or under-permitting. | SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, SUB-RA-0004-WEB | Medium | `lib/auth.ts` should provide a parameterized guard (e.g., `requireRole(['admin', 'physician'])`) rather than a single hardcoded check. Each page passes its allowed roles. The guard is shared; the role lists are subsystem-specific. | **Resolved** — SUB-PR-0001-WEB updated to specify parameterized auth guard with subsystem-specific role lists. |
 | PC-WEB-02 | **Inconsistent patient data between list and dashboard** — SUB-PR-0008-WEB shows paginated patient lists with current data. SUB-RA-0001-WEB shows patient volume dashboards with aggregated data. If the dashboard caches aggregated counts while the patient list shows real-time data, the numbers may disagree within the same user session. | SUB-PR-0008-WEB vs SUB-RA-0001-WEB | Low | Add a cache TTL and "last refreshed" timestamp to the dashboard. Accept eventual consistency (reporting data may lag real-time data by up to the cache TTL). Document this in SUB-RA-0001-WEB acceptance criteria. | **Resolved** — SUB-RA-0001-WEB updated with cache TTL and "last refreshed" timestamp requirement. |
 | PC-WEB-03 | **Shared auth guard (prompt pages)** — SUB-PM-0001-WEB uses the parameterized `requireRole` guard from `lib/auth.ts` shared by SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, and SUB-RA-0004-WEB. Different prompt pages may need role combinations (admin-only for mutation pages, admin+physician for read pages). | SUB-PM-0001-WEB vs SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, SUB-RA-0004-WEB | Low | Follows PC-WEB-01 precedent — the parameterized guard supports subsystem-specific role lists. Prompt pages pass `['admin']` for mutation routes and `['admin', 'physician']` for read routes. No code change to the guard itself is needed. | **Resolved** — Accepted as designed, following PC-WEB-01 precedent. SUB-PM-0001-WEB specifies role lists per route. |
+| PC-WEB-04 | **Shared auth module — bypass addition** — SUB-AU-0016-WEB adds auth bypass logic to `lib/auth.ts`, the same module that provides the parameterized `requireRole` guard (PC-WEB-01, PC-WEB-03) and the token refresh single-Promise lock (RC-WEB-01). When bypass is active, both the guard and the refresh lock must be short-circuited — the mock user is injected before either mechanism runs. If the bypass implementation does not properly short-circuit the refresh logic, it could interfere with the Promise lock mechanism (e.g., leaving a dangling unresolved Promise). | SUB-AU-0016-WEB vs SUB-PR-0001-WEB, SUB-CW-0001-WEB, SUB-MM-0006-WEB, SUB-RA-0004-WEB, SUB-PM-0001-WEB | Low | Follows PC-WEB-01 / PC-WEB-03 precedent — `lib/auth.ts` is the shared auth module for all subsystems. Auth bypass must short-circuit at the top of the auth context initialization, before the `requireRole` guard and token refresh lock are ever invoked. When `NEXT_PUBLIC_AUTH_BYPASS_ENABLED=false` (default), zero code-path changes — the bypass branch is never entered. TST-AU-0016-WEB must verify that normal auth (guard + refresh lock) works correctly when bypass is disabled. | **Resolved** — Follows PC-WEB-01/PC-WEB-03 precedent. Short-circuit requirement specified. Integration test requirement added. |
 
 ### Android (AND) — 3 conflicts
 
@@ -328,7 +337,7 @@ Conflicts where platform-specific requirements across different subsystems or pl
 |---|---|---|---|---|---|
 | PC-AI-01 | **Model version parity between server and mobile** — SUB-PR-0013-AI deploys EfficientNet-B4 via ONNX Runtime on the server. SUB-PR-0013-AND deploys MobileNetV3 via TFLite on Android. These are architecturally different models that may produce divergent classifications for the same input image. ADR-0013 (model lifecycle) covers single-model versioning but does not specify cross-platform model version parity. A clinician receiving a "low risk" triage on-device that is later reclassified as "high risk" by the server undermines trust in the system. | SUB-PR-0013-AI vs SUB-PR-0013-AND | High | Define a model compatibility matrix in the model-manifest.json (ADR-0013): server and mobile models must be trained on the same ISIC dataset version and validated to produce concordant top-1 predictions on a reference test set (target: ≥90% agreement rate). The on-device result must be labeled "preliminary triage — pending server confirmation" and never presented as a final diagnosis. When the server classification becomes available, if it differs from the on-device result, surface a notification to the clinician. | **Resolved** — SUB-PR-0013-AI updated with model compatibility matrix requirement (≥90% agreement, same ISIC dataset version). SUB-PR-0013-AND updated with "preliminary triage" labeling, `confirmed = false` flag, and push notification on classification discrepancy. |
 
-**Total cross-platform conflicts: 15 (15 resolved, 0 open)**
+**Total cross-platform conflicts: 17 (17 resolved, 0 open)**
 
 ---
 
@@ -374,14 +383,26 @@ Race conditions identified per platform where concurrent operations can produce 
 
 ## 6. Summary
 
-All 49 conflicts and race conditions have been resolved at the requirements level. The 9 Dermatology CDS conflicts (v1.5) from SUB-PR-0013–0016 were resolved in v1.6 (2026-02-21). The requirements documents (domain/SUB-PR.md, platform/SUB-BE.md, platform/SUB-AND.md, platform/SUB-AI.md) have been updated to incorporate each resolution. Implementation of the updated requirements is tracked by the individual requirement statuses in each file.
+All 53 conflicts and race conditions have been resolved at the requirements level. The 9 Dermatology CDS conflicts (v1.5) from SUB-PR-0013–0016 were resolved in v1.6 (2026-02-21). The 4 Auth Bypass conflicts from SUB-AU-0016 (SYS-REQ-0016) were resolved in v1.7 (2026-02-23). The requirements documents have been updated to incorporate each resolution. Implementation of the updated requirements is tracked by the individual requirement statuses in each file.
 
 | Category | Count | Critical | High | Medium | Low | Resolved |
 |---|---|---|---|---|---|---|
-| Intra-domain conflicts | 17 | 0 | 7 | 8 | 2 | **17/17** |
-| Cross-platform conflicts | 15 | 0 | 4 | 8 | 3 | **15/15** |
+| Intra-domain conflicts | 19 | 0 | 7 | 9 | 3 | **19/19** |
+| Cross-platform conflicts | 17 | 0 | 4 | 8 | 5 | **17/17** |
 | Race conditions | 17 | 2 | 7 | 7 | 1 | **17/17** |
-| **Total** | **49** | **2** | **18** | **23** | **6** | **49/49** |
+| **Total** | **53** | **2** | **18** | **24** | **9** | **53/53** |
+
+### Resolved Conflicts — Auth Bypass (v1.7, 2026-02-23)
+
+The following 4 conflicts from SUB-AU-0016 (SYS-REQ-0016) were resolved in v1.7:
+
+**Medium (resolved):**
+1. **DC-AU-02** — Backend-frontend bypass flag inconsistency. SUB-AU-0016-WEB detects mismatch at runtime by comparing mock user identity against API response. Documentation requirement added.
+
+**Low (resolved):**
+2. **DC-AU-01** — Auth bypass skips audit trail. AUTH_BYPASS_ACTIVE startup event specified. Runtime auth audit inherently scoped to non-bypass operation.
+3. **PC-BE-09** — Shared auth middleware bypass. Follows PC-BE-02/PC-BE-06 precedent. Integration test requirement added. Environment guard provides safety.
+4. **PC-WEB-04** — Shared auth module bypass. Follows PC-WEB-01/PC-WEB-03 precedent. Short-circuit before guard and refresh lock. Integration test requirement added.
 
 ### Resolved Conflicts — Dermatology CDS (v1.6, 2026-02-21)
 
@@ -426,6 +447,11 @@ The following items have been resolved in the requirements but require code chan
 13. **RC-BE-11** — Concurrent lesion upload serialization + minimum interval (SUB-PR-0013-BE, SUB-PR-0016-BE).
 14. **RC-BE-12** — CDS circuit breaker transaction + idempotency key (SUB-PR-0013-BE).
 
+**Low — target Auth Bypass sprint:**
+15. **DC-AU-01** — AUTH_BYPASS_ACTIVE startup audit event (SUB-AU-0016-BE).
+16. **DC-AU-02** — Backend-frontend bypass flag mismatch detection (SUB-AU-0016-WEB).
+17. **PC-BE-09 / PC-WEB-04** — Shared auth module bypass integration tests (TST-AU-0016-BE, TST-AU-0016-WEB).
+
 ---
 
 ## Appendix A: Conflict Cross-Reference to Requirements
@@ -441,6 +467,7 @@ Quick lookup: which requirement IDs are involved in conflicts or race conditions
 | SYS-REQ-0006 | DC-MM-01, PC-BE-05, RC-BE-03 |
 | SYS-REQ-0011 | DC-PM-01, DC-PM-02, DC-PM-03, RC-BE-09, RC-BE-10 |
 | SYS-REQ-0012 | DC-PR-05, DC-PR-06, DC-PR-07, PC-BE-08, PC-AND-03, PC-AI-01, RC-BE-11, RC-BE-12, RC-AND-03 |
+| SYS-REQ-0016 | DC-AU-01, DC-AU-02, PC-BE-09, PC-WEB-04 |
 | SUB-PR-0003 | DC-PR-02, DC-PR-04, RC-BE-01, RC-BE-06, RC-WEB-02, RC-AND-02 |
 | SUB-PR-0004 | DC-PR-01, PC-BE-01, PC-BE-08 |
 | SUB-PR-0006 | DC-PR-04, RC-BE-05 |
@@ -467,4 +494,6 @@ Quick lookup: which requirement IDs are involved in conflicts or race conditions
 | SUB-PM-0005 | PC-BE-07 |
 | SUB-PM-0007 | DC-PM-03, RC-BE-10 |
 | SUB-RA-0003 | DC-RA-01, RC-BE-04 |
+| SUB-AU-0011 | DC-AU-01 |
+| SUB-AU-0016 | DC-AU-01, DC-AU-02, PC-BE-09, PC-WEB-04 |
 | SUB-RA-0005 | DC-RA-01, PC-BE-04 |
