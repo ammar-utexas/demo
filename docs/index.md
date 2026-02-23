@@ -12,7 +12,7 @@ This directory is the single source of truth for all project context, decisions,
 - [ADR-0003: Backend Tech Stack — FastAPI with Async SQLAlchemy](architecture/0003-backend-tech-stack.md)
 - [ADR-0004: Frontend Tech Stack — Next.js with Tailwind CSS](architecture/0004-frontend-tech-stack.md)
 - [ADR-0005: Android Tech Stack — Kotlin with Jetpack Compose](architecture/0005-android-tech-stack.md)
-- [ADR-0008: Authentication Bypass Flag for Development](architecture/0008-auth-bypass-flag-for-development.md)
+- [ADR-0023: Authentication Bypass Flag for Development](architecture/0023-auth-bypass-flag-for-development.md)
 
 ### ISIC Dermatology CDS (SYS-REQ-0012)
 

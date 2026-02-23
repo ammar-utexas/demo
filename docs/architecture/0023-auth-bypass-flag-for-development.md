@@ -1,4 +1,4 @@
-# ADR-0008: Authentication Bypass Flag for Development
+# ADR-0023: Authentication Bypass Flag for Development
 
 **Status:** Accepted
 **Date:** 2026-02-23
