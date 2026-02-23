@@ -2,6 +2,9 @@
 
 This directory is the single source of truth for all project context, decisions, and implementation details.
 
+- [Documentation Workflow](documentation-workflow.md) — How features flow through requirements, testing, and release across all docs
+- [PMS Project Overview](PMS_Project_Overview.md) — Bird's eye view of all repositories, requirements, and coverage
+
 ## Architecture Decisions
 
 - [ADR-0001: Use Repository-Based Knowledge Management](architecture/0001-repo-based-knowledge-management.md)
@@ -9,6 +12,24 @@ This directory is the single source of truth for all project context, decisions,
 - [ADR-0003: Backend Tech Stack — FastAPI with Async SQLAlchemy](architecture/0003-backend-tech-stack.md)
 - [ADR-0004: Frontend Tech Stack — Next.js with Tailwind CSS](architecture/0004-frontend-tech-stack.md)
 - [ADR-0005: Android Tech Stack — Kotlin with Jetpack Compose](architecture/0005-android-tech-stack.md)
+
+### ISIC Dermatology CDS (SYS-REQ-0012)
+
+- [ADR-0008: CDS Microservice Architecture](architecture/0008-derm-cds-microservice-architecture.md) — Separate Docker service (`pms-derm-cds` :8090) for AI inference
+- [ADR-0009: AI Inference Runtime Selection](architecture/0009-ai-inference-runtime.md) — ONNX Runtime (server) + TensorRT (Jetson) + TFLite (Android)
+- [ADR-0010: Patient Image Storage Strategy](architecture/0010-dermoscopic-image-storage.md) — AES-256-GCM encrypted BYTEA in PostgreSQL
+- [ADR-0011: Vector Database Strategy](architecture/0011-vector-database-pgvector.md) — pgvector extension for similarity search
+- [ADR-0012: Android On-Device Inference](architecture/0012-android-on-device-inference.md) — TFLite with MobileNetV3 for offline skin lesion triage
+- [ADR-0013: AI Model Lifecycle Management](architecture/0013-ai-model-lifecycle.md) — Versioned model artifacts with provenance tracking
+- [ADR-0014: Image Preprocessing & Quality Validation](architecture/0014-image-preprocessing-pipeline.md) — Resize/normalize pipeline with blur/exposure quality gates
+- [ADR-0015: Risk Scoring Engine Design](architecture/0015-risk-scoring-engine.md) — Configurable threshold-based rules for clinical risk assessment
+- [ADR-0016: Encryption Key Management](architecture/0016-image-encryption-key-management.md) — Unified versioned-envelope key management
+- [ADR-0017: ISIC Reference Cache Management](architecture/0017-isic-reference-cache.md) — S3 bulk population, model-version coupling, incremental updates
+- [ADR-0018: Backend-to-CDS Communication](architecture/0018-inter-service-communication.md) — HTTP client pooling, circuit breaking, timeout configuration
+- [ADR-0019: Lesion Longitudinal Tracking](architecture/0019-lesion-longitudinal-tracking.md) — Persistent lesion identity with embedding cosine distance change detection
+- [ADR-0020: Feature Flag Strategy](architecture/0020-derm-cds-feature-flags.md) — Granular per-requirement flags for phased rollout
+- [ADR-0021: Database Migration Strategy](architecture/0021-derm-database-migration.md) — Alembic-managed migrations for pgvector tables
+- [ADR-0022: DermaCheck Core Workflow Orchestration](architecture/0022-dermacheck-workflow-orchestration.md) — Parallel fan-out pipeline for Journey 1 capture-classify-review flow
 
 ## Features
 
@@ -117,6 +138,31 @@ _No bug fixes documented yet._
 - [Claude Model Selection Setup Guide](experiments/15-ClaudeModelSelection-PMS-Developer-Setup-Guide.md) — Model Router service deployment, Anthropic SDK configuration, PHI sanitization, Redis caching, and PMS integration
 - [Claude Model Selection Developer Tutorial](experiments/15-ClaudeModelSelection-Developer-Tutorial.md) — Hands-on onboarding: build a multi-tier clinical encounter pipeline with Haiku extraction, Sonnet summarization, and Opus escalation
 
+### FHIR (Healthcare Data Interoperability Standard)
+- [PRD: FHIR PMS Integration](experiments/16-PRD-FHIR-PMS-Integration.md) — FHIR R4 Facade for bidirectional clinical data exchange with external EHRs, HIEs, pharmacies, and labs via standards-compliant REST API with SMART on FHIR authorization
+- [FHIR Setup Guide](experiments/16-FHIR-PMS-Developer-Setup-Guide.md) — FHIR Facade FastAPI deployment, resource mappers, CapabilityStatement, SMART OAuth 2.0, AuditEvent logging, and Next.js FHIR dashboard
+- [FHIR Developer Tutorial](experiments/16-FHIR-Developer-Tutorial.md) — Hands-on onboarding: build FHIR resource mappers, Encounter endpoints, and external data import end-to-end
+
+### HL7 v2 LIS Messaging (Legacy Lab System Integration)
+- [PRD: HL7v2LIS PMS Integration](experiments/17-PRD-HL7v2LIS-PMS-Integration.md) — Bidirectional HL7 v2 messaging with laboratory information systems via MLLP for electronic lab ordering (ORM) and result reception (ORU) with TLS encryption and HIPAA audit logging
+- [HL7v2LIS Setup Guide](experiments/17-HL7v2LIS-PMS-Developer-Setup-Guide.md) — MLLP listener/sender deployment, hl7apy parser/builder, stunnel TLS, lab order/result API endpoints, and Next.js lab dashboard
+- [HL7v2LIS Developer Tutorial](experiments/17-HL7v2LIS-Developer-Tutorial.md) — Hands-on onboarding: parse ORU lab results, build ORM orders, detect critical values, and test with synthetic HL7 messages end-to-end
+
+### ISIC Archive (AI-Powered Dermatology Clinical Decision Support)
+- [PRD: ISICArchive PMS Integration](experiments/18-PRD-ISICArchive-PMS-Integration.md) — AI skin lesion classification using ISIC Archive's 400K+ dermoscopic images with EfficientNet-B4, pgvector similarity search, and structured risk scoring for dermatology triage
+- [ISICArchive Setup Guide](experiments/18-ISICArchive-PMS-Developer-Setup-Guide.md) — Dermatology CDS Docker service deployment, ONNX Runtime classification, pgvector reference cache, lesion API endpoints, and Next.js classification UI
+- [ISICArchive Developer Tutorial](experiments/18-ISICArchive-Developer-Tutorial.md) — Hands-on onboarding: classify a skin lesion, build similarity search, implement risk scoring, and track lesion changes over time end-to-end
+
+### Superpowers (AI Development Workflow Enforcement)
+- [PRD: Superpowers PMS Integration](experiments/19-PRD-Superpowers-PMS-Integration.md) — Agentic skills framework enforcing TDD, Socratic brainstorming, subagent-driven development, and two-stage code review for healthcare-grade AI-assisted development with PMS-specific HIPAA and architecture custom skills
+- [Superpowers Setup Guide](experiments/19-Superpowers-PMS-Developer-Setup-Guide.md) — Claude Code plugin installation, PMS custom skills creation (HIPAA patterns, testing requirements, architecture conventions), and TDD workflow configuration
+- [Superpowers Developer Tutorial](experiments/19-Superpowers-Developer-Tutorial.md) — Hands-on onboarding: build a PMS feature using the full Superpowers workflow (brainstorm, plan, TDD execute, review) with custom healthcare skills end-to-end
+
+### Qwen 3.5 (On-Premise MoE Reasoning & Code Generation AI)
+- [PRD: Qwen 3.5 PMS Integration](experiments/20-PRD-Qwen35-PMS-Integration.md) — 397B MoE model (17B active) for complex clinical reasoning, differential diagnosis, drug interaction analysis, and clinical rule code generation, complementing Gemma 3 in a dual-model on-premise strategy
+- [Qwen 3.5 Setup Guide](experiments/20-Qwen35-PMS-Developer-Setup-Guide.md) — vLLM deployment with Qwen3-32B, AI Gateway dual-model routing (Qwen + Gemma), reasoning endpoints, and medication interaction analysis pipeline
+- [Qwen 3.5 Developer Tutorial](experiments/20-Qwen35-Developer-Tutorial.md) — Hands-on onboarding: build a medication interaction analyzer with thinking mode reasoning chains, compare Qwen vs Gemma output quality, and implement task-based model routing end-to-end
+
 ---
 
 ## Documentation Views
@@ -148,16 +194,26 @@ Browse documentation organized by deployment platform — [full index](platform/
 
 ## Specifications & Requirements
 
-The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 13 system requirements, 54 domain requirements, and 111 platform requirements across 4 platforms.
+The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → Domain (SUB-*) → Platform (SUB-*-BE/WEB/AND/AI). There are 15 system requirements, 61 domain requirements, and 129 platform requirements across 4 platforms. Domain requirements live in `specs/requirements/domain/` and platform requirements in `specs/requirements/platform/`.
 
 - [System Specification](specs/system-spec.md) — System-level scope, context, subsystem decomposition, and platform codes
-- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 13 system-level requirements with platform annotations
+- [System Requirements (SYS-REQ)](specs/requirements/SYS-REQ.md) — 15 system-level requirements with platform annotations
 - [Authentication & User Management (SUB-AU)](specs/requirements/SUB-AU.md) — 11 domain requirements, 29 platform requirements (BE=14, WEB=9, AND=6)
-- [Patient Records (SUB-PR)](specs/requirements/SUB-PR.md) — 12 domain requirements, 25 platform requirements (BE=11, WEB=4, AND=7, AI=3)
-- [Clinical Workflow (SUB-CW)](specs/requirements/SUB-CW.md) — 8 domain requirements, 14 platform requirements (BE=8, WEB=3, AND=3)
-- [Medication Management (SUB-MM)](specs/requirements/SUB-MM.md) — 9 domain requirements, 13 platform requirements (BE=9, WEB=2, AND=2)
-- [Reporting & Analytics (SUB-RA)](specs/requirements/SUB-RA.md) — 7 domain requirements, 17 platform requirements (BE=7, WEB=5, AND=5)
-- [Prompt Management (SUB-PM)](specs/requirements/SUB-PM.md) — 7 domain requirements, 13 platform requirements (BE=7, WEB=5, AI=1)
+
+### Domain Requirements
+
+- [Patient Records (SUB-PR)](specs/requirements/domain/SUB-PR.md) — 17 domain requirements
+- [Clinical Workflow (SUB-CW)](specs/requirements/domain/SUB-CW.md) — 9 domain requirements
+- [Medication Management (SUB-MM)](specs/requirements/domain/SUB-MM.md) — 9 domain requirements
+- [Reporting & Analytics (SUB-RA)](specs/requirements/domain/SUB-RA.md) — 8 domain requirements
+- [Prompt Management (SUB-PM)](specs/requirements/domain/SUB-PM.md) — 7 domain requirements
+
+### Platform Requirements
+
+- [Backend (SUB-BE)](specs/requirements/platform/SUB-BE.md) — 49 requirements across 5 domains
+- [Web Frontend (SUB-WEB)](specs/requirements/platform/SUB-WEB.md) — 25 requirements across 5 domains
+- [Android (SUB-AND)](specs/requirements/platform/SUB-AND.md) — 19 requirements across 4 domains
+- [AI Infrastructure (SUB-AI)](specs/requirements/platform/SUB-AI.md) — 7 requirements across 2 domains
 
 ## Testing & Traceability
 
@@ -169,4 +225,16 @@ The PMS uses a **three-tier requirements decomposition**: System (SYS-REQ) → D
 - [Requirements Governance & Conflict Analysis](quality/processes/requirements-governance.md) — Governance procedures, feature branching & release strategy, 14 domain conflicts, 12 platform conflicts, 14 race conditions
 - [PMS Developer Working Instructions](quality/processes/PMS_Developer_Working_Instructions.md) — Development process guide
 - [Development Pipeline Tutorial](quality/processes/Development_Pipeline_Tutorial.md) — CI/CD pipeline tutorial
+- [Repository Setup Guide](quality/processes/repository-setup-guide.md) — Step-by-step guide to bootstrap a new repository with this documentation process
 - [ISO 13485:2016 Standard](quality/standards/iso-13485-2016.pdf) — Medical device QMS standard
+
+### Design History File (DHF)
+
+- [DHF Master Index](quality/DHF/DHF-index.md) — ISO 13485:2016 Clause 7.3 traceability matrix mapping all deliverables
+- [Release Evidence: v0.2.0-arch](quality/DHF/10-release-evidence/DHF-release-2026-02-21-v0.2.0-arch.md) — Documentation & Architecture release conformity record
+
+### Risk Management
+
+- Risk assessment files are created per feature using Step 5b of the [Documentation Workflow](documentation-workflow.md)
+- Location: `quality/risk-management/RA-{CODE}-{FEATURE}.md`
+- [RA-DERM-DermaCheckOrchestration](quality/risk-management/RA-DERM-DermaCheckOrchestration.md) — DermaCheck Workflow Orchestration (SYS-REQ-0013): 20 risks across Clinical Safety, Data Integrity, Availability, and Concurrency categories; 0 residual unacceptable

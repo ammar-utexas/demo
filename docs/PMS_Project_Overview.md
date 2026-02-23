@@ -1,6 +1,7 @@
 # PMS Project Overview — Bird's Eye View
 
-**Date:** 2026-02-16
+**Date:** 2026-02-21
+**Version:** 1.2
 **Organization:** utexas-demo (GitHub)
 
 ---
@@ -24,37 +25,50 @@ The Patient Management System (PMS) is a HIPAA-compliant software suite for mana
 
 ## 3. Architecture
 
-```
-┌─────────────────────────────────────────────────┐
-│                  PMS System                     │
-│                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────┐  │
-│  │  Web UI  │  │ Android  │  │  Backend API │  │
-│  │ (Next.js)│  │ (Kotlin) │  │  (FastAPI)   │  │
-│  └────┬─────┘  └────┬─────┘  └──────┬───────┘  │
-│       │              │               │          │
-│       └──────────────┴───────────────┘          │
-│                      │                          │
-│              ┌───────┴────────┐                 │
-│              │  PostgreSQL DB │                 │
-│              └────────────────┘                 │
-└─────────────────────────────────────────────────┘
-         │                    │
-    ┌────┴────┐         ┌────┴────┐
-    │ External│         │  Audit  │
-    │  EHR    │         │  Log    │
-    │ (FHIR)  │         │ Archive │
-    └─────────┘         └─────────┘
+```mermaid
+flowchart TB
+    subgraph PMS["PMS System"]
+        WebUI["Web UI<br/>(Next.js :3000)"]
+        Android["Android App<br/>(Kotlin)<br/>+ TFLite on-device"]
+        Backend["Backend API<br/>(FastAPI :8000)"]
+        DermCDS["Dermatology CDS<br/>(ONNX Runtime :8090)"]
+        DB[("PostgreSQL<br/>+ pgvector")]
+
+        WebUI --> Backend
+        Android --> Backend
+        Backend --> DB
+        Backend --> DermCDS
+        DermCDS --> DB
+    end
+
+    EHR["External EHR<br/>(FHIR R4)"]
+    Audit["Audit Log<br/>Archive"]
+    ISIC["ISIC Archive<br/>(Reference Images<br/>+ S3 Open Data)"]
+
+    Backend <--> EHR
+    Backend --> Audit
+    DermCDS -.->|"One-time cache<br/>population"| ISIC
+
+    style PMS fill:#f0f4ff,stroke:#3366cc
+    style WebUI fill:#d4edda,stroke:#28a745
+    style Android fill:#d4edda,stroke:#28a745
+    style Backend fill:#cce5ff,stroke:#0066cc
+    style DermCDS fill:#fff3cd,stroke:#cc8800
+    style DB fill:#e2d9f3,stroke:#6f42c1
+    style EHR fill:#f8f9fa,stroke:#6c757d
+    style Audit fill:#f8f9fa,stroke:#6c757d
+    style ISIC fill:#f8f9fa,stroke:#6c757d
 ```
 
 ### Subsystems
 
 | Code | Subsystem | Scope | Primary Actor |
 |---|---|---|---|
-| SUB-PR | Patient Records | Demographics, medical history, encrypted PHI, AI vision | All roles |
-| SUB-CW | Clinical Workflow | Scheduling, encounters, status tracking, clinical notes | Physicians, Nurses |
+| SUB-PR | Patient Records | Demographics, medical history, encrypted PHI, AI vision, dermatology CDS (skin lesion classification, similarity search, risk scoring, longitudinal tracking), DermaCheck pipeline orchestration (parallel fan-out, graceful degradation) | All roles |
+| SUB-CW | Clinical Workflow | Scheduling, encounters, status tracking, clinical notes, DermaCheck encounter workflow (capture → classify → review) | Physicians, Nurses |
 | SUB-MM | Medication Management | Prescriptions, drug interactions, formulary, dispensing | Physicians, Pharmacists |
-| SUB-RA | Reporting & Analytics | Dashboards, compliance reports, audit log queries | Administrators, Compliance |
+| SUB-RA | Reporting & Analytics | Dashboards, compliance reports, audit log queries, dermatology classification analytics | Administrators, Compliance |
+| SUB-PM | Prompt Management | Centralized prompt CRUD, versioning, audit trail, LLM-powered version comparison | Administrators |
 
 ---
 
@@ -68,7 +82,7 @@ Central knowledge base shared as a git submodule across all other repos.
 - Development Pipeline Tutorial (.md / .docx)
 - PMS Developer Working Instructions (.md / .docx)
 - `docs/` directory with:
-  - 7 Architecture Decision Records (ADRs)
+  - 22 Architecture Decision Records (ADRs)
   - 7 configuration & setup guides
   - 2 feature implementation docs
   - System spec, testing strategy, requirements governance
@@ -182,12 +196,15 @@ app/src/main/java/com/utexas/pms/
 | SYS-REQ-0002 | Data Encryption (AES-256 at rest, TLS 1.3 in transit) | Critical | Partial |
 | SYS-REQ-0003 | Complete Audit Trail | Critical | Partial |
 | SYS-REQ-0004 | HL7 FHIR R4 Interoperability | High | Not Started |
-| SYS-REQ-0005 | Role-Based Access Control (4 roles) | Critical | Partial |
+| SYS-REQ-0005 | Role-Based Access Control (5 roles) | Critical | Partial |
 | SYS-REQ-0006 | Real-Time Clinical Alerts (< 30 sec) | High | Placeholder |
 | SYS-REQ-0007 | 500+ Concurrent Users (< 2 sec response) | High | Not Started |
 | SYS-REQ-0008 | Web-Based Interface (Chrome, Firefox, Safari, Edge) | High | Scaffolded |
 | SYS-REQ-0009 | Native Android Application | High | Scaffolded |
 | SYS-REQ-0010 | Docker Container Deployment | Medium | Scaffolded |
+| SYS-REQ-0011 | Centralized Prompt Management | High | Not Started |
+| SYS-REQ-0012 | Dermatology Clinical Decision Support (ISIC Archive) | High | Architecture Defined |
+| SYS-REQ-0013 | DermaCheck Workflow Orchestration (parallel fan-out pipeline) | High | Architecture Defined |
 
 ---
 
@@ -195,21 +212,22 @@ app/src/main/java/com/utexas/pms/
 
 | Subsystem | Version | Domain Reqs | Platform Reqs | Verified | Implemented | Scaffolded | Not Started | Coverage |
 |---|---|---|---|---|---|---|---|---|
-| Patient Records (SUB-PR) | v0.6 | 11 | 25 | 3 | 2 | 2 | 18 | 54.5% |
-| Clinical Workflow (SUB-CW) | v0.0 | 8 | 14 | 0 | 0 | 2 | 12 | 0.0% |
+| Patient Records (SUB-PR) | v0.6 | 17 | 38 | 3 | 2 | 2 | 31 | 35.3% |
+| Clinical Workflow (SUB-CW) | v0.0 | 9 | 17 | 0 | 0 | 2 | 15 | 0.0% |
 | Medication Management (SUB-MM) | v0.0 | 9 | 13 | 0 | 0 | 2 | 11 | 0.0% |
-| Reporting & Analytics (SUB-RA) | v0.0 | 7 | 17 | 0 | 0 | 2 | 15 | 0.0% |
-| **Total** | — | **35** | **69** | **3** | **2** | **8** | **56** | **22.2%** |
+| Reporting & Analytics (SUB-RA) | v0.0 | 8 | 19 | 0 | 0 | 2 | 17 | 0.0% |
+| Prompt Management (SUB-PM) | v0.0 | 7 | 13 | 0 | 0 | 0 | 13 | 0.0% |
+| **Total** | — | **50** | **100** | **3** | **2** | **8** | **87** | **16.0%** |
 
 ### Platform Coverage
 
 | Platform | Total Reqs | Verified | Implemented | Scaffolded | Placeholder | Not Started |
 |---|---|---|---|---|---|---|
-| Backend (BE) | 35 | 3 | 2 | 0 | 16 | 14 |
-| Web (WEB) | 14 | 0 | 0 | 5 | 0 | 9 |
-| Android (AND) | 17 | 0 | 0 | 4 | 0 | 13 |
-| AI | 3 | 0 | 0 | 0 | 0 | 3 |
-| **Total** | **69** | **3** | **2** | **9** | **16** | **39** |
+| Backend (BE) | 49 | 3 | 2 | 0 | 16 | 28 |
+| Web (WEB) | 25 | 0 | 0 | 5 | 0 | 20 |
+| Android (AND) | 19 | 0 | 0 | 4 | 0 | 15 |
+| AI | 7 | 0 | 0 | 0 | 0 | 7 |
+| **Total** | **100** | **3** | **2** | **9** | **16** | **70** |
 
 ---
 
@@ -225,12 +243,13 @@ app/src/main/java/com/utexas/pms/
 
 | Subsystem | Domain Reqs | With Tests | Passing | No Tests | Domain Coverage |
 |---|---|---|---|---|---|
-| Patient Records (PR) | 11 | 6 | 6 | 5 | 54.5% |
+| Patient Records (PR) | 16 | 6 | 6 | 10 | 37.5% |
 | Clinical Workflow (CW) | 8 | 1 | 1 | 7 | 12.5% |
 | Medication Mgmt (MM) | 9 | 2 | 2 | 7 | 22.2% |
-| Reporting (RA) | 7 | 0 | 0 | 7 | 0.0% |
-| System (SYS) | 10 | 1 | 1 | 9 | 10.0% |
-| **Total** | **45** | **10** | **10** | **35** | **22.2%** |
+| Reporting (RA) | 8 | 0 | 0 | 8 | 0.0% |
+| Prompt Mgmt (PM) | 7 | 0 | 0 | 7 | 0.0% |
+| System (SYS) | 13 | 1 | 1 | 12 | 7.7% |
+| **Total** | **63** | **10** | **10** | **53** | **15.9%** |
 
 ---
 
@@ -275,9 +294,29 @@ app/src/main/java/com/utexas/pms/
 - Implement report endpoints (SUB-RA-0001 through SUB-RA-0007)
 - Build dashboard UI on Web and Android
 - Add CSV export functionality
+- Implement dermatology analytics dashboard (SUB-RA-0008)
 
-### Priority 5 — Cross-Cutting Concerns
+### Priority 5 — Dermatology Clinical Decision Support
+> **Architecture: COMPLETE** — 15 ADRs (ADR-0008 through ADR-0022) define all architectural decisions. PRD, setup guide, and developer tutorial documented (experiment 18). Implementation phase ready to begin.
+
+- Deploy Dermatology CDS Docker service with EfficientNet-B4 ONNX classifier (SUB-PR-0013) — ADR-0008, ADR-0009
+- Implement Alembic migrations for pgvector tables and lesion schema (ADR-0021)
+- Populate ISIC reference cache from S3 with model-version-coupled embeddings (ADR-0017)
+- Implement AES-256-GCM image encryption with versioned-envelope key management (ADR-0010, ADR-0016)
+- Implement pgvector similarity search against ISIC reference cache (SUB-PR-0014) — ADR-0011
+- Build risk scoring service with configurable thresholds and referral urgency (SUB-PR-0015) — ADR-0015
+- Implement image preprocessing pipeline with quality gates (ADR-0014)
+- Implement backend-to-CDS HTTP communication with circuit breaking (ADR-0018)
+- Implement lesion longitudinal tracking with persistent identity and change detection (SUB-PR-0016) — ADR-0019
+- **Implement DermaCheck pipeline orchestration: parallel fan-out inside CDS, graceful degradation, per-stage timeouts, atomic DermaCheckResult response (SUB-PR-0017) — ADR-0022**
+- **Implement DermaCheck encounter workflow: camera capture → upload → results review → save/discard within encounter context (SUB-CW-0009) — ADR-0022**
+- Build Web UI: lesion upload, classification results, similar gallery, timeline (SUB-PR-0013/0014/0015/0016-WEB)
+- Build Android on-device TFLite triage (SUB-PR-0013-AND) — ADR-0012
+- Configure granular feature flags for phased rollout (ADR-0020)
+
+### Priority 6 — Cross-Cutting Concerns
 - Implement TOTP/MFA to complete SYS-REQ-0001
 - Migrate encryption from Fernet to AES-256-GCM for SYS-REQ-0002
 - Implement FHIR R4 interoperability (SYS-REQ-0004)
 - Performance/load testing (SYS-REQ-0007)
+- Implement centralized prompt management (SYS-REQ-0011)

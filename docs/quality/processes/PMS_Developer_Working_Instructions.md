@@ -67,11 +67,18 @@ docs/
 ├── specs/                           # Specifications & requirements
 │   ├── system-spec.md               # System-level specification
 │   ├── requirements/
-│   │   ├── SYS-REQ.md              # System requirements (SYS-REQ-0001–0010)
-│   │   ├── SUB-PR.md               # Patient Records subsystem requirements
-│   │   ├── SUB-CW.md               # Clinical Workflow subsystem requirements
-│   │   ├── SUB-MM.md               # Medication Management subsystem requirements
-│   │   └── SUB-RA.md               # Reporting & Analytics subsystem requirements
+│   │   ├── SYS-REQ.md              # System requirements (SYS-REQ-0001–0012)
+│   │   ├── domain/                 # Domain-level subsystem requirements
+│   │   │   ├── SUB-PR.md           # Patient Records (16 domain reqs)
+│   │   │   ├── SUB-CW.md           # Clinical Workflow (8 domain reqs)
+│   │   │   ├── SUB-MM.md           # Medication Management (9 domain reqs)
+│   │   │   ├── SUB-RA.md           # Reporting & Analytics (8 domain reqs)
+│   │   │   └── SUB-PM.md           # Prompt Management (7 domain reqs)
+│   │   └── platform/               # Consolidated platform requirements
+│   │       ├── SUB-BE.md           # Backend — all domains (47 reqs)
+│   │       ├── SUB-WEB.md          # Web Frontend — all domains (24 reqs)
+│   │       ├── SUB-AND.md          # Android — all domains (18 reqs)
+│   │       └── SUB-AI.md           # AI Infrastructure — all domains (6 reqs)
 ├── testing/                         # Test strategy and traceability
 │   ├── testing-strategy.md          # Test levels, naming, run records
 │   └── traceability-matrix.md       # RTM: forward + backward traceability
@@ -302,7 +309,7 @@ The PMS follows a specification-first development process. Every feature flows t
 
 1. **System-level requirements** are defined in `docs/specs/requirements/SYS-REQ.md`. These are high-level, cross-cutting requirements (authentication, encryption, audit, RBAC, performance, etc.).
 
-2. **Subsystem-level requirements** are defined in `docs/specs/requirements/SUB-*.md`. Each subsystem (PR, CW, MM, RA) has its own requirements file that decomposes the system requirements into testable, implementable units.
+2. **Subsystem-level requirements** are split into domain and platform files. Domain requirements are in `docs/specs/requirements/domain/SUB-*.md` and platform requirements in `docs/specs/requirements/platform/SUB-*-{PLATFORM}.md`. Each subsystem (PR, CW, MM, RA, PM) has its own domain file that decomposes the system requirements into testable, implementable units, with platform-specific details in separate files.
 
 3. Each subsystem requirement must:
    - Have a unique ID (e.g., `SUB-MM-0001`)
@@ -375,7 +382,7 @@ claude
    - PHI fields are encrypted (SYS-REQ-0002)
    - RBAC checks are in place (SYS-REQ-0005)
 
-4. **Update the Implementation Mapping** table in the relevant `SUB-*.md` file:
+4. **Update the Implementation Mapping** table in the relevant platform file (`docs/specs/requirements/platform/SUB-*-{PLATFORM}.md`):
 
 ```markdown
 | SUB-PR-0007 | `routers/patients.py:search` | `app/patients/page.tsx` | `ui/patients/` | TST-PR-0007 |
@@ -513,7 +520,7 @@ git push
 2. **Read the subsystem requirements:**
 
 ```bash
-# Read docs/specs/requirements/SUB-MM.md
+# Read docs/specs/requirements/domain/SUB-MM.md
 # Find SUB-MM-0001: "Drug interaction check within 5 seconds"
 # Find SUB-MM-0002: "Classify interaction severity"
 ```
@@ -590,7 +597,7 @@ claude
 # logging (SYS-REQ-0003)."
 ```
 
-3. **Update the Implementation Mapping** in `docs/specs/requirements/SUB-MM.md`:
+3. **Update the Implementation Mapping** in `docs/specs/requirements/platform/SUB-BE.md` (Medication Management section):
 
 ```markdown
 | SUB-MM-0001 | `services/interaction_checker.py` | — | — | TST-MM-0001 |
@@ -731,7 +738,7 @@ git submodule update --remote docs
 
 ### Follow the Four-Phase Process
 
-1. **Read** the relevant requirements in `docs/specs/requirements/`
+1. **Read** the relevant requirements in `docs/specs/requirements/domain/` and `docs/specs/requirements/platform/`
 2. **Verify** the traceability matrix is current
 3. **Implement** using `/plan` → `/speckit.tasks` → Claude Code
 4. **Test** with requirement annotations, record results, update RTM
@@ -820,10 +827,12 @@ gh pr create --title "feat: <title>" --body "..."
 | Pattern | Scope | Example |
 |---|---|---|
 | `SYS-REQ-NNNN` | System-level requirement | SYS-REQ-0001 (MFA) |
-| `SUB-PR-NNNN` | Patient Records subsystem | SUB-PR-0003 (CRUD) |
-| `SUB-CW-NNNN` | Clinical Workflow subsystem | SUB-CW-0003 (Encounters) |
-| `SUB-MM-NNNN` | Medication Management subsystem | SUB-MM-0001 (Interactions) |
-| `SUB-RA-NNNN` | Reporting & Analytics subsystem | SUB-RA-0001 (Dashboards) |
+| `SUB-PR-NNNN` | Patient Records domain | SUB-PR-0003 (CRUD) |
+| `SUB-CW-NNNN` | Clinical Workflow domain | SUB-CW-0003 (Encounters) |
+| `SUB-MM-NNNN` | Medication Management domain | SUB-MM-0001 (Interactions) |
+| `SUB-RA-NNNN` | Reporting & Analytics domain | SUB-RA-0001 (Dashboards) |
+| `SUB-PM-NNNN` | Prompt Management domain | SUB-PM-0003 (CRUD) |
+| `SUB-*-NNNN-BE/WEB/AND/AI` | Platform requirement | SUB-PR-0003-BE (Backend CRUD) |
 | `TST-{subsystem}-NNNN` | Test case ID | TST-MM-0001 |
 | `RUN-YYYY-MM-DD-NNN` | Test run record | RUN-2026-02-15-001 |
 
