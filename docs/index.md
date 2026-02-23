@@ -162,6 +162,11 @@ _No bug fixes documented yet._
 - [Qwen 3.5 Setup Guide](experiments/20-Qwen35-PMS-Developer-Setup-Guide.md) — vLLM deployment with Qwen3-32B, AI Gateway dual-model routing (Qwen + Gemma), reasoning endpoints, and medication interaction analysis pipeline
 - [Qwen 3.5 Developer Tutorial](experiments/20-Qwen35-Developer-Tutorial.md) — Hands-on onboarding: build a medication interaction analyzer with thinking mode reasoning chains, compare Qwen vs Gemma output quality, and implement task-based model routing end-to-end
 
+### Voxtral Transcribe 2 (Open-Weight Real-Time Clinical Speech-to-Text)
+- [PRD: Voxtral Transcribe 2 PMS Integration](experiments/21-PRD-VoxtralTranscribe2-PMS-Integration.md) — Dual-mode open-weight ASR using Mistral's Voxtral Realtime (4B, self-hosted streaming) and Voxtral Mini Transcribe V2 (batch API with diarization) for HIPAA-compliant clinical dictation with context biasing
+- [Voxtral Transcribe 2 Setup Guide](experiments/21-VoxtralTranscribe2-PMS-Developer-Setup-Guide.md) — Docker GPU/Metal/CPU deployment, FastAPI WebSocket inference server, context biasing, PMS backend proxy, and Next.js dictation UI
+- [Voxtral Transcribe 2 Developer Tutorial](experiments/21-VoxtralTranscribe2-Developer-Tutorial.md) — Hands-on onboarding: build clinical dictation with medical context biasing, SOAP note extraction via Gemma 3/Qwen 3.5, and compare Voxtral vs MedASR vs Speechmatics end-to-end
+
 ---
 
 ## Documentation Views
