@@ -15,13 +15,13 @@ The Authentication & User Management subsystem implements closed-registration au
 
 | Req ID | Parent | Description | Verification | Status |
 | --- | --- | --- | --- | --- |
-| SUB-AU-0001 | SYS-REQ-0012 | Authenticate users via OAuth 2.0 (Google, Microsoft, GitHub) using Authorization Code flow with PKCE; reject unregistered or inactive users with 403 | Test | Not Started |
-| SUB-AU-0002 | SYS-REQ-0012 | Authenticate users via email/password with bcrypt hashing (cost 12) and password complexity validation (12+ chars, mixed case, digit, special character); support password reset via email token | Test | Not Started |
+| SUB-AU-0001 | SYS-REQ-0014 | Authenticate users via OAuth 2.0 (Google, Microsoft, GitHub) using Authorization Code flow with PKCE; reject unregistered or inactive users with 403 | Test | Not Started |
+| SUB-AU-0002 | SYS-REQ-0014 | Authenticate users via email/password with bcrypt hashing (cost 12) and password complexity validation (12+ chars, mixed case, digit, special character); support password reset via email token | Test | Not Started |
 | SUB-AU-0003 | SYS-REQ-0001 | Issue JWT access tokens (configurable expiry, default 30 min) with claims (sub, email, name, roles, iat, exp) and opaque server-side refresh tokens (7-day lifetime) | Test | Not Started |
 | SUB-AU-0004 | SYS-REQ-0001 | Lock account after 5 consecutive failed email/password attempts for 30 minutes; locked accounts rejected across all authentication methods | Test | Not Started |
-| SUB-AU-0005 | SYS-REQ-0013 | Seed a default admin account on first deployment from environment variables (ADMIN_SEED_EMAIL, ADMIN_SEED_NAME, ADMIN_SEED_PASSWORD); operation is idempotent | Test | Not Started |
-| SUB-AU-0006 | SYS-REQ-0013 | Provide admin-only user CRUD: create (with email, name, roles), update, deactivate (revoke all sessions), reactivate, and resend invite | Test | Not Started |
-| SUB-AU-0007 | SYS-REQ-0013 | Implement invite-based onboarding: generate one-time invite token (72-hour expiry), send invite email, accept invite and set password to activate account | Test | Not Started |
+| SUB-AU-0005 | SYS-REQ-0015 | Seed a default admin account on first deployment from environment variables (ADMIN_SEED_EMAIL, ADMIN_SEED_NAME, ADMIN_SEED_PASSWORD); operation is idempotent | Test | Not Started |
+| SUB-AU-0006 | SYS-REQ-0015 | Provide admin-only user CRUD: create (with email, name, roles), update, deactivate (revoke all sessions), reactivate, and resend invite | Test | Not Started |
+| SUB-AU-0007 | SYS-REQ-0015 | Implement invite-based onboarding: generate one-time invite token (72-hour expiry), send invite email, accept invite and set password to activate account | Test | Not Started |
 | SUB-AU-0008 | SYS-REQ-0005 | Implement four-role model (admin, clinician, sales, lab-staff) with multi-role assignment; permissions evaluated as the union of all assigned roles | Test | Not Started |
 | SUB-AU-0009 | SYS-REQ-0005 | Enforce role-permission matrix per API endpoint; unauthorized access rejected with 403 and logged to audit trail | Test | Not Started |
 | SUB-AU-0010 | SYS-REQ-0005 | Prevent last-admin lockout: admin role cannot be removed from the sole remaining admin user | Test | Not Started |
