@@ -30,6 +30,7 @@ This directory is the single source of truth for all project context, decisions,
 - [ADR-0020: Feature Flag Strategy](architecture/0020-derm-cds-feature-flags.md) — Granular per-requirement flags for phased rollout
 - [ADR-0021: Database Migration Strategy](architecture/0021-derm-database-migration.md) — Alembic-managed migrations for pgvector tables
 - [ADR-0022: DermaCheck Core Workflow Orchestration](architecture/0022-dermacheck-workflow-orchestration.md) — Parallel fan-out pipeline for Journey 1 capture-classify-review flow
+- [ADR-0023: DermaCheck Capture-Classify-Review Flow (Journey 1)](architecture/0023-dermacheck-capture-classify-review-flow.md) — Client-side architecture for branded entry point, camera integration, multipart upload, synchronous processing, and clinician action state machine
 
 ## Features
 
