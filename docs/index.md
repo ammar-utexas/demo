@@ -168,6 +168,12 @@ _No bug fixes documented yet._
 - [Voxtral Transcribe 2 Setup Guide](experiments/21-VoxtralTranscribe2-PMS-Developer-Setup-Guide.md) — Docker GPU/Metal/CPU deployment, FastAPI WebSocket inference server, context biasing, PMS backend proxy, and Next.js dictation UI
 - [Voxtral Transcribe 2 Developer Tutorial](experiments/21-VoxtralTranscribe2-Developer-Tutorial.md) — Hands-on onboarding: build clinical dictation with medical context biasing, SOAP note extraction via Gemma 3/Qwen 3.5, and compare Voxtral vs MedASR vs Speechmatics end-to-end
 
+### Patient Safety AI Reference (AI Extension Ideas)
+- [PMS AI Extension Ideas](experiments/22-PMS_AI_Extension_Ideas.md) — AI feature ideas mapped from IHI Patient Safety report to PMS subsystems
+
+### Atlas — Agentic AI in Healthcare (50 Use Cases Synergy Analysis)
+- [Atlas Agentic AI Healthcare Synergies](experiments/23-Atlas-Agentic-AI-Healthcare-Synergies.md) — Mapping of 50 agentic AI healthcare use cases from the Atlas publication against PMS subsystems and experiments, with priority synergy matrix and new agentic ideas
+
 ---
 
 ## Documentation Views
