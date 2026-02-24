@@ -122,6 +122,7 @@ _No bug fixes documented yet._
 - [PRD: AI Zero-Day Scan PMS Integration](experiments/12-PRD-AIZeroDayScan-PMS-Integration.md) — AI-powered zero-day vulnerability scanning using Claude Opus 4.6 for continuous security assurance of PMS codebase and dependencies
 - [AI Zero-Day Scan Setup Guide](experiments/12-AIZeroDayScan-PMS-Developer-Setup-Guide.md) — CI/CD security gate, deep dependency auditor service, security dashboard integration
 - [AI Zero-Day Scan Developer Tutorial](experiments/12-AIZeroDayScan-Developer-Tutorial.md) — Hands-on onboarding: scan vulnerable code, triage findings, build custom healthcare security prompts
+- [AI Zero-Day Scan Implementation Plan](experiments/12-AIZeroDayScan-Implementation-Plan.md) — Phased rollout steps to incorporate Claude Code Security into PMS screening
 
 ### Gemma 3 (On-Premise Open-Weight Clinical AI)
 - [PRD: Gemma 3 PMS Integration](experiments/13-PRD-Gemma3-PMS-Integration.md) — Self-hosted multimodal AI backbone using Google's Gemma 3 and MedGemma for HIPAA-compliant clinical summarization, structured extraction, and medication intelligence with zero PHI egress
@@ -156,6 +157,16 @@ _No bug fixes documented yet._
 - [PRD: Superpowers PMS Integration](experiments/19-PRD-Superpowers-PMS-Integration.md) — Agentic skills framework enforcing TDD, Socratic brainstorming, subagent-driven development, and two-stage code review for healthcare-grade AI-assisted development with PMS-specific HIPAA and architecture custom skills
 - [Superpowers Setup Guide](experiments/19-Superpowers-PMS-Developer-Setup-Guide.md) — Claude Code plugin installation, PMS custom skills creation (HIPAA patterns, testing requirements, architecture conventions), and TDD workflow configuration
 - [Superpowers Developer Tutorial](experiments/19-Superpowers-Developer-Tutorial.md) — Hands-on onboarding: build a PMS feature using the full Superpowers workflow (brainstorm, plan, TDD execute, review) with custom healthcare skills end-to-end
+
+### Qwen 3.5 (On-Premise MoE Reasoning & Code Generation AI)
+- [PRD: Qwen 3.5 PMS Integration](experiments/20-PRD-Qwen35-PMS-Integration.md) — 397B MoE model (17B active) for complex clinical reasoning, differential diagnosis, drug interaction analysis, and clinical rule code generation, complementing Gemma 3 in a dual-model on-premise strategy
+- [Qwen 3.5 Setup Guide](experiments/20-Qwen35-PMS-Developer-Setup-Guide.md) — vLLM deployment with Qwen3-32B, AI Gateway dual-model routing (Qwen + Gemma), reasoning endpoints, and medication interaction analysis pipeline
+- [Qwen 3.5 Developer Tutorial](experiments/20-Qwen35-Developer-Tutorial.md) — Hands-on onboarding: build a medication interaction analyzer with thinking mode reasoning chains, compare Qwen vs Gemma output quality, and implement task-based model routing end-to-end
+
+### Voxtral Transcribe 2 (Open-Weight Real-Time Clinical Speech-to-Text)
+- [PRD: Voxtral Transcribe 2 PMS Integration](experiments/21-PRD-VoxtralTranscribe2-PMS-Integration.md) — Dual-mode open-weight ASR using Mistral's Voxtral Realtime (4B, self-hosted streaming) and Voxtral Mini Transcribe V2 (batch API with diarization) for HIPAA-compliant clinical dictation with context biasing
+- [Voxtral Transcribe 2 Setup Guide](experiments/21-VoxtralTranscribe2-PMS-Developer-Setup-Guide.md) — Docker GPU/Metal/CPU deployment, FastAPI WebSocket inference server, context biasing, PMS backend proxy, and Next.js dictation UI
+- [Voxtral Transcribe 2 Developer Tutorial](experiments/21-VoxtralTranscribe2-Developer-Tutorial.md) — Hands-on onboarding: build clinical dictation with medical context biasing, SOAP note extraction via Gemma 3/Qwen 3.5, and compare Voxtral vs MedASR vs Speechmatics end-to-end
 
 ---
 
