@@ -1,6 +1,6 @@
 # Authentication Bypass Guide
 
-**Applies to:** PMS Backend
+**Applies to:** PMS Backend, PMS Frontend
 **Requirement:** [SYS-REQ-0016](../specs/requirements/SYS-REQ.md#sys-req-0016-authentication-bypass-for-development) | [ADR-0023](../architecture/0023-auth-bypass-flag-for-development.md)
 **Last Updated:** 2026-02-25
 
@@ -180,3 +180,90 @@ The bypass will look up this email in the database instead of the default `admin
 - The `.env.production` template should **not** include `AUTH_ENABLED`.
 - CI pipelines should reject deployments where `AUTH_ENABLED=false`.
 - When bypass is active, **anyone** with network access to the server has full admin access.
+
+---
+
+# Frontend Authentication Bypass
+
+**Applies to:** PMS Frontend (Next.js)
+**Requirement:** [SUB-AU-0016-WEB](../specs/requirements/platform/SUB-WEB.md)
+
+---
+
+## Overview
+
+The PMS frontend supports its own auth bypass via `NEXT_PUBLIC_AUTH_BYPASS_ENABLED`. When enabled, the frontend skips login redirects and injects a mock user into the auth context. A non-dismissible yellow banner ("Auth Bypass Active — Development Mode") is displayed in the header.
+
+---
+
+## Enabling Auth Bypass (Development Mode)
+
+### Step 1: Set environment variables in `.env.local`
+
+```env
+NEXT_PUBLIC_AUTH_BYPASS_ENABLED=true
+NEXT_PUBLIC_AUTH_BYPASS_ROLE=admin
+NEXT_PUBLIC_AUTH_BYPASS_EMAIL=admin@pms.dev
+NEXT_PUBLIC_AUTH_BYPASS_NAME=System Admin
+```
+
+### Step 2: Restart the dev server
+
+```bash
+npm run dev
+```
+
+### Step 3: Verify
+
+A yellow **"Auth Bypass Active — Development Mode"** banner appears in the header. You are logged in as the mock user without needing credentials.
+
+### Customizing the Mock User
+
+| Variable | Default | Options |
+|----------|---------|---------|
+| `NEXT_PUBLIC_AUTH_BYPASS_ROLE` | `admin` | `admin`, `clinician`, `sales`, `lab-staff` |
+| `NEXT_PUBLIC_AUTH_BYPASS_EMAIL` | `dev@localhost` | Any email string |
+| `NEXT_PUBLIC_AUTH_BYPASS_NAME` | `Dev User` | Any name string |
+
+Change the role to test different permission levels. For example, to test as a clinician:
+
+```env
+NEXT_PUBLIC_AUTH_BYPASS_ROLE=clinician
+```
+
+---
+
+## Disabling Auth Bypass (Real Authentication)
+
+### Prerequisites
+
+- The backend must be running at the URL specified by `NEXT_PUBLIC_API_URL`
+- The backend must have auth endpoints implemented (`POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`)
+
+### Step 1: Update `.env.local`
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_AUTH_BYPASS_ENABLED=false
+```
+
+### Step 2: Restart the dev server
+
+```bash
+npm run dev
+```
+
+### Step 3: Verify
+
+The yellow bypass banner is gone. Navigating to any protected page redirects to `/login`. Log in with valid credentials through the login form.
+
+---
+
+## Frontend Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| "Backend auth bypass is not enabled" error (503) | FE bypass ON, BE bypass OFF | Enable bypass on the BE (`AUTH_ENABLED=false`), or disable bypass on the FE (`NEXT_PUBLIC_AUTH_BYPASS_ENABLED=false`) |
+| Redirect loop to `/login` | FE bypass OFF, BE not running | Start the BE, or enable bypass mode |
+| Changes not taking effect | Next.js caches env vars at build time | Stop dev server (`Ctrl+C`) and run `npm run dev` again |
+| Header shows "Dev User" instead of real name | `NEXT_PUBLIC_AUTH_BYPASS_NAME` not set | Set it to match the seeded admin (e.g., `System Admin`) |
