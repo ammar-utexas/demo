@@ -179,6 +179,11 @@ _No bug fixes documented yet._
 - [Knowledge Work Plugins Setup Guide](experiments/24-KnowledgeWorkPlugins-PMS-Developer-Setup-Guide.md) — Plugin directory creation, skill authoring, command building, MCP configuration, hook setup, and local testing with `--plugin-dir`
 - [Knowledge Work Plugins Developer Tutorial](experiments/24-KnowledgeWorkPlugins-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation command, FHIR interop skill, evaluate plugin strengths/weaknesses, and distribute via marketplace
 
+### Edge Vision Stream (AR Glasses / Phone Camera Streaming to Jetson Thor)
+- [PRD: Edge Vision Stream PMS Integration](experiments/25-PRD-EdgeVisionStream-PMS-Integration.md) — Real-time camera streaming from AR glasses or Android phones to Jetson Thor for QR/barcode scanning, background context analysis, patient/medication verification, and hands-free clinical workflow
+- [Edge Vision Stream Setup Guide](experiments/25-EdgeVisionStream-PMS-Developer-Setup-Guide.md) — GStreamer RTSP ingestion, NVDEC hardware decode, ZBar QR detection, YOLOv8 background analysis, Android RTSP server, and PMS backend integration
+- [Edge Vision Stream Developer Tutorial](experiments/25-EdgeVisionStream-Developer-Tutorial.md) — Hands-on onboarding: stream video from phone to Jetson, detect patient wristband QR codes, analyze clinical background context, and verify against PMS data end-to-end
+
 ---
 
 ## Documentation Views
