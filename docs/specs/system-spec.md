@@ -13,14 +13,14 @@ This document defines the system-level specification for the Patient Management 
 
 ## 2. Scope
 
-The PMS consists of three deployable components sharing a common backend API, plus an AI microservice for dermatology clinical decision support:
+The PMS consists of four deployable components sharing a common backend API, plus a dedicated AI platform for dermatology clinical decision support and other AI services:
 
 | Component | Repository | Technology |
 |---|---|---|
 | Backend API | `ammar-utexas/pms-backend` | Python, FastAPI, PostgreSQL |
 | Web Frontend | `ammar-utexas/pms-frontend` | Next.js, React, TypeScript |
 | Android App | `ammar-utexas/pms-android` | Kotlin, Jetpack Compose |
-| Dermatology CDS | `ammar-utexas/pms-backend` (services/derm-cds) | Python, ONNX Runtime, pgvector |
+| AI Platform (Dermatology CDS, AI Gateway) | `ammar-utexas/pms-ai` | Python, FastAPI, ONNX Runtime, pgvector |
 
 All components share a documentation submodule (`ammar-utexas/demo`) containing specifications, requirements, and traceability evidence.
 
@@ -121,7 +121,7 @@ Requirements decompose into platform-specific requirements using the following p
 | `BE` | Backend API | `ammar-utexas/pms-backend` | Python, FastAPI, PostgreSQL |
 | `WEB` | Web Frontend | `ammar-utexas/pms-frontend` | Next.js, React, TypeScript |
 | `AND` | Android App | `ammar-utexas/pms-android` | Kotlin, Jetpack Compose |
-| `AI` | AI Infrastructure | Edge deployment (Jetson Thor), Dermatology CDS Docker service | Python, ONNX Runtime, TensorRT, pgvector |
+| `AI` | AI Infrastructure | `ammar-utexas/pms-ai` — Dermatology CDS Docker service, AI Gateway, Edge deployment (Jetson Thor) | Python, FastAPI, ONNX Runtime, TensorRT, pgvector |
 
 A domain requirement (e.g., `SUB-PR-0003`) decomposes into one or more platform requirements (e.g., `SUB-PR-0003-BE`, `SUB-PR-0003-WEB`, `SUB-PR-0003-AND`). Not every domain requirement requires all platforms — backend-only concerns like encryption and audit logging may have only a `BE` platform requirement.
 

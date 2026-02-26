@@ -653,7 +653,7 @@ Double-check that the platform requirements are complete, unambiguous, and consi
 > | `pms-backend` | BE |
 > | `pms-frontend` | WEB |
 > | `pms-android` | AND |
-> | `pms-derm-cds` | AI |
+> | `pms-ai` | AI |
 >
 > It then reads the **consolidated** platform requirement file for that platform (e.g., for BE: `SUB-BE.md` which contains all domain sections) and filters to only those requirements that trace to the target feature's SYS-REQ.
 
@@ -684,7 +684,7 @@ Map the current repository name to a platform code:
   pms-backend   → BE
   pms-frontend  → WEB
   pms-android   → AND
-  pms-derm-cds  → AI
+  pms-ai        → AI
 
 If the repo name does not match any entry, ask the user to confirm the
 platform code.

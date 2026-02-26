@@ -13,6 +13,7 @@ This document describes the three security scanning tools integrated across all 
 | `utexas-demo_pms-backend` | pms-backend |
 | `utexas-demo_pms-frontend` | pms-frontend |
 | `utexas-demo_pms-android` | pms-android |
+| `utexas-demo_pms-ai` | pms-ai |
 
 **Organization:** `utexas-demo`
 
@@ -29,6 +30,7 @@ Each repo contains:
 | pms-backend | `pytest --cov=src/pms --cov-report=xml` | pytest-cov | `coverage.xml` |
 | pms-frontend | `npm test -- --coverage --coverage.reporter=lcov` | v8 (via Vitest) | `coverage/lcov.info` |
 | pms-android | `./gradlew createDevDebugUnitTestCoverageReport` | JaCoCo (AGP built-in) | `app/build/reports/coverage/test/dev/debug/report.xml` |
+| pms-ai | `pytest --cov=services --cov-report=xml` | pytest-cov | `coverage.xml` |
 
 **Android JaCoCo setup:** The `app/build.gradle.kts` has `enableUnitTestCoverage = true` in the `debug` build type, which enables AGP's built-in JaCoCo instrumentation. The CI workflow runs the `createDevDebugUnitTestCoverageReport` Gradle task to generate the XML report. The `sonar-project.properties` file points `sonar.coverage.jacoco.xmlReportPaths` to the AGP output path.
 
@@ -96,6 +98,7 @@ CodeRabbit is instructed to verify:
 | pms-backend | `snyk/actions/python-3.12` | `snyk/actions/python-3.12` (code test) | `snyk/actions/docker` |
 | pms-frontend | `snyk/actions/node` | `snyk/actions/node` (code test) | `snyk/actions/docker` |
 | pms-android | `snyk/actions/gradle-jdk17` | `snyk/actions/node` (code test) | N/A |
+| pms-ai | `snyk/actions/python-3.12` | `snyk/actions/python-3.12` (code test) | `snyk/actions/docker` |
 
 ### Configuration
 
@@ -137,6 +140,7 @@ The backend and frontend CI workflows (`.github/workflows/ci.yml`) build and pus
 |---|---|
 | pms-backend | `utexas-demo/pms-backend` |
 | pms-frontend | `utexas-demo/pms-frontend` |
+| pms-ai | `utexas-demo/pms-ai` |
 
 Images are pushed on `main` branch and version tags. The workflow uses `GITHUB_TOKEN` with `packages: write` permission — no additional secrets needed.
 

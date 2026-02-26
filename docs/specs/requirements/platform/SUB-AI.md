@@ -3,8 +3,10 @@
 **Version:** 1.0
 **Date:** 2026-02-21
 **Platform:** AI Infrastructure (AI) — 7 requirements across 2 domains
-**Repository:** pms-derm-cds
-**Technology:** Python, ONNX Runtime, TensorRT (Jetson), TFLite (Android), pgvector, EfficientNet-B4, MobileNetV3
+**Repository:** pms-ai
+**Technology:** Python, FastAPI, ONNX Runtime, TensorRT (Jetson), TFLite (Android), pgvector, EfficientNet-B4, MobileNetV3
+
+> **Note:** The `pms-ai` repository is the broader AI platform. The Dermatology CDS service lives at `pms-ai/services/derm-cds/`. Other AI services (AI Gateway, shared model infrastructure) are co-located in the same repository.
 
 ---
 

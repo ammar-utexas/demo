@@ -9,6 +9,8 @@
 | Node.js | 24+ | pms-frontend |
 | Android Studio | Ladybug 2024.2+ | pms-android |
 | JDK | 17+ | pms-android |
+| Docker | 24+ | pms-ai |
+| ONNX Runtime | 1.17+ | pms-ai |
 | Git | 2.x | All |
 
 ## Clone All Repos
@@ -17,6 +19,7 @@
 git clone --recurse-submodules git@github.com:utexas-demo/pms-backend.git
 git clone --recurse-submodules git@github.com:utexas-demo/pms-frontend.git
 git clone --recurse-submodules git@github.com:utexas-demo/pms-android.git
+git clone --recurse-submodules git@github.com:utexas-demo/pms-ai.git
 ```
 
 ## Backend Setup
@@ -70,6 +73,28 @@ cd pms-android
 
 # Sync Gradle
 # Run on emulator (connects to backend at 10.0.2.2:8000)
+```
+
+## AI Platform Setup
+
+```bash
+cd pms-ai
+
+# Virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install
+pip install -e ".[dev]"
+
+# Configure
+cp .env.example .env
+# Edit .env: set DATABASE_URL, MODEL_PATH
+
+# Start via Docker Compose (recommended — includes ONNX Runtime + pgvector)
+docker compose up --build -d
+# → Dermatology CDS: http://localhost:8090
+# → AI Gateway: http://localhost:8001
 ```
 
 ## Docker Compose (Full Stack)
@@ -136,6 +161,9 @@ cd pms-frontend && npm run test:run
 
 # Android
 cd pms-android && ./gradlew test
+
+# AI Platform
+cd pms-ai && pytest
 ```
 
 ## Updating Shared Docs
@@ -146,4 +174,5 @@ When docs change in the `demo` repo, update the submodule in each project:
 cd pms-backend/docs && git pull origin main && cd .. && git add docs && git commit -m "Update docs submodule"
 cd pms-frontend/docs && git pull origin main && cd .. && git add docs && git commit -m "Update docs submodule"
 cd pms-android/docs && git pull origin main && cd .. && git add docs && git commit -m "Update docs submodule"
+cd pms-ai/docs && git pull origin main && cd .. && git add docs && git commit -m "Update docs submodule"
 ```
