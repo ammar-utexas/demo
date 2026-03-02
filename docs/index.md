@@ -191,6 +191,9 @@ _No bug fixes documented yet._
 - [LangGraph Setup Guide](experiments/26-LangGraph-PMS-Developer-Setup-Guide.md) — LangGraph installation, PostgreSQL checkpointer setup, FastAPI agent endpoints, HITL manager, and Next.js progress component integration
 - [LangGraph Developer Tutorial](experiments/26-LangGraph-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation agent with stateful checkpointing, clinician HITL review, conditional routing, and fault-tolerant execution end-to-end
 
+### Claude Code (AI-Native Development Environment)
+- [Claude Code Developer Tutorial](experiments/27-ClaudeCode-Developer-Tutorial.md) — Comprehensive Claude Code mastery guide: foundations (tools, context window, permissions), personalization (CLAUDE.md, memory, models), power features (sub-agents, MCP, hooks, skills), and autonomous usage (headless mode, worktrees, git integration)
+
 ---
 
 ## Documentation Views

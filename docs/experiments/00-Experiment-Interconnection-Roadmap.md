@@ -10,11 +10,11 @@
 
 ## 1. Executive Summary
 
-The PMS project maintains 27 experiments (numbered 00–26) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but no single document maps how these experiments relate to each other or the recommended order to execute them.
+The PMS project maintains 28 experiments (numbered 00–27) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but no single document maps how these experiments relate to each other or the recommended order to execute them.
 
 This roadmap serves as the **master navigation guide** for the experiment portfolio. It provides:
 
-- A **complete registry** of all 27 experiments with categories, platforms, and documentation inventory
+- A **complete registry** of all 28 experiments with categories, platforms, and documentation inventory
 - A **dependency graph** showing which experiments build on or complement others
 - **Execution tiers** recommending a foundation-first build order
 - **Parallel tracks** for teams that can work on independent streams simultaneously
@@ -30,7 +30,7 @@ This roadmap serves as the **master navigation guide** for the experiment portfo
 
 ### Scope
 
-This roadmap covers experiments 00–26 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
+This roadmap covers experiments 00–27 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
 
 ---
 
@@ -65,6 +65,7 @@ This roadmap covers experiments 00–26 as documented in `docs/experiments/`. It
 | 24 | [Knowledge Work Plugins](24-PRD-KnowledgeWorkPlugins-PMS-Integration.md) | Dev Tooling | Dev | 19-Superpowers, 14-Agent Teams | PRD, Setup, Tutorial |
 | 25 | [Edge Vision Stream](25-PRD-EdgeVisionStream-PMS-Integration.md) | Edge / AI Models | Edge, Android | 18-ISIC, 13-Gemma 3 | PRD, Setup, Tutorial, Build Guide |
 | 26 | [LangGraph](26-PRD-LangGraph-PMS-Integration.md) | Backend / AI Agents | Backend, Web | 09-MCP, 05-OpenClaw | PRD, Setup, Tutorial |
+| 27 | [Claude Code](27-ClaudeCode-Developer-Tutorial.md) | Dev Tooling | Dev | None | Tutorial |
 
 ---
 
@@ -130,6 +131,7 @@ flowchart TD
         E14["14 Agent Teams"]
         E19["19 Superpowers"]
         E24["24 Knowledge Work Plugins"]
+        E27["27 Claude Code"]
     end
 
     %% ── Subgraph: Reference & Analysis ──
@@ -158,6 +160,8 @@ flowchart TD
     E19 --> E14
     E19 --> E24
     E14 --> E24
+    E27 --> E19
+    E27 --> E14
 
     %% ── Complementary / Enhances (dashed arrows) ──
     E07 -.->|enhances| E10
@@ -194,7 +198,7 @@ flowchart TD
     class E16,E17 interop
     class E05,E26 agents
     class E25 edge
-    class E12,E14,E19,E24 devtool
+    class E12,E14,E19,E24,E27 devtool
     class E04,E22,E23 ref
 ```
 
@@ -217,6 +221,7 @@ Establish infrastructure, standards, and context. These experiments have **zero 
 | 19 | Superpowers | Dev workflow — gates Agent Teams and Knowledge Work Plugins |
 | 22 | Patient Safety AI Ref | Reference — informs prioritization |
 | 23 | Atlas Agentic AI | Reference — maps 50 use cases to PMS subsystems |
+| 27 | Claude Code | Developer prerequisite — master the primary development tool before all experiments |
 
 ### Tier 1 — Core Capabilities (Weeks 3–5)
 
@@ -284,6 +289,7 @@ gantt
     19 Superpowers             :t19, 2026-03-09, 5d
     22 Patient Safety Ref      :t22, 2026-03-09, 2d
     23 Atlas Agentic AI        :t23, 2026-03-09, 2d
+    27 Claude Code             :t27, 2026-03-09, 3d
 
     section Tier 1 — Core
     08 Adaptive Thinking       :t08, after t09, 7d
@@ -346,8 +352,8 @@ Five independent tracks that can be staffed and executed simultaneously. Cross-t
 
 ### Track E — Developer Experience
 ```
-19-Superpowers → 14-Agent Teams → 24-Knowledge Work Plugins
-                                    (+ 12-AI Zero-Day Scan runs in parallel)
+27-Claude Code → 19-Superpowers → 14-Agent Teams → 24-Knowledge Work Plugins
+                                                      (+ 12-AI Zero-Day Scan runs in parallel)
 ```
 
 ### Cross-Track Dependencies
@@ -395,10 +401,12 @@ flowchart LR
     end
 
     subgraph E["Track E: Dev Experience"]
+        E0["27 Claude Code"]
         E1["19 Superpowers"]
         E2["14 Agent Teams"]
         E3["24 Knowledge Plugins"]
         E4["12 Zero-Day Scan"]
+        E0 --> E1
         E1 --> E2
         E2 --> E3
     end
@@ -522,7 +530,7 @@ flowchart LR
 
 | Weeks | Tier | Experiments |
 |-------|------|-------------|
-| 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23 |
+| 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23, 27 |
 | 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12 |
 | 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21 |
 | 10–12 | 3 — Advanced | 18, 25, 26, 24 |
@@ -561,7 +569,8 @@ flowchart LR
 | 24 Knowledge Work Plugins | | | | | | | | X |
 | 25 Edge Vision Stream | | | X | | X | X | | |
 | 26 LangGraph | X | X | | X | X | | | |
-| **Total** | **18** | **16** | **5** | **9** | **14** | **3** | **2** | **5** |
+| 27 Claude Code | | | | | | | | X |
+| **Total** | **18** | **16** | **5** | **9** | **14** | **3** | **2** | **6** |
 
 ---
 
@@ -579,7 +588,7 @@ Reference for Mermaid diagram styling in Section 3.
 | Interoperability | Violet | `#a78bfa` | 16, 17 |
 | Agentic AI | Orange | `#fb923c` | 05, 26 |
 | Edge Computing | Teal | `#2dd4bf` | 25 |
-| Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24 |
+| Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27 |
 | Reference & Analysis | Light Gray | `#e2e8f0` | 04, 22, 23 |
 
 ---
@@ -588,4 +597,5 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.1 | 2026-03-02 | Ammar | Added Experiment 27 (Claude Code Mastery) |
 | 1.0 | 2026-03-02 | Ammar | Initial roadmap covering experiments 00–26 |
