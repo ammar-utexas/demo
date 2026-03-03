@@ -202,6 +202,11 @@ _No bug fixes documented yet._
 - [Gemini Interactions API Setup Guide](experiments/29-GeminiInteractions-PMS-Developer-Setup-Guide.md) — SDK installation, PHI de-identification gateway, FastAPI router, Next.js research and chat components, and Vertex AI BAA configuration
 - [Gemini Interactions API Developer Tutorial](experiments/29-GeminiInteractions-Developer-Tutorial.md) — Hands-on onboarding: build a drug interaction research pipeline with Deep Research Agent, streaming events, structured extraction, and PHI-safe clinical workflows end-to-end
 
+### ElevenLabs (Cloud Voice AI — TTS, STT, Conversational Agents)
+- [PRD: ElevenLabs PMS Integration](experiments/30-PRD-ElevenLabs-PMS-Integration.md) — Unified voice AI layer with Flash v2.5 TTS for clinical readback, Scribe v2 STT as cloud ASR fallback, and Conversational AI 2.0 agents for patient-facing phone interactions
+- [ElevenLabs Setup Guide](experiments/30-ElevenLabs-PMS-Developer-Setup-Guide.md) — Python SDK installation, TTS and Scribe client configuration, PHI de-identification, FastAPI router, and React audio player components
+- [ElevenLabs Developer Tutorial](experiments/30-ElevenLabs-Developer-Tutorial.md) — Hands-on onboarding: build a clinical readback pipeline with PHI-safe TTS, Scribe transcription, and streaming audio delivery end-to-end
+
 ---
 
 ## Documentation Views
