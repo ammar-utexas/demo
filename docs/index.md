@@ -67,7 +67,7 @@ _No bug fixes documented yet._
 
 ## Experiments & Tool Evaluations
 
-- **[Experiment Interconnection Roadmap](experiments/00-Experiment-Interconnection-Roadmap.md)** — Master navigation guide: dependency graph, execution tiers, parallel tracks, critical path analysis, and quick-start recommendations for all 39 experiments
+- **[Experiment Interconnection Roadmap](experiments/00-Experiment-Interconnection-Roadmap.md)** — Master navigation guide: dependency graph, execution tiers, parallel tracks, critical path analysis, and quick-start recommendations for all 40 experiments
 
 ### Tambo AI (Conversational Analytics)
 - [PRD: Tambo PMS Integration](experiments/00-PRD-Tambo-PMS-Integration.md) — Conversational analytics sidebar with generative UI components
@@ -251,6 +251,11 @@ _No bug fixes documented yet._
 - [PRD: Docker PMS Integration](experiments/39-PRD-Docker-PMS-Integration.md) — Docker containerization and Docker Compose orchestration for all PMS services with multi-stage builds, custom bridge network isolation, Docker secrets for HIPAA-compliant credential management, health check dependency ordering, and Compose profiles for core, Kafka, AI, and monitoring service groups
 - [Docker Setup Guide](experiments/39-Docker-PMS-Developer-Setup-Guide.md) — Dockerfiles for FastAPI backend and Next.js frontend, PostgreSQL and Redis containers, Docker Compose with profiles, secrets management, development hot-reload overrides, and production hardening configuration
 - [Docker Developer Tutorial](experiments/39-Docker-Developer-Tutorial.md) — Hands-on onboarding: build a containerized patient encounter audit logger with PostgreSQL durable storage, Redis caching, network isolation, and Docker secrets for PHI protection end-to-end
+
+### ExcalidrawSkill (AI-Generated Visual Diagram Tool for Claude Code)
+- [PRD: ExcalidrawSkill PMS Integration](experiments/40-PRD-ExcalidrawSkill-PMS-Integration.md) — Claude Code skill for generating semantically structured, evidence-rich Excalidraw diagrams of clinical workflows, system architecture, and HIPAA data boundaries with a built-in Playwright render-and-validate loop
+- [ExcalidrawSkill Setup Guide](experiments/40-ExcalidrawSkill-PMS-Developer-Setup-Guide.md) — Plugin installation, Playwright renderer setup, MPS brand color configuration, `/api/diagrams` FastAPI endpoint, and `DiagramViewer` Next.js component integration
+- [ExcalidrawSkill Developer Tutorial](experiments/40-ExcalidrawSkill-Developer-Tutorial.md) — Hands-on onboarding: build a complete prescription approval workflow diagram with fan-out evidence artifacts, section-by-section generation, and validated PNG output end-to-end
 
 ---
 
