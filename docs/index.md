@@ -222,6 +222,11 @@ _No bug fixes documented yet._
 - [Speechmatics Flow API Setup Guide](experiments/33-SpeechmaticsFlow-PMS-Developer-Setup-Guide.md) — Flow API WebSocket proxy, medical language models, Voice Agent Manager, Redis session caching, and React voice agent components
 - [Speechmatics Flow API Developer Tutorial](experiments/33-SpeechmaticsFlow-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation voice agent with real-time structured extraction, multilingual medical models, and HIPAA-compliant audit logging end-to-end
 
+### n8n 2.0+ (Visual Clinical Workflow Automation with AI Agents & HITL)
+- [PRD: n8n 2.0+ PMS Integration](experiments/34-PRD-n8nUpdates-PMS-Integration.md) — Self-hosted visual workflow automation with task runners, HITL approval gates for AI agent actions, bidirectional MCP integration, enterprise security (RBAC, audit, encrypted credentials), and clinical workflow templates
+- [n8n 2.0+ Setup Guide](experiments/34-n8nUpdates-PMS-Developer-Setup-Guide.md) — Docker Compose self-hosted deployment, AI Agent node with Claude, HITL Chat node, MCP Server and Client workflows, and PostgreSQL Memory configuration
+- [n8n 2.0+ Developer Tutorial](experiments/34-n8nUpdates-Developer-Tutorial.md) — Hands-on onboarding: build a prior authorization workflow with AI analysis, clinician HITL review, MCP tool exposure, and enterprise audit logging end-to-end
+
 ---
 
 ## Documentation Views
