@@ -247,6 +247,11 @@ _No bug fixes documented yet._
 - [Kafka Setup Guide](experiments/38-Kafka-PMS-Developer-Setup-Guide.md) — KRaft Docker Compose deployment, Debezium CDC connector, Schema Registry configuration, aiokafka async producer, consumer framework, WebSocket bridge consumer, and HIPAA audit consumer setup
 - [Kafka Developer Tutorial](experiments/38-Kafka-Developer-Tutorial.md) — Hands-on onboarding: build a prescription drug interaction detection pipeline with Kafka event production, Avro serialization, CDC replay, consumer lag monitoring, and WebSocket alert delivery end-to-end
 
+### Docker (Container Platform for Unified Service Deployment)
+- [PRD: Docker PMS Integration](experiments/39-PRD-Docker-PMS-Integration.md) — Docker containerization and Docker Compose orchestration for all PMS services with multi-stage builds, custom bridge network isolation, Docker secrets for HIPAA-compliant credential management, health check dependency ordering, and Compose profiles for core, Kafka, AI, and monitoring service groups
+- [Docker Setup Guide](experiments/39-Docker-PMS-Developer-Setup-Guide.md) — Dockerfiles for FastAPI backend and Next.js frontend, PostgreSQL and Redis containers, Docker Compose with profiles, secrets management, development hot-reload overrides, and production hardening configuration
+- [Docker Developer Tutorial](experiments/39-Docker-Developer-Tutorial.md) — Hands-on onboarding: build a containerized patient encounter audit logger with PostgreSQL durable storage, Redis caching, network isolation, and Docker secrets for PHI protection end-to-end
+
 ---
 
 ## Documentation Views
