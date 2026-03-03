@@ -242,6 +242,11 @@ _No bug fixes documented yet._
 - [WebSocket Setup Guide](experiments/37-WebSocket-PMS-Developer-Setup-Guide.md) — WebSocket endpoint implementation, PostgreSQL NOTIFY triggers, Redis pub/sub cross-instance broadcasting, Nginx WSS proxy configuration, React useWebSocket hook, and connection manager setup
 - [WebSocket Developer Tutorial](experiments/37-WebSocket-Developer-Tutorial.md) — Hands-on onboarding: build a real-time encounter collaboration panel with presence indicators, section focus tracking, edit conflict warnings, and clinical alert notifications end-to-end
 
+### Apache Kafka (Durable Event Streaming Backbone for Clinical Data Pipelines)
+- [PRD: Kafka PMS Integration](experiments/38-PRD-Kafka-PMS-Integration.md) — Distributed event streaming platform with KRaft consensus, Debezium PostgreSQL CDC, Schema Registry with Avro, exactly-once delivery, and 7-year HIPAA-compliant retention for decoupled clinical event pipelines across all PMS services
+- [Kafka Setup Guide](experiments/38-Kafka-PMS-Developer-Setup-Guide.md) — KRaft Docker Compose deployment, Debezium CDC connector, Schema Registry configuration, aiokafka async producer, consumer framework, WebSocket bridge consumer, and HIPAA audit consumer setup
+- [Kafka Developer Tutorial](experiments/38-Kafka-Developer-Tutorial.md) — Hands-on onboarding: build a prescription drug interaction detection pipeline with Kafka event production, Avro serialization, CDC replay, consumer lag monitoring, and WebSocket alert delivery end-to-end
+
 ---
 
 ## Documentation Views
