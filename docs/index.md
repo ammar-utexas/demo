@@ -217,6 +217,11 @@ _No bug fixes documented yet._
 - [GitHub Agent HQ Setup Guide](experiments/32-GitHubAgentHQ-PMS-Developer-Setup-Guide.md) — Organization governance policies, AGENTS.md creation, branch protection rules, cloud agent task templates, and Mission Control configuration
 - [GitHub Agent HQ Developer Tutorial](experiments/32-GitHubAgentHQ-Developer-Tutorial.md) — Hands-on onboarding: run an agent-powered security audit, monitor via Mission Control, and practice the three-layer agent stack (Agent HQ, VS Code, Claude Code CLI) end-to-end
 
+### Speechmatics Flow API (Conversational Voice Agents for Clinical Workflows)
+- [PRD: Speechmatics Flow API PMS Integration](experiments/33-PRD-SpeechmaticsFlow-PMS-Integration.md) — Unified voice agent platform combining ASR, LLM, and TTS for interactive clinical conversations with 4.0% medical KWER, Nordic language models, and custom LLM routing
+- [Speechmatics Flow API Setup Guide](experiments/33-SpeechmaticsFlow-PMS-Developer-Setup-Guide.md) — Flow API WebSocket proxy, medical language models, Voice Agent Manager, Redis session caching, and React voice agent components
+- [Speechmatics Flow API Developer Tutorial](experiments/33-SpeechmaticsFlow-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation voice agent with real-time structured extraction, multilingual medical models, and HIPAA-compliant audit logging end-to-end
+
 ---
 
 ## Documentation Views
