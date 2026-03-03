@@ -1,8 +1,8 @@
 # PMS Experiment Interconnection Roadmap
 
 **Document ID:** PMS-EXP-ROADMAP-001
-**Version:** 1.0
-**Date:** March 2, 2026
+**Version:** 2.0
+**Date:** March 3, 2026
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Living Document
 
@@ -10,11 +10,11 @@
 
 ## 1. Executive Summary
 
-The PMS project maintains 29 experiments (numbered 00–28) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but no single document maps how these experiments relate to each other or the recommended order to execute them.
+The PMS project maintains 39 experiments (numbered 00–38) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but no single document maps how these experiments relate to each other or the recommended order to execute them.
 
 This roadmap serves as the **master navigation guide** for the experiment portfolio. It provides:
 
-- A **complete registry** of all 29 experiments with categories, platforms, and documentation inventory
+- A **complete registry** of all 39 experiments with categories, platforms, and documentation inventory
 - A **dependency graph** showing which experiments build on or complement others
 - **Execution tiers** recommending a foundation-first build order
 - **Parallel tracks** for teams that can work on independent streams simultaneously
@@ -30,7 +30,7 @@ This roadmap serves as the **master navigation guide** for the experiment portfo
 
 ### Scope
 
-This roadmap covers experiments 00–28 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
+This roadmap covers experiments 00–38 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
 
 ---
 
@@ -67,6 +67,16 @@ This roadmap covers experiments 00–28 as documented in `docs/experiments/`. It
 | 26 | [LangGraph](26-PRD-LangGraph-PMS-Integration.md) | Backend / AI Agents | Backend, Web | 09-MCP, 05-OpenClaw | PRD, Setup, Tutorial |
 | 27 | [Claude Code](27-ClaudeCode-Developer-Tutorial.md) | Dev Tooling | Dev | None | Tutorial |
 | 28 | [AI Coding Tools Landscape](28-AI-Coding-Tools-Landscape-2026.md) | Dev Tooling / Strategic | Cross | 27-Claude Code | Research |
+| 29 | [Gemini Interactions API](29-PRD-GeminiInteractions-PMS-Integration.md) | Backend / AI Infra | Backend, Web | None | PRD, Setup, Tutorial |
+| 30 | [ElevenLabs](30-PRD-ElevenLabs-PMS-Integration.md) | Backend / Voice AI | Backend, Web | None | PRD, Setup, Tutorial |
+| 31 | [VS Code Multi-Agent](31-PRD-VSCodeMultiAgent-PMS-Integration.md) | Dev Tooling | Dev | 27-Claude Code | PRD, Setup, Tutorial |
+| 32 | [GitHub Agent HQ](32-PRD-GitHubAgentHQ-PMS-Integration.md) | Dev Tooling / Governance | Dev, CI/CD | 31-VS Code | PRD, Setup, Tutorial |
+| 33 | [Speechmatics Flow](33-PRD-SpeechmaticsFlow-PMS-Integration.md) | Backend / Voice AI | Backend, Web | 10-Speechmatics | PRD, Setup, Tutorial |
+| 34 | [n8n 2.0+](34-PRD-n8nUpdates-PMS-Integration.md) | Backend / Automation | Backend, Web | 09-MCP | PRD, Setup, Tutorial |
+| 35 | [Kintsugi Open-Source](35-PRD-KintsugiOpenSource-PMS-Integration.md) | Backend / AI Models | Backend, Web | None | PRD, Setup, Tutorial |
+| 36 | [Claude Context Mode](36-PRD-ClaudeContextMode-PMS-Integration.md) | Dev Tooling | Dev | 27-Claude Code | PRD, Setup, Tutorial |
+| 37 | [WebSocket](37-PRD-WebSocket-PMS-Integration.md) | Backend / Real-Time | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 38 | [Apache Kafka](38-PRD-Kafka-PMS-Integration.md) | Backend / Event Streaming | Backend | None | PRD, Setup, Tutorial |
 
 ---
 
@@ -87,6 +97,7 @@ flowchart TD
         E09["09 MCP"]
         E08["08 Adaptive Thinking"]
         E15["15 Claude Model Selection"]
+        E29["29 Gemini Interactions"]
     end
 
     %% ── Subgraph: On-Premise Models ──
@@ -96,11 +107,14 @@ flowchart TD
         E20["20 Qwen 3.5"]
     end
 
-    %% ── Subgraph: Speech & NLP ──
-    subgraph SPEECH["Speech & NLP"]
+    %% ── Subgraph: Speech & Voice AI ──
+    subgraph SPEECH["Speech & Voice AI"]
         E07["07 MedASR"]
         E10["10 Speechmatics"]
         E21["21 Voxtral Transcribe 2"]
+        E30["30 ElevenLabs"]
+        E33["33 Speechmatics Flow"]
+        E35["35 Kintsugi"]
     end
 
     %% ── Subgraph: Clinical Decision Support ──
@@ -115,10 +129,17 @@ flowchart TD
         E17["17 HL7v2 LIS"]
     end
 
-    %% ── Subgraph: Agentic AI ──
-    subgraph AGENTS["Agentic AI"]
+    %% ── Subgraph: Agentic AI & Automation ──
+    subgraph AGENTS["Agentic AI & Automation"]
         E05["05 OpenClaw"]
         E26["26 LangGraph"]
+        E34["34 n8n 2.0+"]
+    end
+
+    %% ── Subgraph: Real-Time & Streaming ──
+    subgraph REALTIME["Real-Time & Streaming"]
+        E37["37 WebSocket"]
+        E38["38 Apache Kafka"]
     end
 
     %% ── Subgraph: Edge Computing ──
@@ -134,6 +155,9 @@ flowchart TD
         E24["24 Knowledge Work Plugins"]
         E27["27 Claude Code"]
         E28["28 AI Coding Tools"]
+        E31["31 VS Code Multi-Agent"]
+        E32["32 GitHub Agent HQ"]
+        E36["36 Claude Context Mode"]
     end
 
     %% ── Subgraph: Reference & Analysis ──
@@ -150,6 +174,7 @@ flowchart TD
     E09 --> E05
     E09 --> E08
     E09 --> E26
+    E09 --> E34
     E05 --> E26
     E08 --> E15
     E09 --> E15
@@ -165,6 +190,10 @@ flowchart TD
     E27 --> E19
     E27 --> E14
     E27 --> E28
+    E27 --> E31
+    E27 --> E36
+    E10 --> E33
+    E31 --> E32
 
     %% ── Complementary / Enhances (dashed arrows) ──
     E07 -.->|enhances| E10
@@ -180,6 +209,19 @@ flowchart TD
     E23 -.->|informs| E05
     E22 -.->|informs| E04
     E04 -.->|informs| E09
+    E29 -.->|enhances| E15
+    E30 -.->|complements| E07
+    E30 -.->|complements| E33
+    E33 -.->|enhances| E10
+    E34 -.->|enhances| E05
+    E34 -.->|enhances| E38
+    E35 -.->|enhances| E07
+    E37 -.->|enhances| E38
+    E38 -.->|enhances| E16
+    E38 -.->|enhances| E17
+    E37 -.->|enhances| E00
+    E32 -.->|enhances| E12
+    E36 -.->|enhances| E19
 
     %% ── Color Classes ──
     classDef ui fill:#818cf8,stroke:#4f46e5,color:#fff
@@ -189,19 +231,21 @@ flowchart TD
     classDef cds fill:#f87171,stroke:#dc2626,color:#fff
     classDef interop fill:#a78bfa,stroke:#7c3aed,color:#fff
     classDef agents fill:#fb923c,stroke:#ea580c,color:#fff
+    classDef realtime fill:#f472b6,stroke:#ec4899,color:#fff
     classDef edge fill:#2dd4bf,stroke:#0d9488,color:#fff
     classDef devtool fill:#94a3b8,stroke:#64748b,color:#fff
     classDef ref fill:#e2e8f0,stroke:#94a3b8,color:#334155
 
     class E00,E01,E02,E03 ui
-    class E09,E08,E15 infra
+    class E09,E08,E15,E29 infra
     class E06,E13,E20 models
-    class E07,E10,E21 speech
+    class E07,E10,E21,E30,E33,E35 speech
     class E11,E18 cds
     class E16,E17 interop
-    class E05,E26 agents
+    class E05,E26,E34 agents
+    class E37,E38 realtime
     class E25 edge
-    class E12,E14,E19,E24,E27,E28 devtool
+    class E12,E14,E19,E24,E27,E28,E31,E32,E36 devtool
     class E04,E22,E23 ref
 ```
 
@@ -218,18 +262,18 @@ Establish infrastructure, standards, and context. These experiments have **zero 
 | # | Experiment | Rationale |
 |---|-----------|-----------|
 | 04 | POC Gap Analysis | Understand current coverage gaps before building |
-| 09 | MCP | Foundation protocol — 6 experiments depend on it |
+| 09 | MCP | Foundation protocol — 7 experiments depend on it |
 | 16 | FHIR | Interoperability backbone — gates HL7v2 and Sanford Guide |
 | 01 | Storybook | Component infrastructure — gates v0 and Banani |
 | 19 | Superpowers | Dev workflow — gates Agent Teams and Knowledge Work Plugins |
 | 22 | Patient Safety AI Ref | Reference — informs prioritization |
 | 23 | Atlas Agentic AI | Reference — maps 50 use cases to PMS subsystems |
-| 27 | Claude Code | Developer prerequisite — master the primary development tool before all experiments |
+| 27 | Claude Code | Developer prerequisite — 5 experiments depend on it (most gated dev tool) |
 | 28 | AI Coding Tools Landscape | Strategic — understand vendor landscape, lock-in risks, and emergency transition paths |
 
 ### Tier 1 — Core Capabilities (Weeks 3–5)
 
-Build on Tier 0 foundations. These experiments provide core AI, interop, and security capabilities.
+Build on Tier 0 foundations. These experiments provide core AI, interop, security, real-time, and voice capabilities.
 
 | # | Experiment | Dependencies |
 |---|-----------|-------------|
@@ -239,6 +283,10 @@ Build on Tier 0 foundations. These experiments provide core AI, interop, and sec
 | 17 | HL7v2 LIS | 16-FHIR |
 | 07 | MedASR | None (standalone, but position here for clinical pipeline) |
 | 12 | AI Zero-Day Scan | None (parallel security track) |
+| 29 | Gemini Interactions API | None (cloud AI complement to on-premise models) |
+| 30 | ElevenLabs | None (standalone voice AI — TTS, STT, conversational agents) |
+| 35 | Kintsugi Open-Source | None (standalone voice biomarker screening) |
+| 37 | WebSocket | None (foundational real-time transport layer) |
 
 ### Tier 2 — Integration & Expansion (Weeks 6–9)
 
@@ -255,6 +303,11 @@ Combine Tier 1 capabilities into integrated workflows. Multiple experiments can 
 | 03 | Banani | 01-Storybook |
 | 14 | Agent Teams | 19-Superpowers |
 | 21 | Voxtral Transcribe 2 | None (compare with 07, 10) |
+| 31 | VS Code Multi-Agent | 27-Claude Code |
+| 33 | Speechmatics Flow | 10-Speechmatics |
+| 34 | n8n 2.0+ | 09-MCP |
+| 36 | Claude Context Mode | 27-Claude Code |
+| 38 | Apache Kafka | None (complements 37-WebSocket via bridge consumer) |
 
 ### Tier 3 — Advanced Capabilities (Weeks 10–12)
 
@@ -266,6 +319,7 @@ Complex integrations requiring multiple Tier 1–2 foundations.
 | 25 | Edge Vision Stream | 18-ISIC, 13-Gemma 3 |
 | 26 | LangGraph | 09-MCP, 05-OpenClaw |
 | 24 | Knowledge Work Plugins | 19-Superpowers, 14-Agent Teams |
+| 32 | GitHub Agent HQ | 31-VS Code Multi-Agent |
 
 ### Tier 4 — Capstone Integrations (Week 13+)
 
@@ -276,6 +330,9 @@ Full end-to-end clinical workflows combining multiple experiments.
 | Clinical Documentation Pipeline | 07/10/21 + 13/20 + 05 + 26 | Transcribe → Structure → Approve → File |
 | Full DermaCheck + Edge | 18 + 25 + 13 + 09 + 16 | Capture → Classify → Risk Score → FHIR Export |
 | Autonomous Care Coordination | 05 + 26 + 16 + 11 + 15 | Multi-step agent with HITL, FHIR interop, model routing |
+| Real-Time Clinical Event Pipeline | 37 + 38 + 34 + 16 | Stream DB changes → Kafka topics → n8n automation → FHIR exchange |
+| Voice AI Full Stack | 07/10/21 + 30 + 33 + 35 | Transcribe → Synthesize readback → Voice agent → Mental health screening |
+| Three-Layer Agent Governance | 27 + 31 + 32 + 36 + 12 | CLI agents + IDE agents + Platform governance + context optimization + security scanning |
 
 ### Execution Timeline (Gantt)
 
@@ -303,6 +360,10 @@ gantt
     17 HL7v2 LIS               :t17, after t16, 7d
     07 MedASR                  :t07, 2026-03-16, 7d
     12 AI Zero-Day Scan        :t12, 2026-03-16, 5d
+    29 Gemini Interactions     :t29, 2026-03-16, 7d
+    30 ElevenLabs              :t30, 2026-03-16, 5d
+    35 Kintsugi                :t35, 2026-03-16, 7d
+    37 WebSocket               :t37, 2026-03-16, 7d
 
     section Tier 2 — Integration
     05 OpenClaw                :t05, after t09, 10d
@@ -314,23 +375,32 @@ gantt
     03 Banani                  :t03, after t01, 5d
     14 Agent Teams             :t14, after t19, 5d
     21 Voxtral Transcribe 2    :t21, after t07, 5d
+    31 VS Code Multi-Agent     :t31, after t28, 7d
+    33 Speechmatics Flow       :t33, after t10, 7d
+    34 n8n 2.0+                :t34, after t09, 7d
+    36 Claude Context Mode     :t36, after t27, 5d
+    38 Apache Kafka             :t38, after t37, 10d
 
     section Tier 3 — Advanced
     18 ISIC Archive            :t18, after t13, 10d
     25 Edge Vision Stream      :t25, after t18, 10d
     26 LangGraph               :t26, after t05, 10d
     24 Knowledge Work Plugins  :t24, after t14, 7d
+    32 GitHub Agent HQ         :t32, after t31, 7d
 
     section Tier 4 — Capstone
     Clinical Doc Pipeline      :t_cdp, after t26, 14d
     Full DermaCheck + Edge     :t_dce, after t25, 14d
+    Real-Time Event Pipeline   :t_rep, after t38, 10d
+    Voice AI Full Stack        :t_vfs, after t33, 10d
+    Agent Governance Stack     :t_ags, after t32, 7d
 ```
 
 ---
 
 ## 5. Parallel Execution Tracks
 
-Five independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
+Six independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
 
 ### Track A — UI/UX
 ```
@@ -339,26 +409,46 @@ Five independent tracks that can be staffed and executed simultaneously. Cross-t
                                   (needs 09-MCP from Track D)
 ```
 
-### Track B — Clinical AI
+### Track B — Clinical AI Models
 ```
-{07-MedASR, 10-Speechmatics, 21-Voxtral}  →  {13-Gemma 3, 20-Qwen 3.5}  →  18-ISIC  →  25-Edge Vision
-     (independent ASR comparisons)              (on-premise model stack)       (CDS)       (edge deploy)
+{13-Gemma 3, 20-Qwen 3.5}  →  18-ISIC  →  25-Edge Vision
+  (on-premise model stack)       (CDS)       (edge deploy)
+
+29-Gemini Interactions  (cloud complement — parallel)
+35-Kintsugi             (voice biomarkers — parallel)
 ```
 
-### Track C — Interoperability
+### Track C — Interoperability & Data
 ```
 16-FHIR → {17-HL7v2 LIS, 11-Sanford Guide}
+37-WebSocket → 38-Kafka
+                 ↓
+         (Kafka enhances FHIR event exchange, n8n automation)
 ```
 
 ### Track D — AI Infrastructure & Agents
 ```
 09-MCP → {08-Adaptive Thinking, 05-OpenClaw} → {15-Claude Model Selection, 26-LangGraph}
+   ↓
+34-n8n 2.0+  (visual workflow automation with MCP integration)
 ```
 
 ### Track E — Developer Experience
 ```
-27-Claude Code → {28-AI Coding Tools, 19-Superpowers} → 14-Agent Teams → 24-Knowledge Work Plugins
-                                                                           (+ 12-AI Zero-Day Scan runs in parallel)
+27-Claude Code → {28-AI Coding Tools, 19-Superpowers, 36-Claude Context Mode}
+                                          ↓
+                               {14-Agent Teams, 31-VS Code Multi-Agent}
+                                          ↓
+                               {24-Knowledge Work Plugins, 32-GitHub Agent HQ}
+                               (+ 12-AI Zero-Day Scan runs in parallel)
+```
+
+### Track F — Voice AI
+```
+{07-MedASR, 10-Speechmatics, 21-Voxtral}  →  33-Speechmatics Flow (conversational agents)
+     (independent ASR comparisons)
+30-ElevenLabs  (cloud TTS/STT/agents — parallel)
+35-Kintsugi    (voice biomarker screening — parallel, shared with Track B)
 ```
 
 ### Cross-Track Dependencies
@@ -372,25 +462,26 @@ flowchart LR
     end
 
     subgraph B["Track B: Clinical AI"]
-        B1["07 MedASR"]
-        B2["10 Speechmatics"]
-        B3["21 Voxtral"]
         B4["13 Gemma 3"]
         B5["20 Qwen 3.5"]
         B6["18 ISIC"]
         B7["25 Edge Vision"]
-        B1 --> B4
+        B8["29 Gemini"]
+        B9["35 Kintsugi"]
         B4 --> B5
         B4 --> B6
         B6 --> B7
     end
 
-    subgraph C["Track C: Interop"]
+    subgraph C["Track C: Interop & Data"]
         C1["16 FHIR"]
         C2["17 HL7v2 LIS"]
         C3["11 Sanford Guide"]
+        C4["37 WebSocket"]
+        C5["38 Kafka"]
         C1 --> C2
         C1 --> C3
+        C4 --> C5
     end
 
     subgraph D["Track D: AI Infra"]
@@ -399,8 +490,10 @@ flowchart LR
         D3["05 OpenClaw"]
         D4["15 Model Selection"]
         D5["26 LangGraph"]
+        D6["34 n8n"]
         D1 --> D2
         D1 --> D3
+        D1 --> D6
         D2 --> D4
         D3 --> D5
     end
@@ -412,10 +505,25 @@ flowchart LR
         E2["14 Agent Teams"]
         E3["24 Knowledge Plugins"]
         E4["12 Zero-Day Scan"]
+        E6["31 VS Code"]
+        E7["32 Agent HQ"]
+        E8["36 Context Mode"]
         E0 --> E5
         E0 --> E1
+        E0 --> E6
+        E0 --> E8
         E1 --> E2
         E2 --> E3
+        E6 --> E7
+    end
+
+    subgraph F["Track F: Voice AI"]
+        F1["07 MedASR"]
+        F2["10 Speechmatics"]
+        F3["21 Voxtral"]
+        F4["30 ElevenLabs"]
+        F5["33 Flow API"]
+        F2 --> F5
     end
 
     %% Cross-track dependencies
@@ -423,12 +531,17 @@ flowchart LR
     C1 -.->|"enhances"| D3
     D3 -.->|"required"| D5
     B4 -.->|"required"| B7
+    C5 -.->|"enhances"| C1
+    C4 -.->|"enhances"| A4
+    D6 -.->|"enhances"| C5
+    E7 -.->|"enhances"| E4
 
     style A fill:#eef2ff,stroke:#818cf8
     style B fill:#ecfdf5,stroke:#34d399
     style C fill:#f5f3ff,stroke:#a78bfa
     style D fill:#f0f9ff,stroke:#38bdf8
     style E fill:#f8fafc,stroke:#94a3b8
+    style F fill:#fffbeb,stroke:#fbbf24
 ```
 
 ---
@@ -436,6 +549,8 @@ flowchart LR
 ## 6. Interconnection Matrix
 
 Relationship types: **D** = Dependency, **C** = Complementary, **S** = Same Domain, **E** = Enhances
+
+### Core Experiments (00–26)
 
 |  | 00 | 01 | 02 | 03 | 05 | 07 | 08 | 09 | 10 | 11 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 24 | 25 | 26 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -464,6 +579,21 @@ Relationship types: **D** = Dependency, **C** = Complementary, **S** = Same Doma
 
 _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 23 omitted (zero or reference-only relationships)._
 
+### New Experiments (29–38) — Relationships to All Others
+
+| Experiment | Hard Dependencies | Complementary / Enhances |
+|-----------|------------------|--------------------------|
+| **29 Gemini Interactions** | None | Enhances 15-Claude Model Selection (adds Gemini to multi-model routing). Complements 13-Gemma 3, 20-Qwen 3.5 (cloud+on-premise dual strategy) |
+| **30 ElevenLabs** | None | Complements 07-MedASR, 10-Speechmatics, 21-Voxtral (cloud voice AI comparison). Enhances 33-Speechmatics Flow (TTS readback for voice agents) |
+| **31 VS Code Multi-Agent** | 27-Claude Code | Complements 19-Superpowers (IDE workflow enforcement). Dependency for 32-GitHub Agent HQ (three-layer stack) |
+| **32 GitHub Agent HQ** | 31-VS Code Multi-Agent | Enhances 12-AI Zero-Day Scan (agent-powered security audits). Complements 14-Agent Teams (platform-level governance) |
+| **33 Speechmatics Flow** | 10-Speechmatics Medical | Enhances 07-MedASR, 21-Voxtral (conversational voice layer). Complements 30-ElevenLabs (vendor comparison). Enhances 35-Kintsugi (voice agent screening flow) |
+| **34 n8n 2.0+** | 09-MCP | Enhances 05-OpenClaw, 26-LangGraph (visual automation alternative). Enhances 38-Kafka (n8n Kafka trigger node for event-driven workflows) |
+| **35 Kintsugi Open-Source** | None | Enhances 07-MedASR (voice analysis extends to mental health). Complements 33-Speechmatics Flow (voice agent can trigger screening) |
+| **36 Claude Context Mode** | 27-Claude Code | Enhances 19-Superpowers, 24-Knowledge Work Plugins (session optimization for dev workflows) |
+| **37 WebSocket** | None | Enhances 00-Tambo (real-time UI updates). Enhances 38-Kafka (WebSocket Bridge Consumer for real-time delivery). Core transport for clinical alerts across all frontend experiments |
+| **38 Apache Kafka** | None | Enhances 16-FHIR, 17-HL7v2 LIS (event-driven interop). Enhances 34-n8n (Kafka event triggers). Complements 37-WebSocket (durable backbone + real-time delivery). Debezium CDC captures all PostgreSQL changes |
+
 ---
 
 ## 7. Critical Path Analysis
@@ -483,11 +613,14 @@ These experiments **gate the most downstream work** and should be prioritized:
 
 | Experiment | Downstream Count | Blocks |
 |-----------|-----------------|--------|
-| **09 MCP** | 6 | 00-Tambo, 05-OpenClaw, 08-Adaptive, 15-Model Selection, 26-LangGraph, (+ Tier 4 pipelines) |
+| **27 Claude Code** | 7 | 19-Superpowers, 14-Agent Teams (via 19), 24-Knowledge Plugins (via 14), 28-AI Coding Tools, 31-VS Code, 32-GitHub Agent HQ (via 31), 36-Claude Context Mode |
+| **09 MCP** | 7 | 00-Tambo, 05-OpenClaw, 08-Adaptive, 15-Model Selection, 26-LangGraph, 34-n8n, (+ Tier 4 pipelines) |
 | **13 Gemma 3** | 3 | 18-ISIC, 20-Qwen 3.5, 25-Edge Vision |
 | **16 FHIR** | 2 | 11-Sanford Guide, 17-HL7v2 LIS |
 | **01 Storybook** | 2 | 02-v0, 03-Banani |
 | **19 Superpowers** | 2 | 14-Agent Teams, 24-Knowledge Work Plugins |
+| **10 Speechmatics** | 1 | 33-Speechmatics Flow |
+| **31 VS Code Multi-Agent** | 1 | 32-GitHub Agent HQ |
 
 ### Critical Path Diagram
 
@@ -499,12 +632,20 @@ flowchart LR
 
     E09 --> E08["08 Adaptive<br/>7d"]
     E08 --> E15["15 Model Selection<br/>5d"]
+    E09 --> E34["34 n8n<br/>7d"]
+
+    E27["27 Claude Code<br/>3d"]:::bottleneck --> E31["31 VS Code<br/>7d"]
+    E31 --> E32["32 Agent HQ<br/>7d"]
+    E27 --> E36["36 Context Mode<br/>5d"]
 
     E13["13 Gemma 3<br/>10d"]:::bottleneck --> E18["18 ISIC<br/>10d"]
     E18 --> E25["25 Edge Vision<br/>10d"]
     E25 --> CAP2["DermaCheck+Edge<br/>14d"]
 
     E16["16 FHIR<br/>10d"]:::bottleneck --> E17["17 HL7v2 LIS<br/>7d"]
+
+    E37["37 WebSocket<br/>7d"] --> E38["38 Kafka<br/>10d"]
+    E38 --> CAP3["Real-Time Event<br/>Pipeline<br/>10d"]
 
     classDef critical fill:#dc2626,stroke:#991b1b,color:#fff
     classDef bottleneck fill:#f59e0b,stroke:#d97706,color:#000
@@ -528,20 +669,20 @@ flowchart LR
 
 | Week | Focus | Experiments |
 |------|-------|-------------|
-| 1 | Infrastructure | 09-MCP + 16-FHIR (parallel) |
-| 2 | AI Foundation | 13-Gemma 3 + 08-Adaptive Thinking (parallel) |
-| 3 | Agents + Speech | 05-OpenClaw + 07-MedASR (parallel) |
-| 4 | Dev + UI | 01-Storybook + 19-Superpowers (parallel) |
+| 1 | Infrastructure | 09-MCP + 16-FHIR + 37-WebSocket (parallel) |
+| 2 | AI Foundation | 13-Gemma 3 + 08-Adaptive Thinking + 29-Gemini (parallel) |
+| 3 | Agents + Speech | 05-OpenClaw + 07-MedASR + 30-ElevenLabs (parallel) |
+| 4 | Dev + UI + Streaming | 01-Storybook + 19-Superpowers + 38-Kafka (parallel) |
 
 ### 1-Quarter Plan (13 Weeks)
 
 | Weeks | Tier | Experiments |
 |-------|------|-------------|
 | 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23, 27, 28 |
-| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12 |
-| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21 |
-| 10–12 | 3 — Advanced | 18, 25, 26, 24 |
-| 13 | 4 — Capstone | Clinical Doc Pipeline, DermaCheck+Edge |
+| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37 |
+| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38 |
+| 10–12 | 3 — Advanced | 18, 25, 26, 24, 32 |
+| 13 | 4 — Capstone | Clinical Doc Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack |
 
 ---
 
@@ -578,7 +719,17 @@ flowchart LR
 | 26 LangGraph | X | X | | X | X | | | |
 | 27 Claude Code | | | | | | | | X |
 | 28 AI Coding Tools | X | X | X | | X | X | | X |
-| **Total** | **19** | **17** | **6** | **9** | **15** | **4** | **2** | **7** |
+| 29 Gemini Interactions | X | X | | | X | | X | |
+| 30 ElevenLabs | X | X | | | X | | X | |
+| 31 VS Code Multi-Agent | | | | | | | | X |
+| 32 GitHub Agent HQ | | | | | | | | X |
+| 33 Speechmatics Flow | X | X | | | | | X | |
+| 34 n8n 2.0+ | X | X | | X | X | | | |
+| 35 Kintsugi Open-Source | X | X | | | X | | | |
+| 36 Claude Context Mode | | | | | | | | X |
+| 37 WebSocket | X | X | X | | | | | |
+| 38 Apache Kafka | X | | | X | | | | |
+| **Total** | **25** | **22** | **8** | **12** | **18** | **4** | **5** | **10** |
 
 ---
 
@@ -589,14 +740,15 @@ Reference for Mermaid diagram styling in Section 3.
 | Category | Color | Hex | Experiments |
 |----------|-------|-----|-------------|
 | UI Tools | Indigo | `#818cf8` | 00, 01, 02, 03 |
-| AI Infrastructure | Sky Blue | `#38bdf8` | 08, 09, 15 |
+| AI Infrastructure | Sky Blue | `#38bdf8` | 08, 09, 15, 29 |
 | On-Premise Models | Emerald | `#34d399` | 06, 13, 20 |
-| Speech & NLP | Amber | `#fbbf24` | 07, 10, 21 |
+| Speech & Voice AI | Amber | `#fbbf24` | 07, 10, 21, 30, 33, 35 |
 | Clinical Decision Support | Red | `#f87171` | 11, 18 |
 | Interoperability | Violet | `#a78bfa` | 16, 17 |
-| Agentic AI | Orange | `#fb923c` | 05, 26 |
+| Agentic AI & Automation | Orange | `#fb923c` | 05, 26, 34 |
+| Real-Time & Streaming | Rose | `#f472b6` | 37, 38 |
 | Edge Computing | Teal | `#2dd4bf` | 25 |
-| Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27, 28 |
+| Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27, 28, 31, 32, 36 |
 | Reference & Analysis | Light Gray | `#e2e8f0` | 04, 22, 23 |
 
 ---
@@ -605,6 +757,7 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.0 | 2026-03-03 | Ammar | Major update: added Experiments 29–38 (Gemini Interactions, ElevenLabs, VS Code Multi-Agent, GitHub Agent HQ, Speechmatics Flow, n8n 2.0+, Kintsugi, Claude Context Mode, WebSocket, Apache Kafka). New categories: Real-Time & Streaming, Voice AI expansion. New Track F (Voice AI). New Tier 4 capstone pipelines. Updated all dependency graphs, execution tiers, platform coverage, and bottleneck analysis |
 | 1.2 | 2026-03-02 | Ammar | Added Experiment 28 (AI Coding Tools Landscape) |
 | 1.1 | 2026-03-02 | Ammar | Added Experiment 27 (Claude Code Mastery) |
 | 1.0 | 2026-03-02 | Ammar | Initial roadmap covering experiments 00–26 |
