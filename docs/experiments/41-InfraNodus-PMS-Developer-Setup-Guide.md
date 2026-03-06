@@ -1,7 +1,7 @@
 # InfraNodus Setup Guide for PMS Integration
 
 **Document ID:** PMS-EXP-INFRANODUS-001
-**Version:** 1.0
+**Version:** 2.0
 **Date:** 2026-03-06
 **Applies To:** PMS project (all platforms)
 **Prerequisites Level:** Intermediate
@@ -12,32 +12,37 @@
 
 1. [Overview](#1-overview)
 2. [Prerequisites](#2-prerequisites)
-3. [Part A: Install and Configure InfraNodus](#3-part-a-install-and-configure-infranodus)
-4. [Part B: Integrate with PMS Backend](#4-part-b-integrate-with-pms-backend)
-5. [Part C: Integrate with PMS Frontend](#5-part-c-integrate-with-pms-frontend)
-6. [Part D: Testing and Verification](#6-part-d-testing-and-verification)
-7. [Troubleshooting](#7-troubleshooting)
-8. [Reference Commands](#8-reference-commands)
+3. [Part A: Configure InfraNodus Cloud API](#3-part-a-configure-infranodus-cloud-api)
+4. [Part B: Set Up the MCP Server](#4-part-b-set-up-the-mcp-server)
+5. [Part C: Integrate with PMS Backend](#5-part-c-integrate-with-pms-backend)
+6. [Part D: Integrate with PMS Frontend](#6-part-d-integrate-with-pms-frontend)
+7. [Part E: Testing and Verification](#7-part-e-testing-and-verification)
+8. [Troubleshooting](#8-troubleshooting)
+9. [Reference Commands](#9-reference-commands)
 
 ---
 
 ## 1. Overview
 
-This guide walks you through deploying a self-hosted InfraNodus instance with Neo4j, connecting it to the PMS backend via a Knowledge Graph Service, and adding graph visualization and gap analysis to the PMS frontend.
+This guide walks you through connecting InfraNodus to the PMS via its Cloud API (RapidAPI) and MCP server, building a Knowledge Graph Service in the backend, and adding graph visualization and gap analysis to the frontend.
 
 By the end of this guide you will have:
 
-- A self-hosted InfraNodus + Neo4j running in Docker
+- InfraNodus Cloud API configured via RapidAPI with `doNotSave=true` for PHI safety
+- The InfraNodus MCP server running for Claude Code developer workflows
 - A PHI De-Identification Gateway in the PMS backend
 - A Knowledge Graph Service exposing graph analysis endpoints
 - A D3.js-based graph visualization component in the PMS frontend
 - A gap analysis panel showing structural gaps with AI-generated suggestions
+- Graph metadata persisted in PostgreSQL (no external graph database required)
+
+> **Note**: An open-source self-hosted InfraNodus exists at [github.com/noduslabs/infranodus](https://github.com/noduslabs/infranodus) but was last updated in 2020 and is explicitly unsupported by Nodus Labs. This guide uses the actively maintained Cloud API and MCP server instead.
 
 ```mermaid
 flowchart LR
-    subgraph Docker["Docker Compose"]
-        IN["InfraNodus :8080"]
-        NEO["Neo4j :7687"]
+    subgraph Cloud["InfraNodus Cloud"]
+        API["RapidAPI<br/>(doNotSave=true)"]
+        MCP["MCP Server<br/>(npm)"]
     end
 
     subgraph PMS["PMS Services"]
@@ -46,13 +51,14 @@ flowchart LR
         PG["PostgreSQL :5432"]
     end
 
-    BE -->|"Analyze text"| IN
-    IN --> NEO
+    BE -->|"De-identified text"| API
+    API -->|"Graph JSON"| BE
     FE -->|"Fetch graphs"| BE
     BE --> PG
+    MCP -.->|"Developer workflow"| API
 
-    style IN fill:#4a9eff,color:#fff
-    style NEO fill:#008cc1,color:#fff
+    style API fill:#4a9eff,color:#fff
+    style MCP fill:#7c3aed,color:#fff
     style BE fill:#009688,color:#fff
     style FE fill:#0070f3,color:#fff
     style PG fill:#336791,color:#fff
@@ -64,8 +70,6 @@ flowchart LR
 
 | Software | Minimum Version | Check Command |
 |----------|----------------|---------------|
-| Docker | 24.0+ | `docker --version` |
-| Docker Compose | 2.20+ | `docker compose version` |
 | Node.js | 20.x LTS | `node --version` |
 | Python | 3.11+ | `python3 --version` |
 | Git | 2.40+ | `git --version` |
@@ -75,20 +79,11 @@ flowchart LR
 
 ### 2.2 Installation of Prerequisites
 
-**Neo4j (via Docker — no manual install needed)**:
-Neo4j is deployed as a Docker container alongside InfraNodus. No separate installation required.
-
 **D3.js (frontend dependency)**:
 ```bash
 cd pms-frontend
 npm install d3@7 @types/d3
 ```
-
-**InfraNodus API key (for cloud fallback)**:
-1. Create an account at [infranodus.com](https://infranodus.com)
-2. Navigate to Settings → API Access
-3. Copy your API token
-4. Store in `.env` as `INFRANODUS_API_KEY`
 
 ### 2.3 Verify PMS Services
 
@@ -105,75 +100,19 @@ psql -h localhost -p 5432 -U pms_user -d pms_db -c "SELECT 1;"
 
 All three should return successful responses before proceeding.
 
-## 3. Part A: Install and Configure InfraNodus
+## 3. Part A: Configure InfraNodus Cloud API
 
-### Step 1: Create Docker Compose extension
+### Step 1: Create an InfraNodus account
 
-Create `docker-compose.infranodus.yml` in the project root:
+1. Go to [infranodus.com](https://infranodus.com) and sign up (14-day free trial available)
+2. Navigate to Settings -> API Access
+3. Copy your API key
 
-```yaml
-# docker-compose.infranodus.yml
-services:
-  infranodus:
-    image: node:20-slim
-    container_name: pms-infranodus
-    working_dir: /app
-    volumes:
-      - ./infranodus-app:/app
-    ports:
-      - "8080:8080"
-    environment:
-      - NEO4J_URI=bolt://neo4j:7687
-      - NEO4J_USER=neo4j
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-pms_infra_secure_2026}
-      - PORT=8080
-      - NODE_ENV=production
-    depends_on:
-      neo4j:
-        condition: service_healthy
-    networks:
-      - pms-network
-    restart: unless-stopped
+### Step 2: Get RapidAPI access
 
-  neo4j:
-    image: neo4j:5-community
-    container_name: pms-neo4j
-    environment:
-      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-pms_infra_secure_2026}
-      - NEO4J_PLUGINS=["apoc"]
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
-    volumes:
-      - neo4j-data:/data
-      - neo4j-logs:/logs
-    ports:
-      - "7474:7474"   # Browser UI (dev only)
-      - "7687:7687"   # Bolt protocol
-    healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:-pms_infra_secure_2026}", "RETURN 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - pms-network
-    restart: unless-stopped
-
-volumes:
-  neo4j-data:
-  neo4j-logs:
-
-networks:
-  pms-network:
-    external: true
-```
-
-### Step 2: Clone InfraNodus open-source
-
-```bash
-git clone https://github.com/noduslabs/infranodus.git infranodus-app
-cd infranodus-app
-npm install
-cd ..
-```
+1. Go to [InfraNodus on RapidAPI](https://rapidapi.com/infranodus-infranodus-default/api/infranodus)
+2. Subscribe to a plan (free tier allows ~70 requests)
+3. Copy your RapidAPI key
 
 ### Step 3: Configure environment variables
 
@@ -181,38 +120,78 @@ Add to your project `.env`:
 
 ```bash
 # InfraNodus Configuration
-NEO4J_PASSWORD=pms_infra_secure_2026
-INFRANODUS_INTERNAL_URL=http://infranodus:8080
-INFRANODUS_API_KEY=your_rapidapi_key_here    # Cloud fallback only
-INFRANODUS_DO_NOT_SAVE=true                   # Never persist PHI on cloud
+INFRANODUS_API_KEY=your_rapidapi_key_here
+INFRANODUS_DO_NOT_SAVE=true    # Never persist PHI on cloud
 ```
 
-### Step 4: Start InfraNodus services
+### Step 4: Verify API connectivity
 
 ```bash
-# Create the shared network if it doesn't exist
-docker network create pms-network 2>/dev/null || true
-
-# Start InfraNodus + Neo4j
-docker compose -f docker-compose.infranodus.yml up -d
-
-# Watch logs until healthy
-docker compose -f docker-compose.infranodus.yml logs -f --tail=50
+# Test the InfraNodus Cloud API
+curl -s -X POST "https://infranodus.p.rapidapi.com/api/1/graph/graphAndStatements" \
+  -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Patient presents with headache and fatigue. Blood pressure elevated. Started lisinopril.",
+    "graphName": "test_graph",
+    "doNotSave": true
+  }' | jq '{
+    has_nodes: (.data.nodes | length > 0),
+    has_edges: (.data.edges | length > 0)
+  }'
 ```
 
-### Step 5: Verify InfraNodus is running
+Expected:
+```json
+{
+  "has_nodes": true,
+  "has_edges": true
+}
+```
+
+**Checkpoint**: InfraNodus Cloud API key configured, `doNotSave=true` verified, API returns graph data.
+
+## 4. Part B: Set Up the MCP Server
+
+The InfraNodus MCP server enables Claude Code and other MCP-compatible LLMs to query knowledge graphs directly.
+
+### Step 1: Install and configure
+
+For Claude Code / Claude Desktop, add to your MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "infranodus": {
+      "command": "npx",
+      "args": ["-y", "infranodus-mcp-server"],
+      "env": {
+        "INFRANODUS_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+### Step 2: Verify MCP server
 
 ```bash
-# Check Neo4j
-curl -s http://localhost:7474 | head -5
-
-# Check Neo4j Bolt connectivity
-docker exec pms-neo4j cypher-shell -u neo4j -p pms_infra_secure_2026 "RETURN 'Neo4j OK' AS status"
+# Test the MCP server starts
+npx -y infranodus-mcp-server --help
 ```
 
-**Checkpoint**: Neo4j is running and accessible via Bolt. InfraNodus Node.js app is connected to Neo4j. Both containers are on the `pms-network`.
+### Step 3: Alternative -- hosted MCP server
 
-## 4. Part B: Integrate with PMS Backend
+For clients that support HTTP/SSE MCP, use the hosted server directly:
+
+```
+URL: https://mcp.infranodus.com
+Authentication: OAuth (via InfraNodus account)
+```
+
+**Checkpoint**: InfraNodus MCP server configured for Claude Code. Developer can query knowledge graphs during development sessions.
+
+## 5. Part C: Integrate with PMS Backend
 
 ### Step 1: Create the PHI De-Identification Gateway
 
@@ -227,7 +206,7 @@ from typing import Dict, List, Tuple
 
 # PHI patterns to redact
 PHI_PATTERNS: List[Tuple[str, str]] = [
-    # Names (simplified — production should use NER)
+    # Names (simplified -- production should use NER)
     (r"\b(?:Mr|Mrs|Ms|Dr|Prof)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", "[PERSON_NAME]"),
     # SSN
     (r"\b\d{3}-\d{2}-\d{4}\b", "[SSN]"),
@@ -270,7 +249,7 @@ def deidentify_text(text: str) -> Dict[str, str]:
 Create `pms-backend/app/services/knowledge_graph.py`:
 
 ```python
-"""Knowledge Graph Service — InfraNodus integration for clinical text analysis."""
+"""Knowledge Graph Service -- InfraNodus Cloud API integration for clinical text analysis."""
 
 import httpx
 import logging
@@ -283,10 +262,11 @@ logger = logging.getLogger(__name__)
 
 
 class KnowledgeGraphService:
-    """Analyzes clinical text via InfraNodus and returns graph structures."""
+    """Analyzes clinical text via InfraNodus Cloud API and returns graph structures."""
+
+    RAPIDAPI_URL = "https://infranodus.p.rapidapi.com/api/1/graph"
 
     def __init__(self):
-        self.internal_url = settings.INFRANODUS_INTERNAL_URL
         self.api_key = settings.INFRANODUS_API_KEY
         self.do_not_save = settings.INFRANODUS_DO_NOT_SAVE
 
@@ -294,40 +274,14 @@ class KnowledgeGraphService:
         self,
         encounter_text: str,
         graph_name: str,
-        use_cloud_fallback: bool = False,
     ) -> Dict[str, Any]:
         """Analyze a single encounter note and return graph structure."""
-        # Step 1: De-identify PHI
+        # Step 1: De-identify PHI (mandatory)
         deid_result = deidentify_text(encounter_text)
         clean_text = deid_result["deidentified_text"]
 
-        # Step 2: Submit to InfraNodus
-        try:
-            if use_cloud_fallback:
-                return await self._analyze_cloud(clean_text, graph_name)
-            return await self._analyze_self_hosted(clean_text, graph_name)
-        except Exception as e:
-            logger.error(f"InfraNodus analysis failed: {e}")
-            if not use_cloud_fallback:
-                logger.info("Falling back to cloud API")
-                return await self._analyze_cloud(clean_text, graph_name)
-            raise
-
-    async def _analyze_self_hosted(
-        self, text: str, graph_name: str
-    ) -> Dict[str, Any]:
-        """Submit text to self-hosted InfraNodus."""
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{self.internal_url}/api/graph/analyze",
-                json={
-                    "text": text,
-                    "graphName": graph_name,
-                    "language": "en",
-                },
-            )
-            response.raise_for_status()
-            return response.json()
+        # Step 2: Submit to InfraNodus Cloud API
+        return await self._analyze_cloud(clean_text, graph_name)
 
     async def _analyze_cloud(
         self, text: str, graph_name: str
@@ -335,7 +289,7 @@ class KnowledgeGraphService:
         """Submit text to InfraNodus Cloud API via RapidAPI."""
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                "https://infranodus.p.rapidapi.com/api/1/graph/graphAndStatements",
+                f"{self.RAPIDAPI_URL}/graphAndStatements",
                 headers={
                     "X-RapidAPI-Key": self.api_key,
                     "Content-Type": "application/json",
@@ -349,14 +303,25 @@ class KnowledgeGraphService:
             response.raise_for_status()
             return response.json()
 
-    async def get_gaps(
-        self, graph_name: str
+    async def get_gaps_and_advice(
+        self, text: str, graph_name: str
     ) -> Dict[str, Any]:
         """Get structural gaps and AI-generated bridging questions."""
+        deid_result = deidentify_text(text)
+        clean_text = deid_result["deidentified_text"]
+
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                f"{self.internal_url}/api/graph/gaps",
-                json={"graphName": graph_name},
+                f"{self.RAPIDAPI_URL}/graphAndAdvice",
+                headers={
+                    "X-RapidAPI-Key": self.api_key,
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "text": clean_text,
+                    "graphName": graph_name,
+                    "doNotSave": self.do_not_save,
+                },
             )
             response.raise_for_status()
             return response.json()
@@ -433,8 +398,11 @@ async def get_patient_gaps(
     kg_service: KnowledgeGraphService = Depends(),
 ):
     """Get structural gaps in a patient's clinical documentation."""
-    graph_name = f"patient_{patient_id}_longitudinal"
-    result = await kg_service.get_gaps(graph_name)
+    # In production, fetch combined encounter text from DB
+    result = await kg_service.get_gaps_and_advice(
+        text="",  # Populated from DB in production
+        graph_name=f"patient_{patient_id}_longitudinal",
+    )
     return result
 ```
 
@@ -457,14 +425,13 @@ class Settings(BaseSettings):
     # ... existing settings ...
 
     # InfraNodus
-    INFRANODUS_INTERNAL_URL: str = "http://infranodus:8080"
     INFRANODUS_API_KEY: str = ""
     INFRANODUS_DO_NOT_SAVE: bool = True
 ```
 
-**Checkpoint**: PMS backend has PHI De-ID Gateway, Knowledge Graph Service, and three API endpoints (`POST /api/kg/analyze`, `GET /api/kg/{patient_id}`, `GET /api/kg/{patient_id}/gaps`). Cloud fallback configured with `doNotSave=true`.
+**Checkpoint**: PMS backend has PHI De-ID Gateway, Knowledge Graph Service (cloud API), and three API endpoints (`POST /api/kg/analyze`, `GET /api/kg/{patient_id}`, `GET /api/kg/{patient_id}/gaps`). All calls use `doNotSave=true`.
 
-## 5. Part C: Integrate with PMS Frontend
+## 6. Part D: Integrate with PMS Frontend
 
 ### Step 1: Create the Graph Visualization component
 
@@ -698,7 +665,7 @@ export function GapAnalysisPanel({ patientId }: Props) {
                 <span className="font-medium text-amber-800">
                   {gap.cluster1_label}
                 </span>
-                <span className="text-amber-400">↔</span>
+                <span className="text-amber-400">--</span>
                 <span className="font-medium text-amber-800">
                   {gap.cluster2_label}
                 </span>
@@ -746,28 +713,26 @@ Add to `pms-frontend/.env.local`:
 NEXT_PUBLIC_KG_ENABLED=true
 ```
 
-**Checkpoint**: PMS frontend has a D3.js graph visualization component and a gap analysis panel. Both fetch data from the PMS backend Knowledge Graph endpoints. The graph is interactive (zoom, drag, tooltips).
+**Checkpoint**: PMS frontend has a D3.js graph visualization component and a gap analysis panel. Both fetch data from the PMS backend Knowledge Graph endpoints.
 
-## 6. Part D: Testing and Verification
+## 7. Part E: Testing and Verification
 
 ### Service Health Checks
 
 ```bash
-# 1. Neo4j health
-docker exec pms-neo4j cypher-shell \
-  -u neo4j -p pms_infra_secure_2026 \
-  "RETURN 'healthy' AS status"
-# Expected: healthy
+# 1. InfraNodus Cloud API connectivity
+curl -s -X POST "https://infranodus.p.rapidapi.com/api/1/graph/graphAndStatements" \
+  -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "test connection", "graphName": "health_check", "doNotSave": true}' \
+  | jq .status
+# Expected: success or graph data
 
-# 2. InfraNodus health
-curl -s http://localhost:8080/health
-# Expected: {"status":"ok"}
-
-# 3. PMS Backend KG endpoints
+# 2. PMS Backend KG endpoints
 curl -s http://localhost:8000/api/kg/1 | jq .status
 # Expected: graph data or empty result
 
-# 4. PHI De-ID test
+# 3. PHI De-ID test
 curl -s -X POST http://localhost:8000/api/kg/analyze \
   -H "Content-Type: application/json" \
   -d '{
@@ -811,55 +776,35 @@ curl -s -X POST http://localhost:8000/api/kg/analyze \
 # Expected: Non-zero counts for nodes, edges, and clusters
 ```
 
-**Checkpoint**: All services running, PHI de-identification verified, graph analysis returning structured data, no PHI in graph output.
+**Checkpoint**: Cloud API connected, PHI de-identification verified, graph analysis returning structured data, no PHI in graph output.
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
-### Neo4j fails to start
+### Cloud API returns 403
 
-**Symptom**: `pms-neo4j` container exits immediately or health check fails.
+**Symptom**: `403 Forbidden` when calling InfraNodus API.
 
 **Solution**:
 ```bash
-# Check logs
-docker logs pms-neo4j
+# Verify API key is set
+echo $INFRANODUS_API_KEY | head -c 10
 
-# Common fix: permission issue on data volume
-docker volume rm neo4j-data
-docker compose -f docker-compose.infranodus.yml up -d neo4j
+# Test key directly
+curl -s -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
+  "https://infranodus.p.rapidapi.com/api/1/status"
+
+# Check RapidAPI subscription is active at:
+# https://rapidapi.com/developer/billing/subscriptions-and-usage
 ```
 
-### InfraNodus cannot connect to Neo4j
+### Cloud API returns 429 (rate limited)
 
-**Symptom**: InfraNodus logs show `ServiceUnavailable: Could not connect to Neo4j`.
+**Symptom**: `429 Too Many Requests` after multiple calls.
 
-**Solution**:
-```bash
-# Verify Neo4j is on the same network
-docker network inspect pms-network | grep -A5 neo4j
-
-# Verify Neo4j bolt port
-docker exec pms-neo4j cypher-shell -u neo4j -p pms_infra_secure_2026 "RETURN 1"
-
-# Restart InfraNodus after Neo4j is healthy
-docker restart pms-infranodus
-```
-
-### Port 8080 conflict
-
-**Symptom**: `Bind for 0.0.0.0:8080 failed: port is already allocated`.
-
-**Solution**:
-```bash
-# Find what's using port 8080
-lsof -i :8080
-
-# Change InfraNodus port in docker-compose.infranodus.yml
-ports:
-  - "8081:8080"
-
-# Update INFRANODUS_INTERNAL_URL in .env
-INFRANODUS_INTERNAL_URL=http://infranodus:8080  # Internal port stays the same
+**Solution**: The free tier allows ~70 requests. Implement request caching in PostgreSQL:
+```python
+# Cache graph results for 24 hours to reduce API calls
+# Check cache before making API calls
 ```
 
 ### Graph visualization not rendering
@@ -872,74 +817,68 @@ INFRANODUS_INTERNAL_URL=http://infranodus:8080  # Internal port stays the same
 cd pms-frontend && npm list d3
 
 # Check browser console for errors
-# Common issue: CORS — ensure backend allows frontend origin
+# Common issue: CORS -- ensure backend allows frontend origin
 
 # Verify API returns data
 curl -s http://localhost:8000/api/kg/1 | jq '.nodes | length'
 ```
 
-### Cloud API returns 403
+### PHI appears in graph nodes
 
-**Symptom**: `403 Forbidden` when using cloud fallback.
+**Symptom**: Patient name or date appears as a node label.
+
+**Solution**: Add the missed pattern to `PHI_PATTERNS` in `phi_deid.py`:
+```bash
+python3 -c "
+from app.services.phi_deid import deidentify_text
+result = deidentify_text('your problematic text here')
+print(result['deidentified_text'])
+"
+```
+
+### MCP server fails to start
+
+**Symptom**: `npx infranodus-mcp-server` throws an error.
 
 **Solution**:
 ```bash
-# Verify API key
-echo $INFRANODUS_API_KEY
+# Clear npx cache
+npx clear-npx-cache
 
-# Test directly
-curl -s -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
-  https://infranodus.p.rapidapi.com/api/1/status
+# Try installing globally
+npm install -g infranodus-mcp-server
+
+# Verify API key is set
+echo $INFRANODUS_API_KEY
 ```
 
-## 8. Reference Commands
+## 9. Reference Commands
 
 ### Daily Development
 
 ```bash
-# Start InfraNodus stack
-docker compose -f docker-compose.infranodus.yml up -d
+# Test InfraNodus API
+curl -s -X POST "https://infranodus.p.rapidapi.com/api/1/graph/graphAndStatements" \
+  -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "your text here", "graphName": "test", "doNotSave": true}' | jq .
 
-# Stop InfraNodus stack
-docker compose -f docker-compose.infranodus.yml down
-
-# View logs
-docker compose -f docker-compose.infranodus.yml logs -f infranodus
-
-# Neo4j browser (dev only)
-open http://localhost:7474
-```
-
-### Management Commands
-
-```bash
-# Clear all graph data (development only!)
-docker exec pms-neo4j cypher-shell \
-  -u neo4j -p pms_infra_secure_2026 \
-  "MATCH (n) DETACH DELETE n"
-
-# Export graph data
-docker exec pms-neo4j cypher-shell \
-  -u neo4j -p pms_infra_secure_2026 \
-  "MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 100" \
-  --format plain > graph_export.txt
-
-# Check graph node count
-docker exec pms-neo4j cypher-shell \
-  -u neo4j -p pms_infra_secure_2026 \
-  "MATCH (n) RETURN count(n) AS node_count"
+# Analyze via PMS backend
+curl -s -X POST http://localhost:8000/api/kg/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"encounter_id": 1, "text": "clinical text here"}'
 ```
 
 ### Useful URLs
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| InfraNodus App | http://localhost:8080 | Self-hosted UI |
-| Neo4j Browser | http://localhost:7474 | Graph database admin |
+| InfraNodus Cloud API (RapidAPI) | https://rapidapi.com/infranodus-infranodus-default/api/infranodus | API marketplace |
+| InfraNodus API Docs | https://infranodus.com/api | Endpoint documentation |
+| InfraNodus MCP Server | https://github.com/infranodus/mcp-server-infranodus | MCP server repo |
+| InfraNodus MCP Setup | https://infranodus.com/mcp | MCP integration guide |
 | PMS Backend API Docs | http://localhost:8000/docs | Swagger UI with KG endpoints |
 | PMS Frontend | http://localhost:3000 | Graph visualization in patient view |
-| InfraNodus Cloud API | https://infranodus.com/api | API documentation |
-| InfraNodus MCP Server | https://infranodus.com/mcp | MCP integration guide |
 
 ## Next Steps
 
@@ -951,9 +890,9 @@ docker exec pms-neo4j cypher-shell \
 ## Resources
 
 - [InfraNodus Official Documentation](https://infranodus.com/docs)
-- [InfraNodus GitHub Repository](https://github.com/noduslabs/infranodus)
 - [InfraNodus API Reference](https://infranodus.com/api)
-- [InfraNodus MCP Server](https://github.com/infranodus/mcp-server-infranodus)
-- [Neo4j Documentation](https://neo4j.com/docs/)
+- [InfraNodus MCP Server (GitHub)](https://github.com/infranodus/mcp-server-infranodus)
+- [InfraNodus MCP Setup Guide](https://infranodus.com/mcp)
+- [InfraNodus on RapidAPI](https://rapidapi.com/infranodus-infranodus-default/api/infranodus)
 - [D3.js Force-Directed Graph](https://d3js.org/d3-force)
 - [InfraNodus Support Center](https://support.noduslabs.com/)

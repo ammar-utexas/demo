@@ -5,7 +5,7 @@
 This tutorial will take you from zero to building your first clinical text knowledge graph integration with the PMS. By the end, you will understand how text network analysis works, have a running local environment, and have built and tested a custom encounter documentation analyzer end-to-end.
 
 **Document ID:** PMS-EXP-INFRANODUS-002
-**Version:** 1.0
+**Version:** 2.0
 **Date:** 2026-03-06
 **Applies To:** PMS project (all platforms)
 **Prerequisite:** [InfraNodus Setup Guide](41-InfraNodus-PMS-Developer-Setup-Guide.md)
@@ -20,7 +20,7 @@ This tutorial will take you from zero to building your first clinical text knowl
 2. How InfraNodus transforms text into knowledge graphs using co-occurrence networks
 3. How Louvain community detection identifies topical clusters in clinical notes
 4. How structural gaps reveal missing connections in clinical reasoning
-5. How to submit clinical text to the InfraNodus API and interpret the response
+5. How to submit clinical text to the InfraNodus Cloud API and interpret the response
 6. How to build a patient encounter knowledge graph endpoint
 7. How to render an interactive force-directed graph in React
 8. How to detect and display documentation gaps with bridging questions
@@ -41,9 +41,9 @@ Imagine a patient with type 2 diabetes, chronic kidney disease, hypertension, an
 - **Clusters** are topical groups (e.g., the "diabetes management" cluster, the "mental health" cluster)
 - **Gaps** are missing connections between clusters that suggest unexplored clinical relationships
 
-Instead of reading 47 notes, the clinician sees a graph with 5 colored clusters, immediately spotting that the "depression" cluster and the "medication adherence" cluster have no connection — a gap that suggests this relationship has never been documented or addressed.
+Instead of reading 47 notes, the clinician sees a graph with 5 colored clusters, immediately spotting that the "depression" cluster and the "medication adherence" cluster have no connection -- a gap that suggests this relationship has never been documented or addressed.
 
-### 1.2 How InfraNodus Works — The Key Pieces
+### 1.2 How InfraNodus Works -- The Key Pieces
 
 ```mermaid
 flowchart LR
@@ -51,7 +51,7 @@ flowchart LR
         TEXT["Clinical encounter<br/>notes (de-identified)"]
     end
 
-    subgraph Transform["2. Text → Graph"]
+    subgraph Transform["2. Text to Graph"]
         TOK["Tokenize &<br/>Lemmatize"]
         COOC["Build Co-occurrence<br/>Network"]
         GRAPH["Knowledge<br/>Graph"]
@@ -81,13 +81,28 @@ flowchart LR
     style QUEST fill:#e74c3c,color:#fff
 ```
 
-**Stage 1 — Text to Graph**: InfraNodus tokenizes text, removes stop words, and builds a co-occurrence network. If "metformin" and "kidney function" appear within a 4-word window, an edge is created between them. The more often they co-occur, the stronger the edge.
+**Stage 1 -- Text to Graph**: InfraNodus tokenizes text, removes stop words, and builds a co-occurrence network. If "metformin" and "kidney function" appear within a 4-word window, an edge is created between them. The more often they co-occur, the stronger the edge.
 
-**Stage 2 — Community Detection**: The Louvain algorithm identifies clusters of densely connected concepts. In clinical text, these clusters naturally correspond to clinical domains: "cardiovascular management," "pain symptoms," "medication list."
+**Stage 2 -- Community Detection**: The Louvain algorithm identifies clusters of densely connected concepts. In clinical text, these clusters naturally correspond to clinical domains: "cardiovascular management," "pain symptoms," "medication list."
 
-**Stage 3 — Gap & Centrality Analysis**: Betweenness centrality identifies "bridge" concepts that connect multiple clusters (e.g., "fatigue" bridging diabetes and depression). Structural gaps are pairs of clusters with weak or no connections — these are the insights.
+**Stage 3 -- Gap & Centrality Analysis**: Betweenness centrality identifies "bridge" concepts that connect multiple clusters (e.g., "fatigue" bridging diabetes and depression). Structural gaps are pairs of clusters with weak or no connections -- these are the insights.
 
-### 1.3 How InfraNodus Fits with Other PMS Technologies
+### 1.3 Two Integration Paths
+
+| Feature | Cloud API (RapidAPI) | MCP Server |
+|---------|---------------------|------------|
+| Use case | PMS backend integration | Developer workflows (Claude Code) |
+| Endpoint | `infranodus.p.rapidapi.com` | `npx infranodus-mcp-server` or `mcp.infranodus.com` |
+| Authentication | RapidAPI key | InfraNodus API key / OAuth |
+| Data safety | `doNotSave=true` parameter | `doNotSave=true` parameter |
+| PHI handling | PHI De-ID Gateway required | Never submit PHI via MCP |
+| Output | Graph JSON (nodes, edges, clusters, gaps) | Same, plus AI-generated insights |
+| Actively maintained | Yes (InfraNodus cloud) | Yes (173 commits, 70+ stars) |
+| Pricing | Free tier (~70 requests), paid plans | Included with InfraNodus subscription |
+
+> **Note**: An open-source self-hosted option exists at [github.com/noduslabs/infranodus](https://github.com/noduslabs/infranodus) but was last updated in 2020 and is unsupported. We use the Cloud API for all PMS integration.
+
+### 1.4 How InfraNodus Fits with Other PMS Technologies
 
 | Technology | Experiment | Relationship to InfraNodus |
 |------------|-----------|----------------------------|
@@ -98,22 +113,21 @@ flowchart LR
 | **Kintsugi** | Exp 35 | Mental health voice biomarkers could be correlated with depression-cluster gaps in clinical graphs |
 | **ExcalidrawSkill** | Exp 40 | Knowledge graphs could be exported to Excalidraw for clinical presentation diagrams |
 
-### 1.4 Key Vocabulary
+### 1.5 Key Vocabulary
 
 | Term | Meaning |
 |------|---------|
 | **Co-occurrence network** | A graph where nodes are words and edges connect words that appear near each other in text |
 | **Topical cluster** | A group of densely connected nodes identified by community detection (Louvain algorithm) |
-| **Structural gap** | A weak or missing connection between two topical clusters — potential area for new insight |
-| **Betweenness centrality** | A measure of how often a node sits on the shortest path between other nodes — high centrality = bridge concept |
+| **Structural gap** | A weak or missing connection between two topical clusters -- potential area for new insight |
+| **Betweenness centrality** | A measure of how often a node sits on the shortest path between other nodes -- high centrality = bridge concept |
 | **Modularity** | A metric measuring how well a graph decomposes into distinct clusters (0 = random, 1 = perfect separation) |
 | **Force-directed layout** | A physics simulation that positions graph nodes so connected nodes attract and unconnected nodes repel |
-| **Graph RAG** | Using knowledge graph structure to augment LLM retrieval — InfraNodus provides graph context for AI reasoning |
+| **Graph RAG** | Using knowledge graph structure to augment LLM retrieval -- InfraNodus provides graph context for AI reasoning |
 | **PHI De-identification** | Removing protected health information (names, dates, MRNs) from text before processing |
 | **`doNotSave`** | InfraNodus API parameter that prevents server-side storage of submitted text |
-| **Neo4j** | Graph database used by self-hosted InfraNodus to store and query knowledge graphs |
 
-### 1.5 Our Architecture
+### 1.6 Our Architecture
 
 ```mermaid
 flowchart TB
@@ -130,10 +144,9 @@ flowchart TB
         PAT_API["/api/patients"]
     end
 
-    subgraph Graph["Graph Analysis Layer"]
-        IN_SH["InfraNodus<br/>Self-Hosted :8080"]
-        NEO["Neo4j<br/>:7687"]
-        IN_CLOUD["InfraNodus Cloud<br/>(Fallback Only)"]
+    subgraph Cloud["InfraNodus Cloud"]
+        IN_API["RapidAPI<br/>(doNotSave=true)"]
+        IN_MCP["MCP Server<br/>(Developer Workflow)"]
     end
 
     subgraph Data["Data Layer"]
@@ -146,24 +159,23 @@ flowchart TB
     KG_SVC -->|"Fetch encounters"| ENC_API
     ENC_API --> PG
     KG_SVC -->|"Strip PHI"| PHI
-    PHI -->|"Clean text"| IN_SH
-    PHI -.->|"Fallback<br/>doNotSave=true"| IN_CLOUD
-    IN_SH --> NEO
+    PHI -->|"De-identified text<br/>doNotSave=true"| IN_API
+    IN_API -->|"Graph JSON"| KG_SVC
     KG_SVC -->|"Store graph metadata"| PG
 
     style PHI fill:#e74c3c,color:#fff
-    style IN_SH fill:#4a9eff,color:#fff
-    style NEO fill:#008cc1,color:#fff
+    style IN_API fill:#4a9eff,color:#fff
+    style IN_MCP fill:#7c3aed,color:#fff
     style KG_ROUTE fill:#009688,color:#fff
     style PG fill:#336791,color:#fff
     style BROWSER fill:#0070f3,color:#fff
 ```
 
 Key design decisions:
-- **PHI never reaches InfraNodus** — the De-ID Gateway is mandatory, not optional
-- **Self-hosted is primary** — cloud API is fallback only, always with `doNotSave=true`
-- **Graph metadata in PostgreSQL** — graph structure persists in PG alongside patient data, not in Neo4j alone
-- **Same API for browser and Android** — both consume `/api/kg/*` endpoints
+- **PHI never reaches InfraNodus** -- the De-ID Gateway is mandatory, not optional
+- **Cloud API with `doNotSave=true`** -- text is processed but never stored on InfraNodus servers
+- **Graph metadata in PostgreSQL** -- graph structures persist in PG alongside patient data
+- **Same API for browser and Android** -- both consume `/api/kg/*` endpoints
 
 ---
 
@@ -186,15 +198,16 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 psql -h localhost -p 5432 -U pms_user -d pms_db -c "SELECT version();" 2>/dev/null | head -3
 # Expected: PostgreSQL 15.x or higher
 
-# 4. Neo4j is healthy
-docker exec pms-neo4j cypher-shell \
-  -u neo4j -p pms_infra_secure_2026 \
-  "RETURN 'Neo4j OK' AS status"
-# Expected: Neo4j OK
+# 4. InfraNodus API key is set
+echo $INFRANODUS_API_KEY | head -c 10
+# Expected: First 10 chars of your key
 
-# 5. InfraNodus is responding
-curl -s http://localhost:8080/health
-# Expected: {"status":"ok"} or similar
+# 5. InfraNodus Cloud API is responding
+curl -s -X POST "https://infranodus.p.rapidapi.com/api/1/graph/graphAndStatements" \
+  -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "test", "graphName": "health", "doNotSave": true}' | jq .status
+# Expected: some response (not 403)
 
 # 6. D3.js is installed
 cd pms-frontend && npm list d3 | grep d3
@@ -235,11 +248,11 @@ If this works, your environment is ready. Move to Part 3.
 
 ### 3.1 What We Are Building
 
-We'll build a **Clinical Encounter Knowledge Graph Analyzer** — a feature that takes a patient's encounter notes, generates a knowledge graph, identifies topical clusters and documentation gaps, and displays the result as an interactive graph with a gap analysis sidebar.
+We'll build a **Clinical Encounter Knowledge Graph Analyzer** -- a feature that takes a patient's encounter notes, generates a knowledge graph via the InfraNodus Cloud API, identifies topical clusters and documentation gaps, and displays the result as an interactive graph with a gap analysis sidebar.
 
 The workflow:
 1. User clicks "Analyze Documentation" on a patient's encounter list
-2. Backend fetches encounter notes, strips PHI, sends to InfraNodus
+2. Backend fetches encounter notes, strips PHI, sends to InfraNodus Cloud API
 3. InfraNodus returns graph structure with clusters and gaps
 4. Frontend renders the graph and gap panel
 
@@ -302,8 +315,11 @@ async def analyze_patient_documentation(
         graph_name=f"patient_{patient_id}_full",
     )
 
-    # Get gaps
-    gaps = await kg_service.get_gaps(f"patient_{patient_id}_full")
+    # Get gaps and advice
+    gaps = await kg_service.get_gaps_and_advice(
+        text=combined_text,
+        graph_name=f"patient_{patient_id}_full",
+    )
 
     return {
         "patient_id": patient_id,
@@ -350,8 +366,8 @@ The graph should reveal approximately 4 clusters:
 | 3 | Orange | fatigue, appetite, mood, weight | Symptom overlap |
 
 The structural gaps might be:
-- **Depression ↔ Diabetes**: Documented separately but not connected — has anyone addressed how depression affects glycemic control?
-- **Medication adherence ↔ Fatigue**: Fatigue mentioned in multiple clusters but not linked to medication side effects
+- **Depression <-> Diabetes**: Documented separately but not connected -- has anyone addressed how depression affects glycemic control?
+- **Medication adherence <-> Fatigue**: Fatigue mentioned in multiple clusters but not linked to medication side effects
 
 ### 3.6 Build the frontend integration
 
@@ -371,7 +387,7 @@ export default function KnowledgeGraphPage() {
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">
-        Clinical Knowledge Graph — Patient #{patientId}
+        Clinical Knowledge Graph -- Patient #{patientId}
       </h1>
       <p className="text-sm text-gray-500 mb-6">
         Text network analysis of all encounter documentation.
@@ -414,20 +430,20 @@ Navigate to `http://localhost:3000/patients/1/knowledge-graph` to see your graph
 ### 4.1 Strengths
 
 - **Unique insight mechanism**: No other tool in the PMS stack provides structural gap detection in clinical documentation. This is genuinely novel for clinical workflows.
-- **Self-hosted option**: AGPLv3 open-source version means zero PHI egress. Full control over data.
-- **MCP server**: Direct integration with Claude for developer-facing knowledge graph analysis. No custom code needed for LLM integration.
+- **Cloud API -- no infrastructure**: No graph database to maintain, no Docker containers to manage. API calls with `doNotSave=true` and results cached in PostgreSQL.
+- **MCP server**: Direct integration with Claude for developer-facing knowledge graph analysis. Actively maintained (70+ stars, 173 commits).
 - **Graph RAG**: Knowledge graph structure augments LLM reasoning quality, providing structured context that flat text search (RAG) misses.
-- **Low resource footprint**: ~512MB RAM for InfraNodus + ~1GB for Neo4j. Runs alongside existing PMS services.
-- **API flexibility**: REST API via RapidAPI with `doNotSave` parameter, MCP server, and n8n/Make.com connectors.
+- **API flexibility**: REST API via RapidAPI, MCP server, and n8n/Make.com connectors.
+- **AI-generated bridging questions**: The `graphAndAdvice` endpoint generates research questions for structural gaps -- directly actionable for clinicians.
 
 ### 4.2 Weaknesses
 
-- **Open-source feature gap**: The self-hosted version lacks some cloud features (advanced AI suggestions, some importers). Advanced gap analysis with AI-generated questions requires the cloud API.
+- **Cloud dependency**: All text analysis requires the InfraNodus cloud API. No viable self-hosted option (open-source repo is from 2020 and unsupported).
+- **PHI risk**: Clinical text is sent to a cloud API. Mitigated by PHI De-ID Gateway and `doNotSave=true`, but cloud processing of healthcare text inherently carries risk.
 - **Not purpose-built for medical NLP**: InfraNodus uses general NLP. It doesn't understand medical ontologies (SNOMED-CT, ICD-10) natively. Acronyms like "BID" or "PRN" are treated as regular words, not pharmaceutical instructions.
 - **Co-occurrence window limitations**: The fixed-window co-occurrence approach may miss clinical relationships that span paragraphs (e.g., a symptom mentioned in HPI and a medication mentioned in the plan).
-- **No temporal analysis**: The graph treats all text as simultaneous. It doesn't capture that symptom X appeared before medication Y was started. Encounter timestamps are lost in the graph.
-- **Limited self-hosted support**: Nodus Labs explicitly states they don't provide support for open-source installation.
-- **AGPLv3 license**: Requires derivative works to be open-sourced. If the PMS is proprietary, the InfraNodus integration module must be carefully architecturally isolated as a separate service to avoid license contamination.
+- **No temporal analysis**: The graph treats all text as simultaneous. It doesn't capture that symptom X appeared before medication Y was started.
+- **API rate limits**: Free tier allows ~70 requests. Production use requires a paid plan.
 
 ### 4.3 When to Use InfraNodus vs Alternatives
 
@@ -438,18 +454,17 @@ Navigate to `http://localhost:3000/patients/1/knowledge-graph` to see your graph
 | Automate multi-step clinical workflows | **LangGraph (Exp 26)** | InfraNodus discovers; LangGraph acts |
 | Extract structured data from clinical notes | **Gemma 3 / Qwen 3.5 (Exp 13/20)** | Better for NER and structured extraction |
 | Build medical knowledge ontologies | **Dedicated medical KG tools** | InfraNodus is general-purpose, not medical ontology-aware |
-| Real-time encounter graph during dictation | **InfraNodus + MedASR (Exp 07)** | Combine: MedASR transcribes → InfraNodus graphs |
+| Real-time encounter graph during dictation | **InfraNodus + MedASR (Exp 07)** | Combine: MedASR transcribes -> InfraNodus graphs |
 
 ### 4.4 HIPAA / Healthcare Considerations
 
 | Concern | Assessment | Mitigation |
 |---------|------------|------------|
-| **PHI in graph nodes** | Risk: patient names, dates in graph | PHI De-ID Gateway is mandatory before any graph operation |
-| **Data at rest in Neo4j** | Risk: graph structures stored on disk | Neo4j volume encryption. Graphs contain only de-identified concepts. |
-| **Cloud API fallback** | Risk: text sent to external server | `doNotSave=true` prevents storage. PHI stripped before transmission. |
-| **AGPLv3 license** | Risk: license contamination | InfraNodus runs as isolated Docker service. API boundary prevents contamination. |
+| **PHI in API calls** | Risk: clinical text sent to cloud | PHI De-ID Gateway is mandatory. `doNotSave=true` prevents storage. |
+| **Cloud data retention** | Risk: InfraNodus might store text | Verify `doNotSave` behavior. Review Nodus Labs data policy. |
 | **Audit trail** | Requirement: HIPAA access logging | All `/api/kg/*` calls logged with user ID, patient ID, timestamp, operation type |
 | **Access control** | Requirement: role-based access | Knowledge graph endpoints require authenticated clinician role |
+| **No BAA available** | Risk: HIPAA compliance gap | Document risk. Ensure PHI De-ID strips all identifiers. Consider enterprise tier with isolated server. |
 
 ---
 
@@ -469,7 +484,7 @@ Navigate to `http://localhost:3000/patients/1/knowledge-graph` to see your graph
 
 **Cause**: Modularity is too low. The text concepts are too interconnected for Louvain to separate.
 
-**Fix**: Use the `resolution` parameter in the Louvain algorithm (if exposed by API) to increase cluster granularity. Alternatively, analyze encounters separately and compare graphs.
+**Fix**: Try longer text inputs or analyze encounters separately and compare graphs.
 
 ### Issue 3: PHI appears in graph nodes
 
@@ -482,27 +497,18 @@ Navigate to `http://localhost:3000/patients/1/knowledge-graph` to see your graph
 ```bash
 python3 -c "
 from app.services.phi_deid import deidentify_text
-# Test with the problematic text
 result = deidentify_text('your problematic text here')
 print(result['deidentified_text'])
 "
 ```
 
-### Issue 4: Neo4j out of memory
+### Issue 4: API returns 429 (rate limited)
 
-**Symptom**: Neo4j container crashes with OOM error.
+**Symptom**: `429 Too Many Requests` after multiple analysis calls.
 
-**Cause**: Processing very large text (>50K words) or too many concurrent graph operations.
+**Cause**: Exceeded free tier (~70 requests) or calling too fast.
 
-**Fix**:
-```yaml
-# In docker-compose.infranodus.yml, add memory limits:
-neo4j:
-  environment:
-    - NEO4J_server_memory_heap_initial__size=512m
-    - NEO4J_server_memory_heap_max__size=1g
-    - NEO4J_server_memory_pagecache_size=256m
-```
+**Fix**: Implement caching in PostgreSQL -- store graph results and serve from cache for repeated analyses. Upgrade to paid tier for production use.
 
 ### Issue 5: D3.js graph overlaps all nodes
 
@@ -526,7 +532,7 @@ Build a specialized graph that only analyzes medication mentions and their co-oc
 
 **Hints**:
 1. Pre-filter encounter text to extract medication-related sentences
-2. Submit filtered text to InfraNodus
+2. Submit filtered text to InfraNodus Cloud API
 3. Clusters should correspond to therapeutic areas
 4. Gaps may reveal undocumented drug interactions
 
@@ -540,13 +546,13 @@ Build a specialized graph that only analyzes medication mentions and their co-oc
 Build a population-level analysis that scores documentation completeness for a cohort.
 
 **Hints**:
-1. Batch-analyze encounters for multiple patients
+1. Batch-analyze encounters for multiple patients (be mindful of API rate limits)
 2. Compute per-patient metrics: cluster count, gap density, average betweenness
 3. Score documentation quality as inverse of gap density
 4. Surface patients with high gap density for review
 
 **Steps outline**:
-- Create `batch_analyze()` in Knowledge Graph Service
+- Create `batch_analyze()` in Knowledge Graph Service with rate limiting
 - Build endpoint `GET /api/kg/quality/cohort`
 - Display as sortable table with quality scores
 
@@ -556,7 +562,7 @@ Connect InfraNodus to the live encounter editor so the graph updates as the clin
 
 **Hints**:
 1. Use WebSocket (Exp 37) for real-time text streaming
-2. Debounce InfraNodus API calls (every 5 seconds)
+2. Debounce InfraNodus API calls (every 10 seconds to respect rate limits)
 3. Animate graph transitions as new nodes/edges appear
 4. Highlight newly detected gaps in real time
 
@@ -576,7 +582,7 @@ pms-backend/
   app/
     services/
       phi_deid.py              # PHI de-identification gateway
-      knowledge_graph.py       # InfraNodus integration service
+      knowledge_graph.py       # InfraNodus Cloud API integration
     api/
       routes/
         knowledge_graph.py     # KG API endpoints
@@ -594,9 +600,6 @@ pms-frontend/
         [id]/
           knowledge-graph/
             page.tsx            # Knowledge graph page
-
-infranodus-app/                # Self-hosted InfraNodus (cloned from GitHub)
-docker-compose.infranodus.yml  # InfraNodus + Neo4j Docker services
 ```
 
 ### 7.2 Naming Conventions
@@ -607,27 +610,26 @@ docker-compose.infranodus.yml  # InfraNodus + Neo4j Docker services
 | API endpoints | `/api/kg/{resource}` | `/api/kg/analyze`, `/api/kg/{id}/gaps` |
 | React components | PascalCase in `knowledge-graph/` | `GraphVisualization.tsx` |
 | Python services | snake_case | `knowledge_graph.py` |
-| Environment vars | `INFRANODUS_` prefix | `INFRANODUS_INTERNAL_URL` |
-| Neo4j labels | PascalCase | `:ClinicalConcept`, `:EncounterGraph` |
+| Environment vars | `INFRANODUS_` prefix | `INFRANODUS_API_KEY` |
 
 ### 7.3 PR Checklist
 
-- [ ] PHI De-ID Gateway tested with new text patterns — no PHI leaks
-- [ ] `doNotSave=true` used for all cloud API calls
+- [ ] PHI De-ID Gateway tested with new text patterns -- no PHI leaks
+- [ ] `doNotSave=true` used for all Cloud API calls
 - [ ] HIPAA audit log entry added for new KG operations
 - [ ] Graph visualization tested with 1, 5, and 50 encounter inputs
-- [ ] Neo4j queries tested for performance with >100 nodes
 - [ ] D3.js component tested on Chrome, Firefox, Safari
-- [ ] Error handling for InfraNodus timeout (self-hosted and cloud)
+- [ ] Error handling for InfraNodus API timeout and rate limits
+- [ ] Graph results cached in PostgreSQL to reduce API calls
 - [ ] No PII/PHI in test fixtures committed to repo
 
 ### 7.4 Security Reminders
 
-1. **Never bypass the PHI De-ID Gateway** — all text must be de-identified before graph analysis, even for testing
-2. **Never expose Neo4j port 7687 externally** — keep it on internal Docker network only
-3. **Rotate InfraNodus cloud API key every 90 days** — store in Docker secrets or vault, not in code
-4. **Audit log every graph operation** — user ID + patient ID + timestamp + operation type
-5. **AGPLv3 isolation** — InfraNodus runs as a separate Docker service. Do not import InfraNodus code into PMS backend directly.
+1. **Never bypass the PHI De-ID Gateway** -- all text must be de-identified before API calls, even for testing
+2. **Always use `doNotSave=true`** -- never allow InfraNodus to persist clinical text
+3. **Rotate InfraNodus API key every 90 days** -- store in environment variables, not in code
+4. **Audit log every graph operation** -- user ID + patient ID + timestamp + operation type
+5. **Cache graph results** -- reduces API calls and avoids sending the same text repeatedly
 
 ---
 
@@ -636,13 +638,13 @@ docker-compose.infranodus.yml  # InfraNodus + Neo4j Docker services
 ### Key Commands
 
 ```bash
-# Start InfraNodus stack
-docker compose -f docker-compose.infranodus.yml up -d
+# Test Cloud API directly
+curl -s -X POST "https://infranodus.p.rapidapi.com/api/1/graph/graphAndStatements" \
+  -H "X-RapidAPI-Key: $INFRANODUS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "...", "graphName": "test", "doNotSave": true}'
 
-# Check Neo4j health
-docker exec pms-neo4j cypher-shell -u neo4j -p pms_infra_secure_2026 "RETURN 1"
-
-# Analyze text via API
+# Analyze text via PMS backend
 curl -X POST http://localhost:8000/api/kg/analyze \
   -H "Content-Type: application/json" \
   -d '{"encounter_id": 1, "text": "..."}'
@@ -652,10 +654,6 @@ curl http://localhost:8000/api/kg/{patient_id}
 
 # Get gaps
 curl http://localhost:8000/api/kg/{patient_id}/gaps
-
-# Clear Neo4j data (dev only)
-docker exec pms-neo4j cypher-shell -u neo4j -p pms_infra_secure_2026 \
-  "MATCH (n) DETACH DELETE n"
 ```
 
 ### Key Files
@@ -663,23 +661,22 @@ docker exec pms-neo4j cypher-shell -u neo4j -p pms_infra_secure_2026 \
 | File | Purpose |
 |------|---------|
 | `app/services/phi_deid.py` | PHI removal |
-| `app/services/knowledge_graph.py` | InfraNodus client |
+| `app/services/knowledge_graph.py` | InfraNodus Cloud API client |
 | `app/api/routes/knowledge_graph.py` | API endpoints |
 | `src/components/knowledge-graph/GraphVisualization.tsx` | D3.js graph |
 | `src/components/knowledge-graph/GapAnalysisPanel.tsx` | Gap sidebar |
-| `docker-compose.infranodus.yml` | Docker services |
 | `.env` | API keys and config |
 
 ### Key URLs
 
 | URL | Purpose |
 |-----|---------|
-| http://localhost:8080 | InfraNodus self-hosted UI |
-| http://localhost:7474 | Neo4j Browser (dev) |
-| http://localhost:8000/api/kg/analyze | Graph analysis endpoint |
-| http://localhost:3000/patients/1/knowledge-graph | Frontend graph view |
 | https://infranodus.com/api | Cloud API docs |
 | https://infranodus.com/mcp | MCP server docs |
+| https://rapidapi.com/infranodus-infranodus-default/api/infranodus | RapidAPI listing |
+| https://github.com/infranodus/mcp-server-infranodus | MCP server repo |
+| http://localhost:8000/api/kg/analyze | PMS graph analysis endpoint |
+| http://localhost:3000/patients/1/knowledge-graph | Frontend graph view |
 
 ### Starter Template
 

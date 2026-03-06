@@ -258,9 +258,9 @@ _No bug fixes documented yet._
 - [ExcalidrawSkill Developer Tutorial](experiments/40-ExcalidrawSkill-Developer-Tutorial.md) — Hands-on onboarding: build a complete prescription approval workflow diagram with fan-out evidence artifacts, section-by-section generation, and validated PNG output end-to-end
 
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
-- [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs with topical cluster detection, structural gap identification, and documentation completeness scoring via self-hosted InfraNodus + Neo4j
-- [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Self-hosted Docker deployment with Neo4j, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
-- [InfraNodus Developer Tutorial](experiments/41-InfraNodus-Developer-Tutorial.md) — Hands-on onboarding: build a clinical encounter knowledge graph analyzer with longitudinal patient documentation analysis, structural gap detection, and interactive graph visualization end-to-end
+- [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
+- [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
+- [InfraNodus Developer Tutorial](experiments/41-InfraNodus-Developer-Tutorial.md) — Hands-on onboarding: build a clinical encounter knowledge graph analyzer with Cloud API integration, longitudinal patient documentation analysis, structural gap detection, and interactive graph visualization end-to-end
 
 ---
 
