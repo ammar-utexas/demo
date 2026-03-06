@@ -67,7 +67,7 @@ _No bug fixes documented yet._
 
 ## Experiments & Tool Evaluations
 
-- **[Experiment Interconnection Roadmap](experiments/00-Experiment-Interconnection-Roadmap.md)** — Master navigation guide: dependency graph, execution tiers, parallel tracks, critical path analysis, and quick-start recommendations for all 40 experiments
+- **[Experiment Interconnection Roadmap](experiments/00-Experiment-Interconnection-Roadmap.md)** — Master navigation guide: dependency graph, execution tiers, parallel tracks, critical path analysis, and quick-start recommendations for all 41 experiments
 
 ### Tambo AI (Conversational Analytics)
 - [PRD: Tambo PMS Integration](experiments/00-PRD-Tambo-PMS-Integration.md) — Conversational analytics sidebar with generative UI components
@@ -256,6 +256,11 @@ _No bug fixes documented yet._
 - [PRD: ExcalidrawSkill PMS Integration](experiments/40-PRD-ExcalidrawSkill-PMS-Integration.md) — Claude Code skill for generating semantically structured, evidence-rich Excalidraw diagrams of clinical workflows, system architecture, and HIPAA data boundaries with a built-in Playwright render-and-validate loop
 - [ExcalidrawSkill Setup Guide](experiments/40-ExcalidrawSkill-PMS-Developer-Setup-Guide.md) — Plugin installation, Playwright renderer setup, MPS brand color configuration, `/api/diagrams` FastAPI endpoint, and `DiagramViewer` Next.js component integration
 - [ExcalidrawSkill Developer Tutorial](experiments/40-ExcalidrawSkill-Developer-Tutorial.md) — Hands-on onboarding: build a complete prescription approval workflow diagram with fan-out evidence artifacts, section-by-section generation, and validated PNG output end-to-end
+
+### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
+- [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs with topical cluster detection, structural gap identification, and documentation completeness scoring via self-hosted InfraNodus + Neo4j
+- [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Self-hosted Docker deployment with Neo4j, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
+- [InfraNodus Developer Tutorial](experiments/41-InfraNodus-Developer-Tutorial.md) — Hands-on onboarding: build a clinical encounter knowledge graph analyzer with longitudinal patient documentation analysis, structural gap detection, and interactive graph visualization end-to-end
 
 ---
 
