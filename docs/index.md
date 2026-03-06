@@ -257,6 +257,11 @@ _No bug fixes documented yet._
 - [ExcalidrawSkill Setup Guide](experiments/40-ExcalidrawSkill-PMS-Developer-Setup-Guide.md) — Plugin installation, Playwright renderer setup, MPS brand color configuration, `/api/diagrams` FastAPI endpoint, and `DiagramViewer` Next.js component integration
 - [ExcalidrawSkill Developer Tutorial](experiments/40-ExcalidrawSkill-Developer-Tutorial.md) — Hands-on onboarding: build a complete prescription approval workflow diagram with fan-out evidence artifacts, section-by-section generation, and validated PNG output end-to-end
 
+### GPT-5.4 Clinical Benchmark (Cross-Vendor AI Model Cost-Benefit Analysis)
+- [PRD: GPT-5.4 Clinical Benchmark PMS Integration](experiments/42-PRD-GPT54ClinicalBenchmark-PMS-Integration.md) — Head-to-head evaluation framework benchmarking GPT-5.4 ($2.50/$15 per MTok) against Claude Opus 4.6 ($5/$25 per MTok) on encounter summarization, medication interaction analysis, and prior authorization decision support with LLM-as-Judge quality scoring and cost projections
+- [GPT-5.4 Clinical Benchmark Setup Guide](experiments/42-GPT54ClinicalBenchmark-PMS-Developer-Setup-Guide.md) — Dual-provider SDK configuration, Benchmark Runner service, Quality Evaluator, Cost Analysis Engine, and Next.js comparison dashboard
+- [GPT-5.4 Clinical Benchmark Developer Tutorial](experiments/42-GPT54ClinicalBenchmark-Developer-Tutorial.md) — Hands-on onboarding: run a 15-task clinical benchmark suite, evaluate quality with LLM-as-Judge, generate cost-benefit reports, and produce Model Router routing recommendations end-to-end
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
