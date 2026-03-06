@@ -1,9 +1,9 @@
 # Requirements Traceability Matrix (RTM)
 
 **Document ID:** PMS-RTM-001
-**Version:** 1.7
-**Date:** 2026-02-21
-**Last Updated:** 2026-02-21
+**Version:** 1.8
+**Date:** 2026-03-06
+**Last Updated:** 2026-03-06
 
 ---
 
@@ -24,6 +24,7 @@
 | SYS-REQ-0011 (Prompts) | SUB-PM-0003, SUB-PM-0004, SUB-PM-0006, SUB-PM-0007 | — | TST-PM-0003, TST-PM-0004, TST-PM-0006, TST-PM-0007, TST-SYS-0011 | Not Started |
 | SYS-REQ-0012 (Derm CDS) | SUB-PR-0013, SUB-PR-0014, SUB-PR-0015, SUB-PR-0016, SUB-RA-0008 | `routers/lesions.py`, `services/lesion_service.py`, `services/risk_scorer.py` (CDS) | TST-PR-0013, TST-PR-0014, TST-PR-0015, TST-PR-0016, TST-RA-0008, TST-SYS-0012 | Not Started |
 | SYS-REQ-0013 (DermaCheck Orchestration) | SUB-PR-0017, SUB-CW-0009 | `routers/lesions.py`, `services/derm-cds/orchestrator.py`, `services/derm-cds/classifier.py`, `services/derm-cds/similarity.py`, `services/derm-cds/risk_scorer.py` | TST-PR-0017, TST-CW-0009, TST-SYS-0013 | Not Started |
+| SYS-REQ-0014 (Voice Biomarker) | SUB-CW-0010, SUB-CW-0011 | `routers/screening.py`, `integrations/kintsugi/engine.py`, `integrations/kintsugi/features.py`, `services/mood_tracking.py`, `models/screening.py` | TST-CW-0010, TST-CW-0011, TST-SYS-0014 | Not Started |
 
 ---
 
@@ -82,6 +83,10 @@
 | TST-CW-0009-BE | Encounter-lesion linkage: GET /api/encounters/{id}/lesions with encounter-patient validation | pms-backend | — (not implemented) | SUB-CW-0009, SYS-REQ-0013 | — | — |
 | TST-CW-0009-WEB | DermaCheck workflow at /encounters/[id]/dermatology with capture widget, results panel, and degradation banners | pms-frontend | — (not implemented) | SUB-CW-0009, SYS-REQ-0013 | — | — |
 | TST-CW-0009-AND | Android DermaCheck encounter workflow: camera capture, upload, results review, save/discard, degradation handling | pms-android | — (not implemented) | SUB-CW-0009, SYS-REQ-0013 | — | — |
+| TST-CW-0010-BE | Voice biomarker screening API: audio upload, feature extraction, model inference, encounter status validation (422), unique constraint (409), audit with subject_hash | pms-backend | — (not implemented) | SUB-CW-0010, SYS-REQ-0014 | — | — |
+| TST-CW-0010-WEB | Voice Biomarker Screening component: mic recording, consent dialog, telehealth contention guard, navigation guard, results display with disclaimer | pms-frontend | — (not implemented) | SUB-CW-0010, SYS-REQ-0014 | — | — |
+| TST-CW-0011-BE | Longitudinal mood tracking API: trend calculation, score jump alert, minimum 2 data points requirement | pms-backend | — (not implemented) | SUB-CW-0011, SYS-REQ-0014 | — | — |
+| TST-CW-0011-WEB | Mood Timeline component: bar chart, trend indicators, screening count, alert badge for significant change | pms-frontend | — (not implemented) | SUB-CW-0011, SYS-REQ-0014 | — | — |
 | TST-MM-0001 | Interaction check endpoint returns 200 with empty array for unknown patient | pms-backend | `test_check_interactions_empty` | SUB-MM-0001, SYS-REQ-0006 | PASS | RUN-2026-02-16-003 |
 | TST-MM-0002 | Interaction severity classification (contraindicated, major, moderate, minor) | pms-backend | — (not implemented) | SUB-MM-0002, SYS-REQ-0006 | — | — |
 | TST-MM-0003 | Prescription data PHI encryption | pms-backend | — (not implemented) | SUB-MM-0003, SYS-REQ-0002 | — | — |
@@ -135,6 +140,7 @@
 | TST-SYS-0011 | End-to-end prompt management: create, version, compare | SYS-REQ-0011 | — | — |
 | TST-SYS-0012 | End-to-end dermatology CDS: upload lesion, classify, similarity search, risk score | SYS-REQ-0012 | — | — |
 | TST-SYS-0013 | End-to-end DermaCheck pipeline orchestration: upload image, verify parallel fan-out (classify → narrative + similarity + risk), verify degraded response handling, verify atomic DermaCheckResult | SYS-REQ-0013 | — | — |
+| TST-SYS-0014 | End-to-end voice biomarker screening: upload audio, verify acoustic feature extraction, verify depression/anxiety scores returned, verify longitudinal mood trend across encounters, verify audit trail with hashed patient_id | SYS-REQ-0014 | — | — |
 
 ---
 
@@ -175,7 +181,7 @@ Compact view of platform requirement status per domain requirement. Domain statu
 | SUB-PR-0016 | Not Started | Not Started | Not Started | — | — |
 | SUB-PR-0017 | Not Started | Not Started | — | — | Not Started |
 
-### SUB-CW — Clinical Workflow (17 platform reqs)
+### SUB-CW — Clinical Workflow (21 platform reqs)
 
 | Domain Req | Domain Status | BE | WEB | AND | AI |
 |---|---|---|---|---|---|
@@ -188,6 +194,8 @@ Compact view of platform requirement status per domain requirement. Domain statu
 | SUB-CW-0007 | Not Started | Not Started | — | — | — |
 | SUB-CW-0008 | Placeholder | Placeholder | — | — | — |
 | SUB-CW-0009 | Not Started | Not Started | Not Started | Not Started | — |
+| SUB-CW-0010 | Not Started | Not Started | Not Started | — | — |
+| SUB-CW-0011 | Not Started | Not Started | Not Started | — | — |
 
 ### SUB-MM — Medication Management (13 platform reqs)
 
@@ -232,11 +240,11 @@ Compact view of platform requirement status per domain requirement. Domain statu
 
 | Platform | Total Reqs | Verified | Implemented | Partial | Scaffolded | Placeholder | Not Started |
 |---|---|---|---|---|---|---|---|
-| BE | 49 | 3 | 2 | 0 | 0 | 16 | 28 |
-| WEB | 25 | 0 | 0 | 0 | 5 | 0 | 20 |
+| BE | 51 | 3 | 2 | 0 | 0 | 16 | 30 |
+| WEB | 27 | 0 | 0 | 0 | 5 | 0 | 22 |
 | AND | 19 | 0 | 0 | 0 | 4 | 0 | 15 |
 | AI | 7 | 0 | 0 | 0 | 0 | 0 | 7 |
-| **Total** | **100** | **3** | **2** | **0** | **9** | **16** | **70** |
+| **Total** | **104** | **3** | **2** | **0** | **9** | **16** | **74** |
 
 ### Test ID Migration Note
 
@@ -262,12 +270,14 @@ Existing test IDs are preserved as-is in the backward traceability section. The 
 | Subsystem | Domain Reqs | Platform Reqs | With Tests | Passing | Failing | No Tests | Domain Coverage |
 |---|---|---|---|---|---|---|---|
 | Patient Records (PR) | 17 | 38 | 6 | 6 | 0 | 11 | 35.3% |
-| Clinical Workflow (CW) | 9 | 17 | 1 | 1 | 0 | 8 | 11.1% |
+| Clinical Workflow (CW) | 11 | 21 | 1 | 1 | 0 | 10 | 9.1% |
 | Medication Mgmt (MM) | 9 | 13 | 2 | 2 | 0 | 7 | 22.2% |
 | Reporting (RA) | 8 | 19 | 0 | 0 | 0 | 8 | 0.0% |
 | Prompt Mgmt (PM) | 7 | 13 | 0 | 0 | 0 | 7 | 0.0% |
-| System (SYS) | 13 | — | 1 | 1 | 0 | 12 | 7.7% |
-| **TOTAL** | **63** | **100** | **10** | **10** | **0** | **53** | **15.9%** |
+| System (SYS) | 14 | — | 1 | 1 | 0 | 13 | 7.1% |
+| **TOTAL** | **66** | **104** | **10** | **10** | **0** | **56** | **15.2%** |
+
+> **Note on v1.8 updates (Voice Biomarker Screening — SYS-REQ-0014):** Added SYS-REQ-0014 (Voice Biomarker Mental Health Screening) to forward traceability with 2 subsystem requirements (SUB-CW-0010, SUB-CW-0011). Added 4 backward traceability test stubs: TST-CW-0010-BE/WEB, TST-CW-0011-BE/WEB, plus TST-SYS-0014 system test. Platform Traceability Summary updated: SUB-CW expanded from 17→21 platform reqs (BE=9→11, WEB=4→6). Coverage Summary by Platform updated: BE 49→51, WEB 25→27, Total 100→104. Domain req totals: CW 9→11, SYS 13→14, overall 63→66. Overall domain coverage: 15.9%→15.2% (increased denominator from new requirements).
 
 > **Note on v1.7 updates (DermaCheck Orchestration — SYS-REQ-0013):** Added SYS-REQ-0013 (DermaCheck Workflow Orchestration) to forward traceability with 2 subsystem requirements (SUB-PR-0017, SUB-CW-0009). Added 5 backward traceability test stubs: TST-PR-0017-BE/AI, TST-CW-0009-BE/WEB/AND, plus TST-SYS-0013 system test. Platform Traceability Summary updated: SUB-PR expanded from 36→38 platform reqs (BE=15→16, AI=5→6), SUB-CW expanded from 14→17 platform reqs (BE=8→9, WEB=3→4, AND=3→4). Coverage Summary by Platform updated: BE 47→49, WEB 24→25, AND 18→19, AI 6→7, Total 95→100. Domain req totals: PR 16→17, CW 8→9, SYS 12→13, overall 60→63. Overall domain coverage: 16.7%→15.9% (increased denominator from new requirements).
 
