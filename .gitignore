@@ -13,3 +13,6 @@
 generation-config.jsonl
 tasks.md
 .mcp.json
+
+# Experiment 43: CMS Prior Auth Dataset (large data files)
+experiments/43-cms-prior-auth/data/
