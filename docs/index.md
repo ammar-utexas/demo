@@ -275,6 +275,11 @@ _No bug fixes documented yet._
 ### Payer Policy Download (Anti-VEGF PA Rule Library)
 - [PRD: Payer Policy Download PMS Integration](experiments/44-PRD-PayerPolicyDownload-PMS-Integration.md) — Automated download pipeline for anti-VEGF prior authorization policy documents from 6 major payers (CMS Medicare, UHC, Aetna, BCBSTX, Humana, Cigna) with structured rule extraction, SHA-256 integrity verification, and manifest tracking
 
+### CMS Coverage API (Real-Time Medicare Coverage Determination)
+- [PRD: CMS Coverage API PMS Integration](experiments/45-PRD-CMSCoverageAPI-PMS-Integration.md) — Real-time LCD/NCD lookup via CMS Coverage API v1.5 for automated Medicare coverage determination, replacing web scraping with structured JSON responses, PostgreSQL caching, and daily change detection
+- [CMS Coverage API Setup Guide](experiments/45-CMSCoverageAPI-PMS-Developer-Setup-Guide.md) — API client with automatic license token management, FastAPI endpoints, PostgreSQL cache schema, and Next.js coverage lookup component
+- [CMS Coverage API Developer Tutorial](experiments/45-CMSCoverageAPI-Developer-Tutorial.md) — Hands-on onboarding: build a coverage check for intravitreal injections, query LCD ICD-10 codes, detect policy changes, and integrate with encounter workflows end-to-end
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
