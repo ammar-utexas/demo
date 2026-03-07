@@ -305,6 +305,11 @@ _No bug fixes documented yet._
 - [OWASP LLM Top 10 Setup Guide](experiments/50-OWASPLLMTop10-PMS-Developer-Setup-Guide.md) — DeepTeam installation, PMS test harness configuration, automated vulnerability scanning, and security assessment dashboard
 - [OWASP LLM Top 10 Developer Tutorial](experiments/50-OWASPLLMTop10-Developer-Tutorial.md) — Hands-on red teaming: build a healthcare prompt injection scanner, run DeepTeam adversarial tests, and verify security controls for clinical AI endpoints
 
+### Amazon Connect Health (Cloud Contact Center + Agentic Clinical AI)
+- [PRD: Amazon Connect Health PMS Integration](experiments/51-PRD-AmazonConnectHealth-PMS-Integration.md) — AWS-managed healthcare contact center with five agentic AI capabilities: patient verification, appointment scheduling, pre-visit insights, ambient clinical documentation (22+ specialties), and automated ICD-10/CPT medical coding at $99/user/month
+- [Amazon Connect Health Setup Guide](experiments/51-AmazonConnectHealth-PMS-Developer-Setup-Guide.md) — Amazon Connect instance provisioning, KMS encryption, Patient Verification and Ambient Documentation agent configuration, Lambda contact flow integration, and FastAPI/Next.js endpoints
+- [Amazon Connect Health Developer Tutorial](experiments/51-AmazonConnectHealth-Developer-Tutorial.md) — Hands-on onboarding: simulate patient call verification, capture ambient ophthalmology encounter documentation, review auto-generated SOAP notes with ICD-10/CPT codes, and monitor call center metrics end-to-end
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
