@@ -300,6 +300,11 @@ _No bug fixes documented yet._
 - [NextGen FHIR API Setup Guide](experiments/49-NextGenFHIRAPI-PMS-Developer-Setup-Guide.md) — NextGen Developer Program registration, SMART on FHIR authentication, NextGen FHIR Client, Referral Import Service, PostgreSQL schema for external records, and FastAPI endpoints
 - [NextGen FHIR API Developer Tutorial](experiments/49-NextGenFHIRAPI-Developer-Tutorial.md) — Hands-on onboarding: import a complete referral patient record (conditions, medications, allergies, visual acuity) from a simulated NextGen ophthalmology practice, display clinical summary, and understand reconciliation workflow end-to-end
 
+### OWASP LLM Top 10 (AI Security Assessment & Red Teaming)
+- [PRD: OWASP LLM Top 10 PMS Security Assessment](experiments/50-PRD-OWASPLLMTop10-PMS-Integration.md) — Comprehensive security assessment framework mapping all 10 OWASP LLM vulnerabilities to PMS AI components with 48 test cases and DeepTeam red teaming integration
+- [OWASP LLM Top 10 Setup Guide](experiments/50-OWASPLLMTop10-PMS-Developer-Setup-Guide.md) — DeepTeam installation, PMS test harness configuration, automated vulnerability scanning, and security assessment dashboard
+- [OWASP LLM Top 10 Developer Tutorial](experiments/50-OWASPLLMTop10-Developer-Tutorial.md) — Hands-on red teaming: build a healthcare prompt injection scanner, run DeepTeam adversarial tests, and verify security controls for clinical AI endpoints
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
