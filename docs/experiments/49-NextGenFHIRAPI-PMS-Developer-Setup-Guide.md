@@ -102,6 +102,20 @@ psql -h localhost -p 5432 -U pms -c "SELECT 1;"
 
 ## 3. Part A: Register with NextGen Developer Program
 
+### Test Environment Access Summary
+
+Before diving in, here's what's available at each stage:
+
+| Environment | Access | Cost | What You Get | Customer Needed? |
+|-------------|--------|------|-------------|-----------------|
+| **Local HAPI FHIR** | Self-hosted Docker | Free | Simulated FHIR R4 server with synthetic data | No |
+| **NextGen Sandbox** | Developer Program registration | Free | Synthetic patient data, full FHIR R4 API, same endpoints as production | No |
+| **NextGen Patient Access API (read)** | Developer Program + app approval | Free | USCDI v1 read routes on real production data | **Yes** — referring practice must authorize your SMART app |
+| **NextGen Enterprise APIs (800+ routes)** | Contract with NextGen | May have fees | Full clinical/administrative API access | **Yes** — requires NextGen contract |
+| **Write access (send summaries back)** | Enterprise API access | May have fees | Push encounter data to referring provider | **Yes** — requires Enterprise API contract |
+
+**For development and testing, start with the NextGen Sandbox (free) + local HAPI FHIR (free).** No customer or referring practice access is needed until you are ready to test with real patient data in production. At that point, you would ask a friendly referring practice (one of TRA's existing referral sources running NextGen) to authorize your SMART app on their system.
+
 ### Step 1: Create Developer Account
 
 1. Navigate to [https://www.nextgen.com/developer-program](https://www.nextgen.com/developer-program)
