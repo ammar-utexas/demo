@@ -1,0 +1,179 @@
+# Payer Policy Download Configuration
+# Anti-VEGF Prior Authorization Rule Library for Texas Retina Associates
+
+# Target drug/procedure codes to search for
+search_terms:
+  drugs:
+    - name: "aflibercept"
+      brand: "Eylea"
+      hcpcs: "J0178"
+    - name: "aflibercept 8mg"
+      brand: "Eylea HD"
+      hcpcs: "J0179"
+    - name: "bevacizumab"
+      brand: "Avastin"
+      hcpcs: "J9035"
+    - name: "ranibizumab"
+      brand: "Lucentis"
+      hcpcs: "J2778"
+    - name: "faricimab"
+      brand: "Vabysmo"
+      hcpcs: "J3490"
+    - name: "pegcetacoplan"
+      brand: "Syfovre"
+      hcpcs: "J1442"
+    - name: "avacincaptad pegol"
+      brand: "Izervay"
+      hcpcs: "J0ITZ"
+  procedures:
+    - code: "67028"
+      name: "Intravitreal injection"
+  diagnoses:
+    - group: "wet_amd"
+      icd10_prefix: "H35.31"
+    - group: "diabetic_macular_edema"
+      icd10_prefix: "H35.81"
+    - group: "retinal_vein_occlusion"
+      icd10_prefix: "H34"
+    - group: "geographic_atrophy"
+      icd10_prefix: "H35.31"
+
+# Payer configurations
+payers:
+  cms_medicare:
+    name: "CMS Medicare Traditional"
+    type: "FFS"
+    jurisdiction: "Novitas Solutions (Jurisdiction H — Texas)"
+    sources:
+      - type: "coverage_database"
+        url: "https://www.cms.gov/medicare-coverage-database/search.aspx"
+        description: "Medicare Coverage Database — search LCDs and NCDs"
+      - type: "lcd"
+        url: "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33346"
+        description: "LCD L33346 — Intravitreal Injections (Novitas)"
+      - type: "asp_pricing"
+        url: "https://www.cms.gov/medicare/payment/part-b-drugs/average-sales-price"
+        description: "Part B Drug ASP Pricing Files"
+    search_keywords:
+      - "intravitreal injection"
+      - "anti-VEGF"
+      - "aflibercept"
+      - "bevacizumab"
+      - "ophthalmology"
+
+  uhc:
+    name: "UnitedHealthcare Medicare Advantage"
+    type: "Medicare Advantage"
+    sources:
+      - type: "medical_policy"
+        url: "https://www.uhcprovider.com/en/policies-protocols/commercial-policies.html"
+        description: "Medical policies — search for intravitreal/anti-VEGF"
+      - type: "prior_auth"
+        url: "https://www.uhcprovider.com/en/prior-auth-advance-notification.html"
+        description: "Prior Authorization Requirements List"
+      - type: "formulary"
+        url: "https://www.uhc.com/member/pharmacy"
+        description: "Drug Formulary Search"
+      - type: "ma_coverage"
+        url: "https://www.uhcprovider.com/en/health-plans-by-state/texas.html"
+        description: "Texas Medicare Advantage Coverage Summary"
+    search_keywords:
+      - "intravitreal injection"
+      - "aflibercept"
+      - "bevacizumab"
+      - "anti-VEGF"
+      - "67028"
+
+  aetna:
+    name: "Aetna Medicare Advantage"
+    type: "Medicare Advantage"
+    sources:
+      - type: "cpb"
+        url: "https://www.aetna.com/health-care-professionals/clinical-policy-bulletins.html"
+        description: "Clinical Policy Bulletins — search anti-VEGF, intravitreal"
+      - type: "precertification"
+        url: "https://www.aetna.com/health-care-professionals/precertification.html"
+        description: "Precertification / Prior Auth List"
+      - type: "formulary"
+        url: "https://www.aetna.com/individuals-families/find-a-medication.html"
+        description: "Formulary Search"
+    search_keywords:
+      - "anti-VEGF"
+      - "intravitreal injection"
+      - "aflibercept"
+      - "VEGF inhibitors"
+      - "ophthalmology"
+
+  bcbstx:
+    name: "Blue Cross Blue Shield of Texas"
+    type: "Commercial + Medicare Advantage"
+    sources:
+      - type: "medical_policy"
+        url: "https://www.bcbstx.com/provider/clinical/medical-policies"
+        description: "Medical Policies — Ophthalmology"
+      - type: "prior_auth"
+        url: "https://www.bcbstx.com/provider/prior-authorization"
+        description: "Prior Authorization Requirements"
+      - type: "availity"
+        url: "https://www.availity.com"
+        description: "Availity Portal (PA submission for BCBS)"
+    search_keywords:
+      - "intravitreal injection"
+      - "anti-VEGF"
+      - "67028"
+      - "ophthalmology"
+
+  humana:
+    name: "Humana Medicare Advantage"
+    type: "Medicare Advantage"
+    sources:
+      - type: "medical_coverage"
+        url: "https://www.humana.com/provider/medical-resources/clinical"
+        description: "Medical Coverage Policies"
+      - type: "prior_auth"
+        url: "https://www.humana.com/provider/prior-authorization"
+        description: "Prior Authorization Requirements"
+      - type: "formulary"
+        url: "https://www.humana.com/member/pharmacy"
+        description: "Drug Formulary"
+    search_keywords:
+      - "intravitreal injection"
+      - "anti-VEGF"
+      - "aflibercept"
+      - "67028"
+
+  cigna:
+    name: "Cigna Medicare Advantage"
+    type: "Medicare Advantage"
+    sources:
+      - type: "coverage_policy"
+        url: "https://www.cigna.com/health-care-providers/coverage-and-claims/coverage-policies"
+        description: "Coverage Policies — Ophthalmology"
+      - type: "prior_auth"
+        url: "https://www.cigna.com/health-care-providers/resources/prior-authorization"
+        description: "Prior Auth Requirements"
+      - type: "formulary"
+        url: "https://www.cigna.com/medicare/part-d/drug-list"
+        description: "Medicare Part D Drug List"
+      - type: "evicore"
+        url: "https://www.evicore.com/resources/healthplan/cigna"
+        description: "EviCore Clinical Guidelines (Cigna delegates specialty PA)"
+    search_keywords:
+      - "intravitreal"
+      - "anti-VEGF"
+      - "ophthalmology"
+      - "67028"
+
+# Output configuration
+output:
+  base_dir: "data"
+  manifest_file: "data/manifest.json"
+  rules_file: "rules/payer_rules.json"
+
+# Download settings
+settings:
+  user_agent: "MarginLogic-PolicyDownloader/1.0 (Research; Texas Retina Associates)"
+  request_delay_seconds: 2
+  max_retries: 3
+  timeout_seconds: 30
+  verify_ssl: true

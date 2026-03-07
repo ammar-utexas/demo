@@ -272,6 +272,9 @@ _No bug fixes documented yet._
 - [CMS Prior Auth Dataset Setup Guide](experiments/43-CMSPriorAuthDataset-PMS-Developer-Setup-Guide.md) — HIPAA hardening the Jetson Thor (LUKS encryption, UFW firewall, auditd logging, SSH hardening), ML stack installation with GPU-accelerated XGBoost, PostgreSQL feature store, MLflow experiment tracking, and CMS data download/build pipeline
 - [CMS Prior Auth Dataset Developer Tutorial](experiments/43-CMSPriorAuthDataset-Developer-Tutorial.md) — End-to-end PA prediction pipeline on Jetson Thor: data exploration, XGBoost baseline training (GPU vs CPU benchmark), Optuna hyperparameter tuning, SHAP explanations, FastAPI risk scoring API, Streamlit dashboard, and transition guide from CMS synthetic data to real TRA clinical data
 
+### Payer Policy Download (Anti-VEGF PA Rule Library)
+- [PRD: Payer Policy Download PMS Integration](experiments/44-PRD-PayerPolicyDownload-PMS-Integration.md) — Automated download pipeline for anti-VEGF prior authorization policy documents from 6 major payers (CMS Medicare, UHC, Aetna, BCBSTX, Humana, Cigna) with structured rule extraction, SHA-256 integrity verification, and manifest tracking
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration

@@ -16,3 +16,7 @@ tasks.md
 
 # Experiment 43: CMS Prior Auth Dataset (large data files)
 experiments/43-cms-prior-auth/data/
+
+# Experiment 44: Payer Policy Downloads (downloaded PDFs and HTML)
+experiments/44-payer-policy-download/data/
+experiments/44-payer-policy-download/rules/
