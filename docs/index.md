@@ -290,6 +290,11 @@ _No bug fixes documented yet._
 - [Availity API Setup Guide](experiments/47-AvailityAPI-PMS-Developer-Setup-Guide.md) — Developer portal registration, Demo plan subscription, OAuth 2.0 client with 5-minute token refresh, FastAPI endpoints, PostgreSQL audit schema, and multi-payer eligibility panel
 - [Availity API Developer Tutorial](experiments/47-AvailityAPI-Developer-Tutorial.md) — Hands-on onboarding: build a multi-payer batch eligibility checker, submit a PA to any connected payer, query claim status, and integrate with the PA Decision Engine end-to-end
 
+### FHIR Prior Authorization APIs (Da Vinci CRD/DTR/PAS — CMS-0057-F Compliance)
+- [PRD: FHIR Prior Auth PMS Integration](experiments/48-PRD-FHIRPriorAuth-PMS-Integration.md) — Direct payer-to-provider FHIR PA workflow using Da Vinci PAS (Claim/$submit), CRD (coverage requirements discovery), and DTR (auto-documentation) replacing X12 278 transactions, with dual-path routing (FHIR primary, Availity X12 fallback) for CMS-0057-F compliance by January 2027
+- [FHIR Prior Auth Setup Guide](experiments/48-FHIRPriorAuth-PMS-Developer-Setup-Guide.md) — HAPI FHIR test server deployment, fhir.resources Pydantic models, PAS Bundle Builder, SMART on FHIR auth, PA Router (FHIR vs X12), and FastAPI endpoints
+- [FHIR Prior Auth Developer Tutorial](experiments/48-FHIRPriorAuth-Developer-Tutorial.md) — Hands-on onboarding: build an Eylea intravitreal injection PA submission with FHIR Claim, Coverage, and Condition resources, submit via Claim/$submit, process ClaimResponse, and understand the CRD → DTR → PAS workflow end-to-end
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
