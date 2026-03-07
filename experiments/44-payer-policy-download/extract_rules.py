@@ -336,6 +336,138 @@ def print_summary(rules: list[dict]):
     print()
 
 
+def generate_markdown(rules: list[dict], md_path: Path):
+    """Generate a markdown version of the rules file."""
+    lines = [
+        "# Anti-VEGF Prior Authorization Rules",
+        "",
+        f"*Auto-generated from `payer_rules.json` — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}*",
+        "",
+        f"**{len(rules)} rules** extracted from downloaded payer policy documents.",
+        "",
+    ]
+
+    # --- Summary table ---
+    payers = {}
+    for r in rules:
+        pid = r["payer_id"]
+        if pid not in payers:
+            payers[pid] = {"name": r["payer_name"], "rules": 0, "pa": 0, "step": 0}
+        payers[pid]["rules"] += 1
+        if r.get("pa_required"):
+            payers[pid]["pa"] += 1
+        if r.get("step_therapy_required"):
+            payers[pid]["step"] += 1
+
+    lines += [
+        "## Summary",
+        "",
+        "| Payer | Rules | PA Required | Step Therapy |",
+        "|-------|------:|------------:|-------------:|",
+    ]
+    for pid, info in sorted(payers.items()):
+        lines.append(f"| {info['name']} | {info['rules']} | {info['pa']} | {info['step']} |")
+
+    # --- Drug coverage table ---
+    drugs = {}
+    for r in rules:
+        dc = r["drug_code"]
+        if dc not in drugs:
+            drugs[dc] = {"name": r["drug_name"], "payers": set(), "pa_count": 0, "total": 0}
+        drugs[dc]["payers"].add(r["payer_id"])
+        drugs[dc]["total"] += 1
+        if r.get("pa_required"):
+            drugs[dc]["pa_count"] += 1
+
+    lines += [
+        "",
+        "## Drug Coverage",
+        "",
+        "| HCPCS | Drug | Payers | Rules | PA Required |",
+        "|-------|------|-------:|------:|------------:|",
+    ]
+    for dc, info in sorted(drugs.items()):
+        lines.append(f"| {dc} | {info['name']} | {len(info['payers'])} | {info['total']} | {info['pa_count']} |")
+
+    # --- Detailed rules by payer ---
+    lines += ["", "---", "", "## Rules by Payer", ""]
+
+    rules_by_payer = {}
+    for r in rules:
+        rules_by_payer.setdefault(r["payer_id"], []).append(r)
+
+    for pid in sorted(rules_by_payer):
+        payer_rules = rules_by_payer[pid]
+        payer_name = payer_rules[0]["payer_name"]
+        lines += [f"### {payer_name}", ""]
+
+        for r in payer_rules:
+            pa_badge = "**PA Required**" if r.get("pa_required") else "No PA"
+            step_badge = " | **Step Therapy**" if r.get("step_therapy_required") else ""
+            conf = r.get("extraction_confidence", "unknown")
+
+            lines += [
+                f"#### {r['drug_name']} — {r['drug_code']}",
+                "",
+                f"- **Diagnosis Group:** {r['diagnosis_group']}",
+                f"- **Status:** {pa_badge}{step_badge}",
+                f"- **Confidence:** {conf}",
+            ]
+
+            if r.get("procedure_code"):
+                lines.append(f"- **Procedure Code:** CPT {r['procedure_code']}")
+
+            if r.get("auth_duration_months"):
+                lines.append(f"- **Auth Duration:** {r['auth_duration_months']} months")
+
+            if r.get("auth_max_injections"):
+                lines.append(f"- **Max Injections:** {r['auth_max_injections']}")
+
+            if r.get("pa_evidence"):
+                lines += ["", "**PA Evidence:**"]
+                for ev in r["pa_evidence"][:3]:
+                    lines.append(f"> {ev}")
+
+            if r.get("step_therapy_evidence"):
+                lines += ["", "**Step Therapy Evidence:**"]
+                for ev in r["step_therapy_evidence"][:3]:
+                    lines.append(f"> {ev}")
+
+            if r.get("required_documentation"):
+                lines += ["", "**Required Documentation:**"]
+                for doc in r["required_documentation"][:5]:
+                    lines.append(f"- {doc}")
+
+            if r.get("denial_triggers"):
+                lines += ["", "**Denial Triggers:**"]
+                for dt in r["denial_triggers"][:5]:
+                    lines.append(f"- {dt}")
+
+            source_file = Path(r.get("policy_source_file", "")).name
+            lines += [
+                "",
+                f"*Source: `{source_file}` — Downloaded {r.get('policy_last_downloaded', 'unknown')}*",
+                "",
+                "---",
+                "",
+            ]
+
+    md_path.parent.mkdir(parents=True, exist_ok=True)
+    md_path.write_text("\n".join(lines) + "\n")
+    log.info(f"Markdown rules written to {md_path}")
+
+
+def save_rules(rules: list[dict], rules_path: Path):
+    """Save rules as JSON and generate the companion markdown file."""
+    rules_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(rules_path, "w") as f:
+        json.dump(rules, f, indent=2)
+    log.info(f"\nSaved {len(rules)} rules to {rules_path}")
+
+    md_path = rules_path.with_suffix(".md")
+    generate_markdown(rules, md_path)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Extract structured PA rules from downloaded policy PDFs")
     parser.add_argument("--payer", nargs="*", help="Specific payer(s) to extract from")
@@ -371,11 +503,7 @@ def main():
 
     all_rules = extract_all_rules(base_dir, target_payers, config)
 
-    # Save rules
-    rules_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(rules_path, "w") as f:
-        json.dump(all_rules, f, indent=2)
-    log.info(f"\nSaved {len(all_rules)} rules to {rules_path}")
+    save_rules(all_rules, rules_path)
 
     print_summary(all_rules)
 
