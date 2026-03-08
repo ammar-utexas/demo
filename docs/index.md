@@ -310,6 +310,11 @@ _No bug fixes documented yet._
 - [Amazon Connect Health Setup Guide](experiments/51-AmazonConnectHealth-PMS-Developer-Setup-Guide.md) — Amazon Connect instance provisioning, KMS encryption, Patient Verification and Ambient Documentation agent configuration, Lambda contact flow integration, and FastAPI/Next.js endpoints
 - [Amazon Connect Health Developer Tutorial](experiments/51-AmazonConnectHealth-Developer-Tutorial.md) — Hands-on onboarding: simulate patient call verification, capture ambient ophthalmology encounter documentation, review auto-generated SOAP notes with ICD-10/CPT codes, and monitor call center metrics end-to-end
 
+### vLLM (Self-Hosted LLM Inference Engine)
+- [PRD: vLLM PMS Integration](experiments/52-PRD-vLLM-PMS-Integration.md) — Self-hosted, HIPAA-compliant LLM inference with PagedAttention for clinical note summarization, ICD-10/CPT code suggestion, patient communication drafting, and medication interaction analysis
+- [vLLM Setup Guide](experiments/52-vLLM-PMS-Developer-Setup-Guide.md) — Docker deployment with GPU passthrough, OpenAI-compatible API configuration, FastAPI LLMService integration, and Prometheus metrics collection
+- [vLLM Developer Tutorial](experiments/52-vLLM-Developer-Tutorial.md) — Hands-on onboarding: generate SOAP notes from encounter transcripts, suggest medical codes with confidence scores, draft patient communications, and check medication interactions — all on local GPU
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
