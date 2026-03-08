@@ -95,8 +95,8 @@ Before proceeding, ensure:
 3. **IAM permissions**: Your IAM user/role needs `AmazonConnect*`, `AmazonConnectHealth*`, `s3:*`, `kms:*`, `logs:*` permissions.
 
 ```bash
-# Verify BAA status (check AWS Artifact)
-aws artifact list-agreements --region us-east-1
+# Verify BAA status — use the AWS Artifact console (CLI does not support list-agreements):
+# https://console.aws.amazon.com/artifact/home → Agreements → look for AWS BAA
 
 # Verify IAM permissions
 aws sts get-caller-identity
@@ -119,7 +119,7 @@ psql -h localhost -p 5432 -U pms -c "SELECT 1;"
 # Expected: 1
 ```
 
-**Checkpoint:** AWS CLI configured with HIPAA-eligible account, BAA verified, PMS services running.
+**Checkpoint:** AWS CLI configured with HIPAA-eligible account, BAA verified (via console), PMS services running.
 
 ---
 
@@ -137,6 +137,9 @@ aws connect create-instance \
   --region us-east-1
 ```
 
+You can view your instance in the AWS Console at:
+https://us-east-1.console.aws.amazon.com/connect/v2/app/instances
+
 Save the returned `InstanceId`:
 
 ```bash
@@ -152,9 +155,14 @@ aws kms create-key \
   --key-usage ENCRYPT_DECRYPT \
   --region us-east-1
 
-export KMS_KEY_ID="your-kms-key-id"
+# Save the full ARN (not just the key ID) — the Connect API requires the full ARN
+export KMS_KEY_ARN="arn:aws:kms:us-east-1:ACCOUNT:key/your-key-id"
+
+# Create the S3 bucket for call recordings
+aws s3 mb s3://pms-connect-health-recordings --region us-east-1
 
 # Associate KMS key with Connect instance for call recordings
+# IMPORTANT: The KeyId field requires the full KMS key ARN, not just the key ID
 aws connect associate-instance-storage-config \
   --instance-id $CONNECT_INSTANCE_ID \
   --resource-type CALL_RECORDINGS \
@@ -165,7 +173,7 @@ aws connect associate-instance-storage-config \
       "BucketPrefix": "recordings/",
       "EncryptionConfig": {
         "EncryptionType": "KMS",
-        "KeyId": "'"$KMS_KEY_ID"'"
+        "KeyId": "'"$KMS_KEY_ARN"'"
       }
     }
   }' \
@@ -211,28 +219,40 @@ aws connect create-queue \
 
 ### Step 5: Enable Amazon Connect Health agents
 
+The Connect Health API uses a domain/subscription model. First create a domain, then create a subscription within it.
+
+> **Note:** The CLI commands are under `aws connecthealth`. Available subcommands include:
+> `create-domain`, `create-subscription`, `activate-subscription`, `list-domains`, `list-subscriptions`,
+> `get-domain`, `get-subscription`, `get-medical-scribe-listening-session`, `start-patient-insights-job`.
+
 ```bash
-# Enable Patient Verification (GA)
-aws connecthealth enable-agent \
-  --instance-id $CONNECT_INSTANCE_ID \
-  --agent-type PATIENT_VERIFICATION \
+# Step 5a: Create a Connect Health domain with your KMS key
+aws connecthealth create-domain \
+  --name "pms-health-agent" \
+  --kms-key-arn "$KMS_KEY_ARN" \
   --region us-east-1
 
-# Enable Ambient Documentation (GA)
-aws connecthealth enable-agent \
-  --instance-id $CONNECT_INSTANCE_ID \
-  --agent-type AMBIENT_DOCUMENTATION \
-  --specialty-config '{
-    "specialties": ["ophthalmology", "optometry", "general"],
-    "noteTemplates": ["SOAP", "HPI", "PROCEDURE_NOTE"]
-  }' \
+# Save the returned domain ID (format: dom-XXXXXXXXX)
+export CONNECT_HEALTH_DOMAIN_ID="your-domain-id"
+
+# Step 5b: Create a subscription within the domain
+aws connecthealth create-subscription \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
   --region us-east-1
 
-# Enable Patient Insights (Preview)
-aws connecthealth enable-agent \
-  --instance-id $CONNECT_INSTANCE_ID \
-  --agent-type PATIENT_INSIGHTS \
+# Save the returned subscription ID (format: sub-XXXXXXXXXXXXXXXXXXXXX)
+export CONNECT_HEALTH_SUBSCRIPTION_ID="your-subscription-id"
+
+# Step 5c: Verify domain and subscription status
+aws connecthealth get-domain \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
   --region us-east-1
+
+aws connecthealth get-subscription \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
+  --subscription-id $CONNECT_HEALTH_SUBSCRIPTION_ID \
+  --region us-east-1
+# Expected status: "ACTIVE" for both
 ```
 
 ### Step 6: Create the environment configuration
@@ -244,8 +264,10 @@ AWS_REGION=us-east-1
 CONNECT_INSTANCE_ID=your-instance-id
 CONNECT_INSTANCE_ARN=arn:aws:connect:us-east-1:ACCOUNT:instance/your-instance-id
 CONNECT_HEALTH_ENDPOINT=https://connect-health.us-east-1.amazonaws.com
-KMS_KEY_ID=your-kms-key-id
+KMS_KEY_ARN=arn:aws:kms:us-east-1:ACCOUNT:key/your-kms-key-id
 CONNECT_PHONE_NUMBER=+18005551234
+CONNECT_HEALTH_DOMAIN_ID=your-domain-id
+CONNECT_HEALTH_SUBSCRIPTION_ID=your-subscription-id
 
 # S3 Buckets
 RECORDINGS_BUCKET=pms-connect-health-recordings
@@ -257,7 +279,7 @@ MAX_ENCOUNTERS_PER_USER=600
 EOF
 ```
 
-**Checkpoint:** Amazon Connect instance provisioned with KMS encryption, phone number claimed, healthcare queues created, and Connect Health agents enabled.
+**Checkpoint:** Amazon Connect instance provisioned with KMS encryption, phone number claimed, healthcare queues created, and Connect Health domain/subscription active.
 
 ---
 
@@ -966,7 +988,7 @@ export default function CallCenterDashboard() {
 
 ## 6. Part D: Testing and Verification
 
-### Step 1: Verify Amazon Connect instance
+### Step 1: Verify Amazon Connect instance and Connect Health
 
 ```bash
 # Check instance status
@@ -975,11 +997,17 @@ aws connect describe-instance \
   --region us-east-1 | jq '.Instance.InstanceStatus'
 # Expected: "ACTIVE"
 
-# List enabled agents
-aws connecthealth list-agents \
-  --instance-id $CONNECT_INSTANCE_ID \
+# Verify Connect Health domain
+aws connecthealth get-domain \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
+  --region us-east-1 | jq '.status'
+# Expected: "ACTIVE"
+
+# List Connect Health subscriptions
+aws connecthealth list-subscriptions \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
   --region us-east-1
-# Expected: PATIENT_VERIFICATION, AMBIENT_DOCUMENTATION listed
+# Expected: at least one subscription with status "ACTIVE"
 ```
 
 ### Step 2: Test PMS backend endpoints
@@ -1071,6 +1099,14 @@ phone_normalized = caller_phone.lstrip("+1").replace("-", "")
 ```bash
 pip install --upgrade boto3 botocore
 ```
+
+> **Note on CLI commands:** The `aws connecthealth` CLI uses a domain/subscription model.
+> There is no `enable-agent`, `list-agents`, or `describe-agent` subcommand. The available
+> subcommands are: `create-domain`, `create-subscription`, `activate-subscription`,
+> `deactivate-subscription`, `delete-domain`, `get-domain`, `get-subscription`,
+> `get-medical-scribe-listening-session`, `get-patient-insights-job`, `list-domains`,
+> `list-subscriptions`, `start-patient-insights-job`, `list-tags-for-resource`,
+> `tag-resource`, `untag-resource`. Run `aws connecthealth help` to see the full list.
 
 ### Call recordings not encrypted
 

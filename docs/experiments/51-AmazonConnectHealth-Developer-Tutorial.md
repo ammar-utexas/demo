@@ -206,11 +206,16 @@ aws connect describe-instance \
   --region us-east-1 | jq '.Instance.InstanceStatus'
 # Expected: "ACTIVE"
 
-# 4. Connect Health agents enabled
-aws connecthealth list-agents \
-  --instance-id $CONNECT_INSTANCE_ID \
+# 4. Connect Health domain and subscription active
+aws connecthealth get-domain \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
+  --region us-east-1 | jq '.status'
+# Expected: "ACTIVE"
+
+aws connecthealth list-subscriptions \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
   --region us-east-1
-# Expected: PATIENT_VERIFICATION, AMBIENT_DOCUMENTATION
+# Expected: at least one subscription with status "ACTIVE"
 
 # 5. PMS backend running
 curl -s http://localhost:8000/api/health | jq .status
@@ -664,11 +669,10 @@ aws connect list-phone-numbers-v2 \
 
 **Cause:** Specialty not specified in session configuration.
 
-**Fix:** Always pass `specialty: "ophthalmology"` in the `start_ambient_session` call. Verify enabled specialties:
+**Fix:** Always pass `specialty: "ophthalmology"` in the `start_ambient_session` call. Verify your domain configuration:
 ```bash
-aws connecthealth describe-agent \
-  --instance-id $CONNECT_INSTANCE_ID \
-  --agent-type AMBIENT_DOCUMENTATION \
+aws connecthealth get-domain \
+  --domain-id $CONNECT_HEALTH_DOMAIN_ID \
   --region us-east-1
 ```
 
@@ -819,8 +823,9 @@ scripts/
 # Check instance status
 aws connect describe-instance --instance-id $CONNECT_INSTANCE_ID --region us-east-1
 
-# List enabled agents
-aws connecthealth list-agents --instance-id $CONNECT_INSTANCE_ID --region us-east-1
+# Verify Connect Health domain and subscriptions
+aws connecthealth get-domain --domain-id $CONNECT_HEALTH_DOMAIN_ID --region us-east-1
+aws connecthealth list-subscriptions --domain-id $CONNECT_HEALTH_DOMAIN_ID --region us-east-1
 
 # Get real-time metrics
 curl -s http://localhost:8000/api/connect-health/metrics | jq .
