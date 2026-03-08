@@ -230,7 +230,7 @@ curl -s http://localhost:3000 -o /dev/null -w "%{http_code}"
 
 ```bash
 # Test call center metrics endpoint
-curl -s http://localhost:8000/api/connect-health/metrics | jq .
+curl -s http://localhost:8000/connect-health/metrics | jq .
 # Expected: { "agents_online": 0, "contacts_in_queue": 0, ... }
 ```
 
@@ -346,7 +346,7 @@ def simulate_verification():
 
     with httpx.Client(base_url=PMS_URL) as client:
         response = client.post(
-            "/api/connect-health/verify-patient",
+            "/connect-health/verify-patient",
             json={
                 "contact_id": "test-contact-001",
                 "spoken_name": "Maria Garcia",
@@ -395,7 +395,7 @@ def get_pre_visit_summary():
     print("=" * 60)
 
     with httpx.Client(base_url=PMS_URL) as client:
-        response = client.get(f"/api/connect-health/insights/{PATIENT_ID}")
+        response = client.get(f"/connect-health/insights/{PATIENT_ID}")
         insights = response.json()
 
     print(f"\nPatient: {PATIENT_ID}")
@@ -475,7 +475,7 @@ def simulate_ambient_documentation():
         # Step 1: Start ambient session
         print("\n[1] Starting ambient session...")
         response = client.post(
-            "/api/connect-health/ambient/start",
+            "/connect-health/ambient/start",
             json={
                 "encounter_id": "test-encounter-001",
                 "patient_id": PATIENT_ID,
@@ -499,7 +499,7 @@ def simulate_ambient_documentation():
         # Step 3: Stop session and get generated note
         print("\n[3] Stopping ambient session and generating note...")
         response = client.post(
-            "/api/connect-health/ambient/stop",
+            "/connect-health/ambient/stop",
             json={
                 "session_id": session_id,
                 "encounter_id": "test-encounter-001",
@@ -785,7 +785,7 @@ scripts/
 | Item | Convention | Example |
 |------|-----------|---------|
 | Service class | `ConnectHealth{Feature}Service` | `ConnectHealthService` |
-| API endpoint | `/api/connect-health/{feature}` | `/api/connect-health/ambient/start` |
+| API endpoint | `/connect-health/{feature}` | `/connect-health/ambient/start` |
 | Lambda function | `pms_{purpose}` | `pms_patient_lookup` |
 | DB table | `connect_health_{entity}` | `connect_health_ambient_sessions` |
 | React component | `{Feature}.tsx` | `AmbientDocumentation.tsx` |
@@ -828,10 +828,10 @@ aws connecthealth get-domain --domain-id $CONNECT_HEALTH_DOMAIN_ID --region us-e
 aws connecthealth list-subscriptions --domain-id $CONNECT_HEALTH_DOMAIN_ID --region us-east-1
 
 # Get real-time metrics
-curl -s http://localhost:8000/api/connect-health/metrics | jq .
+curl -s http://localhost:8000/connect-health/metrics | jq .
 
 # Start ambient session
-curl -s -X POST http://localhost:8000/api/connect-health/ambient/start \
+curl -s -X POST http://localhost:8000/connect-health/ambient/start \
   -H "Content-Type: application/json" \
   -d '{"encounter_id":"ENC-001","patient_id":"PAT-001","specialty":"ophthalmology"}'
 
