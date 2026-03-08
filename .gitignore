@@ -2,6 +2,13 @@
 !.claude/skills/
 .DS_Store
 
+# Environment files (may contain secrets/credentials)
+.env
+.env.*
+
+# Playwright MCP logs
+.playwright-mcp/
+
 # Word temp files
 ~$*
 
