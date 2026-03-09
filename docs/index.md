@@ -343,6 +343,11 @@ _No bug fixes documented yet._
 - [notebooklm-py Setup Guide](experiments/57-NotebookLM-Py-PMS-Developer-Setup-Guide.md) — Cookie-based Google authentication via Playwright, NotebookLMService async wrapper for FastAPI, REST API endpoints, Next.js Content Library page, and end-to-end verification
 - [notebooklm-py Developer Tutorial](experiments/57-NotebookLM-Py-Developer-Tutorial.md) — Hands-on onboarding: build a Clinical Protocol Podcast Generator that creates notebooks, ingests guidelines, generates audio briefings and comprehension quizzes, and queries sources via grounded Q&A
 
+### Supabase + Claude Code (AI-Assisted Backend-as-a-Service)
+- [PRD: Supabase + Claude Code PMS Integration](experiments/58-PRD-SupabaseClaudeCode-PMS-Integration.md) — HIPAA-compliant BaaS platform (PostgreSQL, Auth, Realtime, Edge Functions) with Claude Code MCP for AI-driven schema design, migration generation, RLS policy auditing, and type generation — replacing manual database workflows with conversational AI
+- [Supabase + Claude Code Setup Guide](experiments/58-SupabaseClaudeCode-PMS-Developer-Setup-Guide.md) — Supabase Cloud project creation with HIPAA add-on, MCP server and Claude Code Templates installation, FastAPI/Next.js/Android client integration, and RLS-protected schema setup
+- [Supabase + Claude Code Developer Tutorial](experiments/58-SupabaseClaudeCode-Developer-Tutorial.md) — Hands-on onboarding: build a real-time vitals monitor with RLS-protected tables, PostgREST auto-API, WebSocket subscriptions, and Claude Code security auditing
+
 ---
 
 ## Documentation Views
