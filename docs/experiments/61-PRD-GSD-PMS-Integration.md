@@ -262,6 +262,27 @@ GSD does not directly interact with PMS APIs at runtime. It orchestrates the dev
 
 **Key differentiator**: GSD operates at the **feature lifecycle level** — spanning planning through verification — while Claude Code (Exp 27), Agent Teams (Exp 14), and Superpowers (Exp 19) operate at the **session or task level**. GSD orchestrates the full Define → Plan → Execute → Verify → Ship workflow with document-driven state that persists across sessions.
 
+### GSD vs GitHub Spec Kit — Complementary SDD Frameworks
+
+GSD and [GitHub Spec Kit](https://github.com/github/spec-kit) (75K stars, official GitHub project) are both spec-driven development frameworks, but they solve **different halves** of the AI-assisted development problem:
+
+| Dimension | GSD | GitHub Spec Kit |
+|---|---|---|
+| **Core problem** | Context rot — AI quality degrades as context fills | Spec drift — AI produces inconsistent code without formal specs |
+| **Primary innovation** | Fresh 200K contexts per task, wave parallelism | Persistent constitution + formal FR-XXX specifications |
+| **Where it intervenes** | **Execution layer** — how the AI runs tasks | **Specification layer** — what the AI is told to build |
+| **Parallel execution** | Yes — wave-based with fresh contexts | No — sequential through connected agent |
+| **Governance** | CLAUDE.md (manual) | `constitution.md` (first-class, travels with every command) |
+| **Spec formality** | Freeform `REQUIREMENTS.md` | Structured FR-XXX, SC-XXX with acceptance criteria |
+| **Verification** | Goal-backward code validation | Cross-artifact consistency validation |
+| **AI runtimes** | 4 (Claude Code, OpenCode, Gemini CLI, Codex) | 11+ (Copilot, Claude, Gemini, Cursor, Windsurf, Qwen, etc.) |
+| **Git automation** | Atomic commits, semantic prefixes, phase branches | Feature branch scripts only |
+| **Best for** | Solo devs, execution efficiency, long features | Teams, formal specifications, multi-runtime portability |
+
+**PMS Recommendation**: Use Spec Kit for the specification and governance layer (constitution encoding HIPAA rules, formal FR-XXX requirements for regulatory traceability), and GSD for the execution layer (parallel wave execution, context isolation, atomic commits). The [GSD vs Spec Kit Comparative Tutorial](61-GSD-vs-SpecKit-Comparative-Tutorial.md) builds the same feature with both approaches and demonstrates the combined workflow.
+
+For detailed side-by-side analysis including ISO 13485 DHF mapping, security posture comparison, and a scoring rubric, see the [Comparative Tutorial](61-GSD-vs-SpecKit-Comparative-Tutorial.md).
+
 ## 12. Research Sources
 
 ### Official Documentation
@@ -285,6 +306,7 @@ GSD does not directly interact with PMS APIs at runtime. It orchestrates the dev
 
 - [GSD Setup Guide](61-GSD-PMS-Developer-Setup-Guide.md)
 - [GSD Developer Tutorial](61-GSD-Developer-Tutorial.md)
+- [GSD vs Spec Kit Comparative Tutorial](61-GSD-vs-SpecKit-Comparative-Tutorial.md)
 - [Claude Code Developer Tutorial (Experiment 27)](27-ClaudeCode-Developer-Tutorial.md)
 - [Agent Teams Reference (Experiment 14)](14-agent-teams-claude-whitepaper.md)
 - [Superpowers PMS Integration (Experiment 19)](19-PRD-Superpowers-PMS-Integration.md)

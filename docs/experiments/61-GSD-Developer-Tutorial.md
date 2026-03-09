@@ -656,8 +656,9 @@ Is this a multi-file, multi-day feature?
 
 ## Next Steps
 
-1. **Build a real PMS feature** using the full GSD workflow — pick a ticket from the backlog
-2. **Customize GSD agents** with PMS-specific patterns (security checks, API conventions)
-3. **Create ISO 13485 artifact generator** that converts `.planning/` files to DHF entries
-4. **Review [Claude Code Tutorial (Exp 27)](27-ClaudeCode-Developer-Tutorial.md)** for advanced Claude Code features used by GSD
-5. **Explore [Agent Teams (Exp 14)](14-agent-teams-claude-whitepaper.md)** for complementary in-session multi-agent patterns
+1. **Read the [GSD vs Spec Kit Comparative Tutorial](61-GSD-vs-SpecKit-Comparative-Tutorial.md)** — builds the same feature with both frameworks and demonstrates the combined workflow
+2. **Build a real PMS feature** using the full GSD workflow — pick a ticket from the backlog
+3. **Customize GSD agents** with PMS-specific patterns (security checks, API conventions)
+4. **Create ISO 13485 artifact generator** that converts `.planning/` files to DHF entries
+5. **Review [Claude Code Tutorial (Exp 27)](27-ClaudeCode-Developer-Tutorial.md)** for advanced Claude Code features used by GSD
+6. **Explore [Agent Teams (Exp 14)](14-agent-teams-claude-whitepaper.md)** for complementary in-session multi-agent patterns

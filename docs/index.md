@@ -362,6 +362,7 @@ _No bug fixes documented yet._
 - [PRD: GSD PMS Integration](experiments/61-PRD-GSD-PMS-Integration.md) — Multi-agent spec-driven development framework orchestrating Claude Code with fresh context isolation per task, wave-based parallelism, document-driven state in `.planning/`, atomic git commits, and goal-backward verification — with HIPAA-safe interactive mode and ISO 13485 artifact generation
 - [GSD Setup Guide](experiments/61-GSD-PMS-Developer-Setup-Guide.md) — npm installation, PMS-specific config (interactive mode, phase branching, quality model profile), project templates with requirement traceability, and CLAUDE.md integration
 - [GSD Developer Tutorial](experiments/61-GSD-Developer-Tutorial.md) — Hands-on onboarding: build a Clinic Operating Hours API using the full GSD lifecycle (new-project, discuss, plan, execute, verify, complete-milestone) with parallel wave execution and atomic commits end-to-end
+- [GSD vs Spec Kit Comparative Tutorial](experiments/61-GSD-vs-SpecKit-Comparative-Tutorial.md) — Side-by-side build of the same feature with GSD and GitHub Spec Kit, architectural comparison (execution-layer vs specification-layer), ISO 13485 DHF mapping, scoring rubric, and combined workflow recommendation
 
 ---
 
