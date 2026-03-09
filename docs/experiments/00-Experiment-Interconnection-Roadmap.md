@@ -1,7 +1,7 @@
 # PMS Experiment Interconnection Roadmap
 
 **Document ID:** PMS-EXP-ROADMAP-001
-**Version:** 3.0
+**Version:** 4.0
 **Date:** March 9, 2026
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Living Document
@@ -10,17 +10,19 @@
 
 ## 1. Executive Summary
 
-The PMS project maintains **61 experiments** (numbered 00–60) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
+The PMS project maintains **64 experiments** (numbered 00–63) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
 
-Since the v2.0 roadmap (covering 00–38), **22 new experiments** (39–60) have been added. These form three major clusters:
+Since the v2.0 roadmap (covering 00–38), **25 new experiments** (39–63) have been added. These form five major clusters:
 
 1. **Prior Authorization (PA) Pipeline** (Exp 43–49, 56) — A six-experiment deep stack automating PA from CMS datasets through payer APIs to FHIR-compliant submission, plus competitive landscape analysis
 2. **AI Inference & Orchestration** (Exp 42, 52–55) — vLLM serving backbone, Llama 4 and Mistral 3 model families, GPT-5.4 benchmarking, and CrewAI multi-agent orchestration
 3. **Knowledge & Content Generation** (Exp 57–60) — NotebookLM-py content transformation, Supabase database tooling, Obsidian knowledge vaults, and Skill Creator framework
+4. **Spec-Driven Development** (Exp 61–62) — GSD execution-layer framework with fresh context isolation and parallel wave execution, and GitHub Spec Kit specification-layer toolkit with five-phase SDD workflow (Constitution → Specify → Plan → Tasks → Implement)
+5. **Agent Interoperability** (Exp 63) — A2A (Agent-to-Agent) Protocol for inter-agent communication across organizational boundaries, complementing MCP (Exp 09) for the complete agent interoperability stack
 
 This roadmap provides:
 
-- A **complete registry** of all 61 experiments with categories, platforms, and documentation inventory
+- A **complete registry** of all 64 experiments with categories, platforms, and documentation inventory
 - A **dependency graph** showing which experiments build on or complement others
 - **Execution tiers** recommending a foundation-first build order
 - **Parallel tracks** for teams that can work on independent streams simultaneously
@@ -36,7 +38,7 @@ This roadmap provides:
 
 ### Scope
 
-This roadmap covers experiments 00–60 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
+This roadmap covers experiments 00–63 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
 
 ---
 
@@ -105,6 +107,9 @@ This roadmap covers experiments 00–60 as documented in `docs/experiments/`. It
 | 58 | [Supabase + Claude Code](58-PRD-SupabaseClaudeCode-PMS-Integration.md) | Infrastructure / Database | Backend, Web, Android | 39-Docker | PRD, Setup, Tutorial |
 | 59 | [Obsidian + Claude Code](59-PRD-ObsidianClaudeCode-PMS-Integration.md) | Knowledge Management | Dev | 27-Claude Code | PRD, Setup, Tutorial |
 | 60 | [Skill Creator](60-PRD-SkillCreator-PMS-Integration.md) | Dev Tooling / Framework | Dev | 27-Claude Code | PRD, Setup, Tutorial |
+| 61 | [GSD](61-PRD-GSD-PMS-Integration.md) | Dev Tooling / SDD | Dev | 27-Claude Code | PRD, Setup, Tutorial, Comparative |
+| 62 | [Spec Kit](62-PRD-SpecKit-PMS-Integration.md) | Dev Tooling / SDD | Dev | 27-Claude Code | PRD, Setup, Tutorial |
+| 63 | [A2A Protocol](63-PRD-A2A-PMS-Integration.md) | Backend / Agent Interop | Backend, Web | 09-MCP | PRD, Setup, Tutorial |
 
 ---
 
@@ -188,6 +193,7 @@ flowchart TD
         E34["34 n8n 2.0+"]
         E55["55 CrewAI"]
         E51["51 Amazon Connect"]
+        E63["63 A2A Protocol"]
     end
 
     %% ── Subgraph: Real-Time & Streaming ──
@@ -227,6 +233,8 @@ flowchart TD
         E32["32 GitHub Agent HQ"]
         E36["36 Claude Context Mode"]
         E60["60 Skill Creator"]
+        E61["61 GSD"]
+        E62["62 Spec Kit"]
     end
 
     %% ── Subgraph: Security ──
@@ -287,7 +295,10 @@ flowchart TD
     E48 --> E49
     E27 --> E59
     E27 --> E60
+    E27 --> E61
+    E27 --> E62
     E27 --> E40
+    E09 --> E63
 
     %% ── Complementary / Enhances (dashed arrows) ── Original
     E07 -.->|enhances| E10
@@ -332,6 +343,14 @@ flowchart TD
     E57 -.->|enhances| E59
     E40 -.->|enhances| E59
     E51 -.->|complements| E55
+    E61 -.->|complements| E62
+    E62 -.->|complements| E61
+    E61 -.->|enhances| E60
+    E62 -.->|enhances| E55
+    E63 -.->|enhances| E55
+    E63 -.->|enhances| E26
+    E63 -.->|enhances| E05
+    E63 -.->|complements| E09
 
     %% ── Color Classes ──
     classDef ui fill:#818cf8,stroke:#4f46e5,color:#fff
@@ -356,10 +375,10 @@ flowchart TD
     class E07,E10,E21,E30,E33,E35 speech
     class E11,E18 cds
     class E16,E17 interop
-    class E05,E26,E34,E55,E51 agents
+    class E05,E26,E34,E55,E51,E63 agents
     class E37,E38 realtime
     class E25 edge
-    class E12,E14,E19,E24,E27,E28,E31,E32,E36,E60 devtool
+    class E12,E14,E19,E24,E27,E28,E31,E32,E36,E60,E61,E62 devtool
     class E04,E22,E23 ref
     class E43,E44,E45,E46,E47,E48,E49,E56 pa
     class E39,E58 platform
@@ -443,6 +462,9 @@ Combine Tier 1 capabilities into integrated workflows. Multiple experiments can 
 | 60 | Skill Creator | 27-Claude Code |
 | 57 | notebooklm-py | None (standalone content generation) |
 | 41 | InfraNodus | None (text network analysis) |
+| 61 | GSD | 27-Claude Code (spec-driven execution framework) |
+| 62 | Spec Kit | 27-Claude Code (specification-layer SDD toolkit) |
+| 63 | A2A Protocol | 09-MCP (inter-agent communication protocol) |
 
 ### Tier 3 — Advanced Capabilities (Weeks 10–12)
 
@@ -468,19 +490,20 @@ Full end-to-end clinical workflows combining multiple experiments.
 |----------|---------------------|-------------|
 | Clinical Documentation Pipeline | 07/10/21 + 13/20 + 05 + 26 + 55 | Transcribe → Structure → Approve → File (CrewAI orchestrated) |
 | Full DermaCheck + Edge | 18 + 25 + 13 + 09 + 16 | Capture → Classify → Risk Score → FHIR Export |
-| Autonomous Care Coordination | 05 + 26 + 16 + 11 + 15 + 55 | Multi-step agent with HITL, FHIR interop, model routing |
+| Autonomous Care Coordination | 05 + 26 + 16 + 11 + 15 + 55 + 63 | Multi-step agent with HITL, FHIR interop, model routing, A2A cross-org delegation |
 | Real-Time Clinical Event Pipeline | 37 + 38 + 34 + 16 | Stream DB changes → Kafka topics → n8n automation → FHIR exchange |
 | Voice AI Full Stack | 07/10/21 + 30 + 33 + 35 | Transcribe → Synthesize readback → Voice agent → Mental health screening |
 | Three-Layer Agent Governance | 27 + 31 + 32 + 36 + 12 | CLI agents + IDE agents + Platform governance + context optimization + security scanning |
 | **PA Automation Pipeline** | 43 + 44 + 45 + 46 + 47 + 48 + 49 + 55 | Dataset → Policies → Coverage → Payer APIs → FHIR PA → EHR import → CrewAI orchestration |
 | **Clinical Knowledge Pipeline** | 55 + 57 + 59 + 41 | CrewAI generates summaries → NotebookLM transforms to audio/quiz → Obsidian stores → InfraNodus maps relationships |
 | **AI Model Deployment Stack** | 39 + 52 + 53 + 54 + 42 + 50 | Docker → vLLM → Llama/Mistral → Benchmark → Security gate |
+| **Spec-Driven Dev Pipeline** | 27 + 60 + 61 + 62 | Claude Code → Skill Creator → GSD execution + Spec Kit specification → Full SDD lifecycle |
 
 ### Execution Timeline (Gantt)
 
 ```mermaid
 gantt
-    title Experiment Execution Tiers (v3.0)
+    title Experiment Execution Tiers (v4.0)
     dateFormat YYYY-MM-DD
     axisFormat %b %d
 
@@ -539,6 +562,9 @@ gantt
     60 Skill Creator           :t60, after t27, 5d
     57 notebooklm-py           :t57, 2026-03-23, 7d
     41 InfraNodus              :t41, 2026-03-23, 5d
+    61 GSD                     :t61, after t27, 7d
+    62 Spec Kit                :t62, after t27, 7d
+    63 A2A Protocol             :t63, after t09, 10d
 
     section Tier 3 — Advanced
     18 ISIC Archive            :t18, after t13, 10d
@@ -560,6 +586,7 @@ gantt
     PA Automation Pipeline     :t_pap, after t49, 14d
     Clinical Knowledge Pipeline:t_ckp, after t55, 10d
     AI Model Deploy Stack      :t_ams, after t42, 7d
+    Spec-Driven Dev Pipeline   :t_sdp, after t62, 7d
 ```
 
 ---
@@ -597,6 +624,8 @@ Eight independent tracks that can be staffed and executed simultaneously. Cross-
 09-MCP → {08-Adaptive Thinking, 05-OpenClaw} → {15-Claude Model Selection, 26-LangGraph}
    ↓
 34-n8n 2.0+  (visual workflow automation with MCP integration)
+   ↓
+63-A2A Protocol  (inter-agent communication — complements MCP)
 
 39-Docker → 52-vLLM → {53-Llama 4, 54-Mistral 3, 42-GPT-5.4 Benchmark}
                 ↓
@@ -613,6 +642,7 @@ Eight independent tracks that can be staffed and executed simultaneously. Cross-
                                (+ 12-AI Zero-Day Scan runs in parallel)
 
 27-Claude Code → {40-ExcalidrawSkill, 59-Obsidian, 60-Skill Creator}
+27-Claude Code → {61-GSD, 62-Spec Kit}  (spec-driven development — complementary pair)
 ```
 
 ### Track F — Voice AI
@@ -696,6 +726,9 @@ flowchart LR
         D7 --> D8
         D8 --> D9
         D8 --> D10
+        D11["63 A2A"]
+        D1 --> D11
+        D11 -.->|"enhances"| D9
     end
 
     subgraph E["Track E: Dev Experience"]
@@ -711,6 +744,8 @@ flowchart LR
         E9["40 Excalidraw"]
         E10["59 Obsidian"]
         E11["60 Skill Creator"]
+        E12a["61 GSD"]
+        E13a["62 Spec Kit"]
         E0 --> E5
         E0 --> E1
         E0 --> E6
@@ -718,6 +753,9 @@ flowchart LR
         E0 --> E9
         E0 --> E10
         E0 --> E11
+        E0 --> E12a
+        E0 --> E13a
+        E12a -.->|"complements"| E13a
         E1 --> E2
         E2 --> E3
         E6 --> E7
@@ -825,7 +863,7 @@ _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 2
 | **37 WebSocket** | None | Enhances 00-Tambo (real-time UI updates). Enhances 38-Kafka (WebSocket Bridge Consumer for real-time delivery). Core transport for clinical alerts across all frontend experiments |
 | **38 Apache Kafka** | None | Enhances 16-FHIR, 17-HL7v2 LIS (event-driven interop). Enhances 34-n8n (Kafka event triggers). Complements 37-WebSocket (durable backbone + real-time delivery). Debezium CDC captures all PostgreSQL changes |
 
-### Experiments 39–60 — Relationships to All Others
+### Experiments 39–63 — Relationships to All Others
 
 | Experiment | Hard Dependencies | Complementary / Enhances |
 |-----------|------------------|--------------------------|
@@ -851,6 +889,9 @@ _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 2
 | **58 Supabase + Claude Code** | 39-Docker | Enhances all backend experiments (AI-assisted schema management). Complements 27-Claude Code (MCP-based database tooling). Same domain as PostgreSQL layer |
 | **59 Obsidian + Claude Code** | 27-Claude Code | Enhances 60-Skill Creator (knowledge vault provides context for skill templates). Receives content from 57-notebooklm-py (generated materials stored in vault). Complements 41-InfraNodus (vault as input for text network analysis) |
 | **60 Skill Creator** | 27-Claude Code | Enhances all Claude Code experiments (standardized skill development). Enhances 59-Obsidian (skills can query vault). Meta-tool — creates tools for other experiments |
+| **61 GSD** | 27-Claude Code | Complements 62-Spec Kit (execution layer vs specification layer — GSD handles parallel wave execution, Spec Kit handles upstream specification). Enhances 60-Skill Creator (GSD can execute skill development tasks in parallel waves). Enhances 55-CrewAI (structured task decomposition for multi-agent workflows). Fresh context isolation benefits all multi-file PMS features |
+| **62 Spec Kit** | 27-Claude Code | Complements 61-GSD (specification layer vs execution layer — Spec Kit generates constitutions and specs that GSD can execute). Enhances 55-CrewAI (constitution-driven specification for agent workflows). Enhances 48-FHIR DA Vinci PA (requirement traceability for compliance). Five-phase SDD workflow (Constitution → Specify → Plan → Tasks → Implement) |
+| **63 A2A Protocol** | 09-MCP | Complements 09-MCP (MCP = agent-to-tool, A2A = agent-to-agent — complete interoperability stack). Enhances 55-CrewAI (PMS agents can delegate to external agents via A2A). Enhances 26-LangGraph (PA agent graph can communicate with payer agents). Enhances 05-OpenClaw (clinical agents gain cross-org collaboration). Enables PA pipeline (43–49) to interact with payer AI agents, not just REST APIs |
 
 ---
 
@@ -880,8 +921,8 @@ These experiments **gate the most downstream work** and should be prioritized:
 
 | Experiment | Downstream Count | Blocks |
 |-----------|-----------------|--------|
-| **27 Claude Code** | 10 | 19-Superpowers, 14-Agent Teams (via 19), 24-Knowledge Plugins (via 14), 28-AI Coding Tools, 31-VS Code, 32-GitHub Agent HQ (via 31), 36-Claude Context Mode, 40-ExcalidrawSkill, 59-Obsidian, 60-Skill Creator |
-| **09 MCP** | 7 | 00-Tambo, 05-OpenClaw, 08-Adaptive, 15-Model Selection, 26-LangGraph, 34-n8n, (+ Tier 4 pipelines) |
+| **27 Claude Code** | 12 | 19-Superpowers, 14-Agent Teams (via 19), 24-Knowledge Plugins (via 14), 28-AI Coding Tools, 31-VS Code, 32-GitHub Agent HQ (via 31), 36-Claude Context Mode, 40-ExcalidrawSkill, 59-Obsidian, 60-Skill Creator, 61-GSD, 62-Spec Kit |
+| **09 MCP** | 8 | 00-Tambo, 05-OpenClaw, 08-Adaptive, 15-Model Selection, 26-LangGraph, 34-n8n, 63-A2A Protocol, (+ Tier 4 pipelines) |
 | **52 vLLM** | 6 | 53-Llama 4, 54-Mistral 3, 42-GPT-5.4 Benchmark, 55-CrewAI, 51-Amazon Connect, (+ Tier 4 pipelines) |
 | **39 Docker** | 4 (+transitive) | 52-vLLM, 58-Supabase, 44-Payer Policies, (+ everything downstream of vLLM) |
 | **45 CMS Coverage API** | 4 | 46-UHC, 47-Availity, 48-FHIR DA Vinci (via 47), 49-NextGen (via 48) |
@@ -920,6 +961,9 @@ flowchart LR
     E31 --> E32["32 Agent HQ<br/>7d"]
     E27 --> E59["59 Obsidian<br/>7d"]
     E27 --> E60["60 Skill Creator<br/>5d"]
+    E27 --> E61["61 GSD<br/>7d"]
+    E27 --> E62["62 Spec Kit<br/>7d"]
+    E09 --> E63["63 A2A<br/>10d"]
 
     %% Cross-path connections
     E55 -.->|"orchestrates"| CAP_PA
@@ -958,7 +1002,7 @@ flowchart LR
 |-------|------|-------------|
 | 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23, 27, 28, 39, 43, 50 |
 | 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45 |
-| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41 |
+| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41, 61, 62, 63 |
 | 10–13 | 3 — Advanced | 18, 25, 26, 24, 32, 55, 51, 48, 49 |
 | 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack |
 
@@ -1029,7 +1073,10 @@ flowchart LR
 | 58 Supabase + Claude Code | X | X | X | X | | | | X |
 | 59 Obsidian + Claude Code | | | | | | | | X |
 | 60 Skill Creator | | | | | | | | X |
-| **Total** | **39** | **31** | **10** | **19** | **25** | **4** | **14** | **17** |
+| 61 GSD | | | | | | | | X |
+| 62 Spec Kit | | | | | | | | X |
+| 63 A2A Protocol | X | X | | | | | X | |
+| **Total** | **40** | **32** | **10** | **19** | **25** | **4** | **15** | **19** |
 
 ---
 
@@ -1046,13 +1093,13 @@ Reference for Mermaid diagram styling in Section 3.
 | Clinical Decision Support | Red | `#f87171` | 11, 18 |
 | Interoperability | Violet | `#a78bfa` | 16, 17 |
 | Prior Authorization | Purple | `#c084fc` | 43, 44, 45, 46, 47, 48, 49, 56 |
-| Agentic AI & Automation | Orange | `#fb923c` | 05, 26, 34, 55, 51 |
+| Agentic AI & Automation | Orange | `#fb923c` | 05, 26, 34, 55, 51, 63 |
 | Real-Time & Streaming | Rose | `#f472b6` | 37, 38 |
 | Edge Computing | Teal | `#2dd4bf` | 25 |
 | Infrastructure | Mint | `#6ee7b7` | 39, 58 |
 | Knowledge & Content | Coral | `#fca5a5` | 40, 41, 57, 59 |
 | Security & Compliance | Yellow | `#fde047` | 50 |
-| Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27, 28, 31, 32, 36, 60 |
+| Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27, 28, 31, 32, 36, 60, 61, 62 |
 | Reference & Analysis | Light Gray | `#e2e8f0` | 04, 22, 23 |
 
 ---
@@ -1061,6 +1108,7 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 4.0 | 2026-03-09 | Ammar | Added Experiments 61–63 (GSD spec-driven execution, Spec Kit specification-layer SDD, A2A Protocol inter-agent communication). New cluster: Spec-Driven Development (61–62) and Agent Interoperability (63). Updated Track D with A2A, Track E with GSD/Spec Kit. New Tier 4 capstone: Spec-Driven Dev Pipeline. Updated bottleneck counts: 27-Claude Code (10→12), 09-MCP (7→8). Experiment count: 61 → 64 |
 | 3.0 | 2026-03-09 | Ammar | Major update: added Experiments 39–60 (Docker, ExcalidrawSkill, InfraNodus, GPT-5.4 Benchmark, CMS PA Dataset, Payer Policies, CMS Coverage API, UHC API, Availity, FHIR DA Vinci PA, NextGen FHIR, OWASP LLM Top 10, Amazon Connect, vLLM, Llama 4, Mistral 3, CrewAI, PA Competitive Landscape, notebooklm-py, Supabase, Obsidian, Skill Creator). New categories: Prior Authorization, Infrastructure, Knowledge & Content, Security & Compliance. New Tracks G (PA Pipeline) and H (Knowledge & Content). Three new Tier 4 capstone pipelines (PA Automation, Clinical Knowledge, AI Model Deploy). PA Pipeline is now the longest critical path (77 days). Updated all dependency graphs, execution tiers, platform coverage, bottleneck analysis, and quick-start recommendations. Experiment count: 39 → 61 |
 | 2.0 | 2026-03-03 | Ammar | Major update: added Experiments 29–38 (Gemini Interactions, ElevenLabs, VS Code Multi-Agent, GitHub Agent HQ, Speechmatics Flow, n8n 2.0+, Kintsugi, Claude Context Mode, WebSocket, Apache Kafka). New categories: Real-Time & Streaming, Voice AI expansion. New Track F (Voice AI). New Tier 4 capstone pipelines. Updated all dependency graphs, execution tiers, platform coverage, and bottleneck analysis |
 | 1.2 | 2026-03-02 | Ammar | Added Experiment 28 (AI Coding Tools Landscape) |
