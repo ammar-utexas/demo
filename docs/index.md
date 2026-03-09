@@ -335,6 +335,9 @@ _No bug fixes documented yet._
 - [CrewAI Setup Guide](experiments/55-CrewAI-PMS-Developer-Setup-Guide.md) — Python library installation in existing FastAPI backend, vLLM + Claude LLM provider configuration, custom PMS API tools, CrewService orchestration, and crew pipeline endpoints
 - [CrewAI Developer Tutorial](experiments/55-CrewAI-Developer-Tutorial.md) — Hands-on onboarding: build a four-agent Encounter Documentation Crew that generates SOAP notes, suggests ICD-10/CPT codes, validates compliance, and drafts patient letters — all coordinated automatically from a single trigger
 
+### PA Competitive Landscape & MarginLogic Positioning
+- [PA Competitive Landscape](experiments/56-PA-Competitive-Landscape.md) — Maps Abridge ($5.3B ambient→PA), Amazon Connect Health ($99/mo platform), Dragon Copilot (partner marketplace), and Epic AI Charting (62.6% ambient adoption) against MarginLogic's defensible wedge: specialty-specific, explainable PA prediction with payer-pattern learning
+
 ---
 
 ## Documentation Views
