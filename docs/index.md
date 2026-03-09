@@ -358,6 +358,11 @@ _No bug fixes documented yet._
 - [Skill Creator Setup Guide](experiments/60-SkillCreator-PMS-Developer-Setup-Guide.md) — Skill scaffolder installation, PMS skill templates, Python validator, cross-platform distribution, and skill registry setup
 - [Skill Creator Developer Tutorial](experiments/60-SkillCreator-Developer-Tutorial.md) — Hands-on onboarding: build a patient encounter summary skill with HIPAA compliance, tool restrictions, example output, and validation end-to-end
 
+### GSD — Get Shit Done (Spec-Driven AI Development Orchestration)
+- [PRD: GSD PMS Integration](experiments/61-PRD-GSD-PMS-Integration.md) — Multi-agent spec-driven development framework orchestrating Claude Code with fresh context isolation per task, wave-based parallelism, document-driven state in `.planning/`, atomic git commits, and goal-backward verification — with HIPAA-safe interactive mode and ISO 13485 artifact generation
+- [GSD Setup Guide](experiments/61-GSD-PMS-Developer-Setup-Guide.md) — npm installation, PMS-specific config (interactive mode, phase branching, quality model profile), project templates with requirement traceability, and CLAUDE.md integration
+- [GSD Developer Tutorial](experiments/61-GSD-Developer-Tutorial.md) — Hands-on onboarding: build a Clinic Operating Hours API using the full GSD lifecycle (new-project, discuss, plan, execute, verify, complete-milestone) with parallel wave execution and atomic commits end-to-end
+
 ---
 
 ## Documentation Views
