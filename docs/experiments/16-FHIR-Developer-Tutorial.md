@@ -5,8 +5,8 @@
 This tutorial will take you from zero to building your first FHIR integration with the PMS. By the end, you will understand how FHIR works, have a running local environment, and have built and tested a custom integration end-to-end.
 
 **Document ID:** PMS-EXP-FHIR-002
-**Version:** 1.0
-**Date:** February 21, 2026
+**Version:** 1.1
+**Date:** March 9, 2026
 **Applies To:** PMS project (all platforms)
 **Prerequisite:** [FHIR Setup Guide](16-FHIR-PMS-Developer-Setup-Guide.md)
 **Estimated time:** 2-3 hours
@@ -96,6 +96,9 @@ flowchart LR
 | OpenClaw | 05 | Agentic workflow automation | OpenClaw agents could use FHIR to fetch external patient data during prior authorization workflows. |
 | MedASR | 07 | Clinical speech-to-text | Transcribed clinical notes can be stored as FHIR `DocumentReference` resources for cross-system sharing. |
 | Sanford Guide | 11 | Antimicrobial CDS | Treatment recommendations can be modeled as FHIR `MedicationKnowledge` resources and shared via FHIR API. |
+| HL7v2 LIS | 17 | Legacy lab messaging | HL7v2 lab messages can bridge to FHIR via v2-to-FHIR translation for unified interoperability. |
+| FHIR Prior Auth | 48 | Electronic PA submission | Builds directly on this FHIR Facade using Da Vinci CRD/DTR/PAS profiles for standardized PA workflows. |
+| NextGen FHIR | 49 | EHR data import | Uses FHIR R4 client capabilities to import referral data from NextGen EHR systems (50%+ ophthalmology market share). |
 | Adaptive Thinking | 08 | AI reasoning optimization | Clinical decision support queries can use FHIR resources as input context for AI reasoning. |
 | Claude Model Selection | 15 | AI model routing | AI queries involving FHIR data can be routed to appropriate model tiers based on clinical complexity. |
 
@@ -586,10 +589,10 @@ curl -s "http://localhost:9090/fhir/r4/Encounter?patient=Patient/1" \
 ### 4.1 Strengths
 
 - **Universal interoperability:** FHIR R4 is supported by Epic, Cerner, Allscripts, athenahealth, and virtually every major EHR vendor. Implementing FHIR means the PMS can exchange data with any of them.
-- **Regulatory compliance:** CMS mandates FHIR-based APIs for prior authorization (January 2026). Having FHIR support ensures the PMS meets federal interoperability requirements.
+- **Regulatory compliance:** CMS mandated FHIR-based APIs for prior authorization effective January 2026 (CMS-0057-F), with Da Vinci PAS mandating standardized electronic PA submission by January 2027. Having FHIR support ensures the PMS meets current and upcoming federal interoperability requirements.
 - **Mature ecosystem:** Over 70% of countries have active FHIR deployments. Libraries exist for Python (`fhir.resources`), Java (HAPI FHIR), Kotlin (Google Android FHIR SDK), JavaScript (`fhir-react`), and every major language.
 - **JSON-native:** FHIR resources are standard JSON, making them natural to work with in FastAPI (Python), Next.js (TypeScript), and Kotlin. No special binary protocols or serialization.
-- **Backward compatibility:** FHIR R4 has normative status, meaning the core resource structures are stable and won't break in future versions. R5 and R6 are additive.
+- **Backward compatibility:** FHIR R4 has normative status, meaning the core resource structures are stable and won't break in future versions. While R5 was published in 2023, major vendors (Epic, Oracle Health) have not adopted it. The HL7 US Realm Steering Committee has confirmed US Core will eventually move to R6, but with no timeline — R4 remains the production standard through at least 2027.
 - **Built-in security model:** SMART on FHIR provides a healthcare-specific OAuth 2.0 framework with clinical scopes, eliminating the need to design a custom authorization model for external access.
 - **Facade architecture:** The PMS doesn't need to replace its database or internal APIs. The FHIR layer is a thin translation layer that can be added incrementally.
 
@@ -932,5 +935,7 @@ def fhir_{resource}_to_pms(fhir_resource: {ResourceType}) -> dict:
 1. Complete Practice Exercise Option A (MedicationRequest mapper) to solidify the pattern
 2. Read the [FHIR Setup Guide](16-FHIR-PMS-Developer-Setup-Guide.md) to deploy SMART on FHIR authorization
 3. Review the [PRD: FHIR PMS Integration](16-PRD-FHIR-PMS-Integration.md) for the full Phase 1-3 roadmap
-4. Test interoperability against the [HAPI FHIR public server](https://hapi.fhir.org/baseR4)
-5. Explore how [MCP (experiment 09)](09-PRD-MCP-PMS-Integration.md) can expose FHIR tools to AI agents
+4. Explore [FHIR Prior Authorization (experiment 48)](48-PRD-FHIRPriorAuth-PMS-Integration.md) for Da Vinci CRD/DTR/PAS implementation
+5. Explore [NextGen FHIR API (experiment 49)](49-PRD-NextGenFHIRAPI-PMS-Integration.md) for EHR referral data import
+6. Test interoperability against the [HAPI FHIR public server](https://hapi.fhir.org/baseR4)
+7. Explore how [MCP (experiment 09)](09-PRD-MCP-PMS-Integration.md) can expose FHIR tools to AI agents

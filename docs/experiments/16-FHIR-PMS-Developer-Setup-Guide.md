@@ -1,8 +1,8 @@
 # FHIR Setup Guide for PMS Integration
 
 **Document ID:** PMS-EXP-FHIR-001
-**Version:** 1.0
-**Date:** February 21, 2026
+**Version:** 1.1
+**Date:** March 9, 2026
 **Applies To:** PMS project (all platforms)
 **Prerequisites Level:** Intermediate
 
@@ -1110,11 +1110,13 @@ After completing this setup:
 
 ## Resources
 
-- [HL7 FHIR R4 Specification](https://www.hl7.org/fhir/) — Complete FHIR R4 standard
-- [fhir.resources on PyPI](https://pypi.org/project/fhir.resources/) — Python FHIR models
-- [SMART on FHIR](https://docs.smarthealthit.org/) — Authorization framework
+- [HL7 FHIR R4 Specification](https://hl7.org/fhir/R4/) — Complete FHIR R4 (v4.0.1) standard
+- [US Core Implementation Guide v8.0.1](https://hl7.org/fhir/us/core/) — US Core profiles (USCDI v5)
+- [fhir.resources on PyPI](https://pypi.org/project/fhir.resources/) — Python Pydantic v2-based FHIR models (use `fhir.resources.R4B` sub-package)
+- [SMART on FHIR v2.2.0](https://docs.smarthealthit.org/) — Authorization framework
 - [Google Android FHIR SDK](https://developers.google.com/open-health-stack/android-fhir) — Android FHIR libraries
 - [HAPI FHIR](https://hapifhir.io/) — Reference FHIR server implementation
-- [Build FHIR API with FastAPI](https://www.wellally.tech/blog/build-fhir-api-with-fastapi) — FastAPI FHIR implementation guide
 - [PRD: FHIR PMS Integration](16-PRD-FHIR-PMS-Integration.md) — Full product requirements
+- [PRD: FHIR Prior Authorization](48-PRD-FHIRPriorAuth-PMS-Integration.md) — Da Vinci CRD/DTR/PAS profiles
+- [PRD: NextGen FHIR API](49-PRD-NextGenFHIRAPI-PMS-Integration.md) — NextGen EHR data import
 - [MCP PMS Integration](09-PRD-MCP-PMS-Integration.md) — Complementary internal AI interoperability

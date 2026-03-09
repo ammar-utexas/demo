@@ -315,6 +315,11 @@ _No bug fixes documented yet._
 - [vLLM Setup Guide](experiments/52-vLLM-PMS-Developer-Setup-Guide.md) — Docker deployment with GPU passthrough, OpenAI-compatible API configuration, FastAPI LLMService integration, and Prometheus metrics collection
 - [vLLM Developer Tutorial](experiments/52-vLLM-Developer-Tutorial.md) — Hands-on onboarding: generate SOAP notes from encounter transcripts, suggest medical codes with confidence scores, draft patient communications, and check medication interactions — all on local GPU
 
+### Llama 4 Scout/Maverick (Self-Hosted Open-Weight Multimodal LLM)
+- [PRD: Llama 4 PMS Integration](experiments/53-PRD-Llama4-PMS-Integration.md) — Self-hosted Llama 4 Scout (17B active/109B MoE, 10M context) and Maverick (17B active/400B MoE, 1M context) for HIPAA-compliant clinical AI: SOAP notes, ICD-10 coding, medication interaction checks, and multimodal image+text analysis on vLLM
+- [Llama 4 Setup Guide](experiments/53-Llama4-PMS-Developer-Setup-Guide.md) — HuggingFace model download, vLLM INT4 deployment on H100, clinical prompt templates, LLM Service routing, FastAPI AI endpoints, and Next.js Clinical AI Assistant panel
+- [Llama 4 Developer Tutorial](experiments/53-Llama4-Developer-Tutorial.md) — Hands-on onboarding: build an encounter summarizer with SOAP note generation, ICD-10 code suggestion with validation, medication interaction checking, and model routing between local Llama 4 and cloud Claude API
+
 ### InfraNodus (Text Network Analysis & Clinical Knowledge Graphs)
 - [PRD: InfraNodus PMS Integration](experiments/41-PRD-InfraNodus-PMS-Integration.md) — Text network analysis transforming clinical encounter notes into interactive knowledge graphs via InfraNodus Cloud API (RapidAPI) with `doNotSave=true` PHI protection, PHI De-ID Gateway, topical cluster detection, structural gap identification, and MCP Server for developer workflows
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
