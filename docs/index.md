@@ -353,6 +353,11 @@ _No bug fixes documented yet._
 - [Obsidian + Claude Code Setup Guide](experiments/59-ObsidianClaudeCode-PMS-Developer-Setup-Guide.md) — Vault structure creation, Filesystem MCP and obsidian-claude-code-mcp plugin configuration, Knowledge Vault Service (FastAPI), Knowledge Search Panel (Next.js), and Obsidian CLI v1.12+ setup
 - [Obsidian + Claude Code Developer Tutorial](experiments/59-ObsidianClaudeCode-Developer-Tutorial.md) — Hands-on onboarding: build a drug interaction knowledge workflow with structured notes, wikilinks, vault search API, interaction lookup endpoint, and Claude Code automated vault curation end-to-end
 
+### Skill Creator (Claude Code Skill Development Framework)
+- [PRD: Skill Creator PMS Integration](experiments/60-PRD-SkillCreator-PMS-Integration.md) — Framework for creating, validating, testing, and distributing custom Claude Code skills with PMS-specific templates, HIPAA compliance validation, and cross-platform Agent Skills standard support
+- [Skill Creator Setup Guide](experiments/60-SkillCreator-PMS-Developer-Setup-Guide.md) — Skill scaffolder installation, PMS skill templates, Python validator, cross-platform distribution, and skill registry setup
+- [Skill Creator Developer Tutorial](experiments/60-SkillCreator-Developer-Tutorial.md) — Hands-on onboarding: build a patient encounter summary skill with HIPAA compliance, tool restrictions, example output, and validation end-to-end
+
 ---
 
 ## Documentation Views
