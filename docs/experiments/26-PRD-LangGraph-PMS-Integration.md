@@ -1,8 +1,8 @@
 # Product Requirements Document: LangGraph Integration into Patient Management System (PMS)
 
 **Document ID:** PRD-PMS-LANGGRAPH-001
-**Version:** 1.0
-**Date:** March 2, 2026
+**Version:** 1.1
+**Date:** 2026-03-09
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Draft
 
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary
 
-LangGraph is an open-source agent orchestration framework by LangChain Inc. that models AI workflows as stateful, directed graphs. Unlike simple LLM chains that execute linearly, LangGraph represents each step — LLM call, tool invocation, human approval gate — as a **node** in a graph, with **edges** defining transitions, conditions, and loops. The framework reached its 1.0 GA milestone in late 2025 and is now in production at companies including Uber, LinkedIn, and Klarna, making it the most mature durable agent framework available.
+LangGraph is an open-source agent orchestration framework by LangChain Inc. that models AI workflows as stateful, directed graphs. Unlike simple LLM chains that execute linearly, LangGraph represents each step — LLM call, tool invocation, human approval gate — as a **node** in a graph, with **edges** defining transitions, conditions, and loops. The framework reached its 1.0 GA milestone in October 2025 and is now in production at companies including Uber, LinkedIn, and Klarna, making it the most mature durable agent framework available. The 1.0 release is stability-focused with zero breaking changes to core graph primitives (state, nodes, edges), while deprecating `langgraph.prebuilt` in favor of `langchain.agents` with a new middleware system for agent customization.
 
 Integrating LangGraph into the PMS addresses a critical architectural gap: **the lack of a durable, stateful orchestration layer for multi-step clinical AI workflows**. Today, PMS AI features (OpenClaw skills, Adaptive Thinking reasoning, MedASR transcription pipelines) each implement their own state management, retry logic, and human-in-the-loop patterns. LangGraph unifies these into a single framework with built-in checkpointing, fault tolerance, and human approval gates — capabilities that directly map to clinical workflow requirements where processes span hours or days (prior authorization, care coordination, multi-provider referral chains).
 
@@ -208,7 +208,7 @@ LangGraph does not access the database directly. All data flows through MCP → 
 
 | Requirement | Specification |
 |---|---|
-| Python | 3.12+ |
+| Python | 3.10+ (3.12+ recommended; Python 3.9 dropped in LangGraph 1.0) |
 | LangGraph | 1.0+ (`pip install langgraph`) |
 | Checkpointer | `langgraph-checkpoint-postgres` (latest) |
 | PostgreSQL | 14+ (existing PMS database) |
@@ -272,7 +272,7 @@ LangGraph does not access the database directly. All data flows through MCP → 
 | Checkpoint data growth fills PostgreSQL | High — affects all PMS operations | Implement checkpoint pruning: retain last 5 checkpoints per thread, archive completed threads after 30 days |
 | LLM API failures during graph execution | Medium — workflow stalls | LangGraph's built-in retry at superstep level. Configurable retry count per node. Fallback to on-premise models (Gemma 3 / Qwen 3.5) |
 | HITL approval delays block workflows | Medium — patient care delayed | Configurable timeout per approval gate. Escalation to supervisor after timeout. Default-approve for low-risk decisions |
-| LangGraph breaking changes | Medium — requires migration | Pin to 1.0.x. Monitor changelog. LangGraph 1.0 promises API stability |
+| LangGraph breaking changes | Medium — requires migration | Pin to 1.0.x. Monitor changelog. LangGraph 1.0 guarantees no breaking changes until 2.0. Note: `langgraph.prebuilt` is deprecated in 1.0 (removed in 2.0) — use `langchain.agents.create_agent` instead |
 | PHI leakage in agent state | High — HIPAA violation | All state in encrypted PostgreSQL. No external state stores. State pruned after completion. Audit logging |
 | Vendor lock-in to LangChain ecosystem | Low — LangGraph is open-source | MIT license. Graph definitions are portable Python. Checkpointer interface is pluggable |
 | Concurrent agent thread resource exhaustion | Medium — backend degradation | Thread pool limits. Memory monitoring. Graceful backpressure via queue |
@@ -287,7 +287,8 @@ LangGraph does not access the database directly. All data flows through MCP → 
 | `langgraph-checkpoint-postgres` | Python package | Latest | PostgreSQL checkpoint persistence |
 | `psycopg[binary,pool]` | Python package | 3.x | PostgreSQL driver for checkpointer |
 | `langchain-anthropic` | Python package | Latest | Claude model integration |
-| `langchain-core` | Python package | 0.3+ | Base abstractions |
+| `langchain` | Python package | 1.0+ | High-level agent API (`create_agent`), middleware |
+| `langchain-core` | Python package | 1.0+ | Base abstractions (messages, chat models, tools) |
 | PMS MCP Server (Experiment 09) | Internal service | :9000 | Tool discovery and invocation |
 | PMS Backend (FastAPI) | Internal service | :8000 | REST API and agent endpoints |
 | PostgreSQL | Database | 14+ | Checkpoint storage and audit logs |
@@ -311,12 +312,48 @@ LangGraph is **complementary to MCP** and **a successor to OpenClaw's orchestrat
 
 ---
 
+## 11.1 LangGraph 1.0 GA Migration Notes
+
+LangGraph 1.0 was released in October 2025 as a stability-focused release. The PMS integration should follow these migration guidelines:
+
+### Deprecated Items (to be removed in 2.0)
+
+| Deprecated | Replacement | PMS Impact |
+|---|---|---|
+| `langgraph.prebuilt.create_react_agent` | `langchain.agents.create_agent` | Not used — PMS builds custom `StateGraph` graphs directly |
+| `langgraph.prebuilt.AgentState` | `langchain.agents.AgentState` | Not used — PMS uses custom `PmsAgentState` extending `MessagesState` |
+| `langgraph.prebuilt.HumanInterruptConfig` | `langchain.agents.middleware.human_in_the_loop.InterruptOnConfig` | Not used — PMS uses `interrupt()` directly |
+| `langgraph.prebuilt.HumanInterrupt` | `langchain.agents.middleware.human_in_the_loop.HITLRequest` | Not used — PMS implements custom HITL Manager |
+| `langgraph.prebuilt.ValidationNode` | Automatic validation in `create_agent` | Not used |
+| `MessageGraph` | `StateGraph` with `messages` key | Not used — PMS already uses `StateGraph` |
+| `prompt` parameter in `create_react_agent` | `system_prompt` parameter in `create_agent` | Not used |
+
+### What Changed
+
+- **Core graph primitives unchanged:** `StateGraph`, nodes, edges, `interrupt()`, checkpointers — all stable. No code changes needed for PMS graphs.
+- **Middleware system:** `langchain.agents.create_agent` introduces a middleware pipeline for cross-cutting concerns (logging, auth, rate limiting). PMS can adopt this for standardized audit logging across all agent graphs.
+- **Interrupt class simplified:** The `Interrupt` dataclass now uses two fields (`value`, `id`) instead of the previous four. This is backward-compatible — existing `interrupt()` calls work unchanged.
+- **Python 3.10+ required:** All LangChain/LangGraph packages dropped Python 3.9 support (EOL October 2025). PMS already requires 3.12+.
+- **Stability guarantee:** No breaking changes until LangGraph 2.0. Safe to pin `langgraph>=1.0,<2.0`.
+
+### PMS Migration Checklist
+
+- [x] Verify no imports from `langgraph.prebuilt` (PMS uses custom graphs — not affected)
+- [x] Update `langchain-core` dependency from `0.3+` to `1.0+`
+- [x] Add `langchain>=1.0` to dependencies (for future `create_agent` middleware adoption)
+- [ ] Evaluate `create_agent` middleware for standardized audit logging across graphs
+- [ ] Update CI/CD to test against `langgraph>=1.0,<2.0` version range
+
+---
+
 ## 12. Research Sources
 
 ### Official Documentation
 - [LangGraph Overview — LangChain Docs](https://docs.langchain.com/oss/python/langgraph/overview) — Core concepts, state management, architecture
 - [LangGraph GitHub Repository](https://github.com/langchain-ai/langgraph) — Source code, examples, issue tracker
 - [LangGraph 1.0 GA Announcement](https://blog.langchain.com/langchain-langgraph-1dot0/) — Release details, production adoption at Uber/LinkedIn/Klarna
+- [What's New in LangGraph v1](https://docs.langchain.com/oss/python/releases/langgraph-v1) — Stability focus, deprecated items, integration with LangChain v1
+- [LangGraph v1 Migration Guide](https://docs.langchain.com/oss/python/migrate/langgraph-v1) — Deprecated imports, `create_react_agent` → `create_agent`, middleware system
 
 ### Architecture & Integration
 - [LangGraph Persistence — LangChain Docs](https://docs.langchain.com/oss/python/langgraph/persistence) — Checkpointer architecture, PostgreSQL integration

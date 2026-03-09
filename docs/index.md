@@ -186,10 +186,10 @@ _No bug fixes documented yet._
 - [Edge Vision Stream Setup Guide](experiments/25-EdgeVisionStream-PMS-Developer-Setup-Guide.md) — GStreamer RTSP ingestion, NVDEC hardware decode, ZBar QR detection, YOLOv8 background analysis, Android RTSP server, and PMS backend integration
 - [Edge Vision Stream Developer Tutorial](experiments/25-EdgeVisionStream-Developer-Tutorial.md) — Hands-on onboarding: stream video from phone to Jetson, detect patient wristband QR codes, analyze clinical background context, and verify against PMS data end-to-end
 
-### LangGraph (Stateful Agent Orchestration for Clinical Workflows)
-- [PRD: LangGraph PMS Integration](experiments/26-PRD-LangGraph-PMS-Integration.md) — Durable, stateful agent orchestration using LangGraph with PostgreSQL checkpointing, human-in-the-loop approval gates, and SSE streaming for multi-step clinical workflows (prior auth, med reconciliation, care coordination)
-- [LangGraph Setup Guide](experiments/26-LangGraph-PMS-Developer-Setup-Guide.md) — LangGraph installation, PostgreSQL checkpointer setup, FastAPI agent endpoints, HITL manager, and Next.js progress component integration
-- [LangGraph Developer Tutorial](experiments/26-LangGraph-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation agent with stateful checkpointing, clinician HITL review, conditional routing, and fault-tolerant execution end-to-end
+### LangGraph 1.0 GA (Stateful Agent Orchestration for Clinical Workflows)
+- [PRD: LangGraph PMS Integration](experiments/26-PRD-LangGraph-PMS-Integration.md) — Durable, stateful agent orchestration using LangGraph 1.0 GA with PostgreSQL checkpointing, human-in-the-loop approval gates, SSE streaming, and `langchain.agents` middleware for multi-step clinical workflows (prior auth, med reconciliation, care coordination)
+- [LangGraph Setup Guide](experiments/26-LangGraph-PMS-Developer-Setup-Guide.md) — LangGraph 1.0 installation, `langgraph.prebuilt` deprecation notes, PostgreSQL checkpointer setup, FastAPI agent endpoints, HITL manager, and Next.js progress component integration
+- [LangGraph Developer Tutorial](experiments/26-LangGraph-Developer-Tutorial.md) — Hands-on onboarding: build a medication reconciliation agent with stateful checkpointing, clinician HITL review, conditional routing, and fault-tolerant execution end-to-end (updated for LangGraph 1.0 GA)
 
 ### Claude Code (AI-Native Development Environment)
 - [Claude Code Developer Tutorial](experiments/27-ClaudeCode-Developer-Tutorial.md) — Comprehensive Claude Code mastery guide: foundations (tools, context window, permissions), personalization (CLAUDE.md, memory, models), power features (sub-agents, MCP, hooks, skills), and autonomous usage (headless mode, worktrees, git integration)

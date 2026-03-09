@@ -1,8 +1,8 @@
 # LangGraph Setup Guide for PMS Integration
 
 **Document ID:** PMS-EXP-LANGGRAPH-001
-**Version:** 1.0
-**Date:** March 2, 2026
+**Version:** 1.1
+**Date:** 2026-03-09
 **Applies To:** PMS project (all platforms)
 **Prerequisites Level:** Intermediate
 
@@ -126,18 +126,20 @@ From the PMS backend project root:
 cd pms-backend
 
 # Using uv (recommended)
-uv pip install langgraph \
+uv pip install "langgraph>=1.0,<2.0" \
   langgraph-checkpoint-postgres \
   "psycopg[binary,pool]" \
+  "langchain>=1.0" \
   langchain-anthropic \
-  langchain-core
+  "langchain-core>=1.0"
 
 # Or using pip
-pip install langgraph \
+pip install "langgraph>=1.0,<2.0" \
   langgraph-checkpoint-postgres \
   "psycopg[binary,pool]" \
+  "langchain>=1.0" \
   langchain-anthropic \
-  langchain-core
+  "langchain-core>=1.0"
 ```
 
 ### Step 2: Verify installation
@@ -147,11 +149,17 @@ python3 -c "
 import langgraph
 print(f'LangGraph version: {langgraph.__version__}')
 
+import langchain
+print(f'LangChain version: {langchain.__version__}')
+
 from langgraph.graph import StateGraph
 print('StateGraph imported successfully')
 
 from langgraph.checkpoint.postgres import PostgresSaver
 print('PostgresSaver imported successfully')
+
+from langgraph.types import interrupt
+print('interrupt() imported successfully')
 "
 ```
 
@@ -159,9 +167,13 @@ Expected output:
 
 ```
 LangGraph version: 1.0.x
+LangChain version: 1.0.x
 StateGraph imported successfully
 PostgresSaver imported successfully
+interrupt() imported successfully
 ```
+
+> **LangGraph 1.0 GA Note:** The `langgraph.prebuilt` module (including `create_react_agent`) is deprecated in 1.0 and will be removed in 2.0. The PMS uses custom `StateGraph` graphs directly, so this deprecation does not affect our codebase. If you encounter tutorials using `from langgraph.prebuilt import create_react_agent`, use `from langchain.agents import create_agent` instead (with `system_prompt` instead of `prompt` parameter). See the [migration guide](https://docs.langchain.com/oss/python/migrate/langgraph-v1) for details.
 
 ### Step 3: Add environment variables
 
@@ -980,8 +992,11 @@ psql -h localhost -p 5432 -U pms -d pms_db \
 
 - [LangGraph Official Documentation](https://docs.langchain.com/oss/python/langgraph/overview)
 - [LangGraph GitHub Repository](https://github.com/langchain-ai/langgraph)
+- [LangGraph v1 Migration Guide](https://docs.langchain.com/oss/python/migrate/langgraph-v1) — Deprecated imports, `create_agent` migration
+- [What's New in LangGraph v1](https://docs.langchain.com/oss/python/releases/langgraph-v1) — Stability guarantees, middleware system
 - [LangGraph Persistence Docs](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [LangGraph Streaming Docs](https://docs.langchain.com/oss/python/langgraph/streaming)
+- [LangGraph Interrupts Docs](https://docs.langchain.com/oss/python/langgraph/interrupts) — HITL interrupt patterns and `Interrupt` class
 - [langgraph-checkpoint-postgres on PyPI](https://pypi.org/project/langgraph-checkpoint-postgres/)
 - [FastAPI + LangGraph Template](https://github.com/wassim249/fastapi-langgraph-agent-production-ready-template)
 - [PMS MCP Integration (Experiment 09)](09-PRD-MCP-PMS-Integration.md)

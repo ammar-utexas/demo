@@ -5,8 +5,8 @@
 This tutorial will take you from zero to building your first LangGraph integration with the PMS. By the end, you will understand how LangGraph works, have a running local environment, and have built and tested a custom clinical workflow agent end-to-end.
 
 **Document ID:** PMS-EXP-LANGGRAPH-002
-**Version:** 1.0
-**Date:** March 2, 2026
+**Version:** 1.1
+**Date:** 2026-03-09
 **Applies To:** PMS project (all platforms)
 **Prerequisite:** [LangGraph Setup Guide](26-LangGraph-PMS-Developer-Setup-Guide.md)
 **Estimated time:** 2-3 hours
@@ -126,6 +126,8 @@ There are three key concepts:
 | **Compiled graph** | A graph + checkpointer ready for execution (call `.compile()`) |
 | **Channel** | A named slot in the state. Each key in your state schema is a channel |
 | **Reducer** | A function that merges state updates (e.g., `operator.add` appends to lists) |
+| **Middleware** | (LangGraph 1.0+) Cross-cutting logic (logging, auth, rate limiting) applied to agents built with `langchain.agents.create_agent` |
+| **`create_agent`** | (LangGraph 1.0+) High-level agent factory from `langchain.agents` replacing deprecated `create_react_agent` from `langgraph.prebuilt` |
 
 ### 1.5 Our Architecture
 
@@ -180,6 +182,31 @@ flowchart TB
 
 ---
 
+### 1.6 LangGraph 1.0 GA: What You Need to Know
+
+LangGraph 1.0 was released in October 2025 as a **stability-focused release**. Here's what matters for PMS development:
+
+**What stayed the same (everything we use):**
+- `StateGraph`, nodes, edges, conditional routing — unchanged
+- `interrupt()` for HITL — unchanged
+- PostgreSQL checkpointer — unchanged
+- Streaming — unchanged
+
+**What's deprecated (doesn't affect PMS):**
+- `langgraph.prebuilt.create_react_agent` → use `langchain.agents.create_agent` with `system_prompt` instead of `prompt`
+- `langgraph.prebuilt.AgentState` → use `langchain.agents.AgentState`
+- `langgraph.prebuilt.HumanInterruptConfig` → use `langchain.agents.middleware.human_in_the_loop.InterruptOnConfig`
+- `MessageGraph` → use `StateGraph` with a `messages` key (already what PMS does)
+
+**What's new:**
+- **Middleware system:** `langchain.agents.create_agent` supports middleware for cross-cutting concerns like audit logging and rate limiting
+- **Stability guarantee:** No breaking changes until LangGraph 2.0 — safe to pin `>=1.0,<2.0`
+- **Python 3.10+ required:** Python 3.9 dropped (PMS requires 3.12+, so no impact)
+
+> **Bottom line:** If you're building custom `StateGraph` graphs (which is what all PMS agents do), LangGraph 1.0 requires zero code changes. The deprecations only affect the `langgraph.prebuilt` convenience functions that PMS doesn't use.
+
+---
+
 ## Part 2: Environment Verification (15 min)
 
 ### 2.1 Checklist
@@ -192,10 +219,13 @@ Run each command and confirm the expected output:
    # Expected: Python 3.12.x or higher
    ```
 
-2. **LangGraph installed:**
+2. **LangGraph and LangChain installed:**
    ```bash
-   python3 -c "import langgraph; print(langgraph.__version__)"
-   # Expected: 1.0.x
+   python3 -c "import langgraph; print(f'LangGraph: {langgraph.__version__}')"
+   # Expected: LangGraph: 1.0.x
+
+   python3 -c "import langchain; print(f'LangChain: {langchain.__version__}')"
+   # Expected: LangChain: 1.0.x
    ```
 
 3. **PostgreSQL checkpointer:**
@@ -502,7 +532,7 @@ curl -s -X POST http://localhost:8000/api/agents/run \
 
 - **Learning curve:** Graph-based programming requires a different mental model from linear code. Developers must think in nodes, edges, and state reducers.
 - **Debugging complexity:** When a graph fails, you need to inspect checkpoint state at each node. Stack traces span multiple node boundaries. LangGraph Studio (desktop tool) helps but adds another tool to the stack.
-- **LangChain ecosystem coupling:** While LangGraph itself is relatively standalone, the most ergonomic path involves `langchain-core` abstractions (ChatModels, Messages, Tools). Switching LLM providers requires learning LangChain's model interfaces.
+- **LangChain ecosystem coupling:** While LangGraph itself is relatively standalone, the most ergonomic path involves `langchain-core` 1.0+ abstractions (ChatModels, Messages, Tools). LangGraph 1.0 deepens this coupling by moving prebuilt agents to `langchain.agents`. Switching LLM providers requires learning LangChain's model interfaces.
 - **State schema evolution:** Changing the state schema of a running graph (adding/removing fields) requires migration logic. In-flight threads may have checkpoints with the old schema.
 - **Memory overhead:** Each active thread holds state in memory during execution. With 50+ concurrent threads handling large clinical documents, memory consumption can grow.
 - **No built-in multi-tenancy:** Thread isolation is by `thread_id`, not by tenant. PMS must enforce tenant isolation at the API layer.
@@ -765,8 +795,10 @@ curl http://localhost:8000/api/agents/graphs
 | Agent API docs | http://localhost:8000/docs#/agents |
 | LangGraph docs | https://docs.langchain.com/oss/python/langgraph/overview |
 | LangGraph GitHub | https://github.com/langchain-ai/langgraph |
+| LangGraph v1 Migration | https://docs.langchain.com/oss/python/migrate/langgraph-v1 |
 | Persistence docs | https://docs.langchain.com/oss/python/langgraph/persistence |
 | Streaming docs | https://docs.langchain.com/oss/python/langgraph/streaming |
+| Interrupts docs | https://docs.langchain.com/oss/python/langgraph/interrupts |
 
 ### Starter Template
 
