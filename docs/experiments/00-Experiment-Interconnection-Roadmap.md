@@ -29,10 +29,10 @@ This roadmap provides:
 
 ### How to Use This Document
 
-1. **New to the project?** Start with [Section 8: Quick Start Recommendations](#8-quick-start-recommendations)
-2. **Planning a sprint?** Check [Section 4: Execution Tiers](#4-recommended-execution-tiers) for prioritization
-3. **Looking for related experiments?** Use the [Section 6: Interconnection Matrix](#6-interconnection-matrix)
-4. **Assessing risk?** Review [Section 7: Critical Path Analysis](#7-critical-path-analysis) for bottlenecks
+1. **New to the project?** Start with the [Dependency Chain Overview](#3-dependency-chain-overview-whats-in-it-for-you) diagram for the big picture, then [Section 9: Quick Start Recommendations](#9-quick-start-recommendations)
+2. **Planning a sprint?** Check [Section 5: Execution Tiers](#5-recommended-execution-tiers) for prioritization
+3. **Looking for related experiments?** Use the [Section 7: Interconnection Matrix](#7-interconnection-matrix)
+4. **Assessing risk?** Review [Section 8: Critical Path Analysis](#8-critical-path-analysis) for bottlenecks
 
 ### Scope
 
@@ -108,7 +108,15 @@ This roadmap covers experiments 00–60 as documented in `docs/experiments/`. It
 
 ---
 
-## 3. Master Dependency Graph
+## 3. Dependency Chain Overview (What's In It For You)
+
+![Experiment Dependency Chains — each chain ends with the value it delivers](00-experiment-dependency-chains.png)
+
+_Each green node shows the outcome you get at the end of that dependency chain. Foundations (dark blue) at top, value propositions (green) at bottom. Orange nodes (vLLM, CrewAI) are high-fanout hubs gating the most downstream work._
+
+---
+
+## 4. Master Dependency Graph
 
 ```mermaid
 flowchart TD
@@ -363,7 +371,7 @@ flowchart TD
 
 ---
 
-## 4. Recommended Execution Tiers
+## 5. Recommended Execution Tiers
 
 ### Tier 0 — Foundation (Weeks 1–2)
 
@@ -556,7 +564,7 @@ gantt
 
 ---
 
-## 5. Parallel Execution Tracks
+## 6. Parallel Execution Tracks
 
 Eight independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
 
@@ -769,7 +777,7 @@ flowchart LR
 
 ---
 
-## 6. Interconnection Matrix
+## 7. Interconnection Matrix
 
 Relationship types: **D** = Dependency, **C** = Complementary, **S** = Same Domain, **E** = Enhances
 
@@ -846,7 +854,7 @@ _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 2
 
 ---
 
-## 7. Critical Path Analysis
+## 8. Critical Path Analysis
 
 ### Longest Dependency Chains
 
@@ -923,7 +931,7 @@ flowchart LR
 
 ---
 
-## 8. Quick Start Recommendations
+## 9. Quick Start Recommendations
 
 ### 1-Week Sprint
 
@@ -956,7 +964,7 @@ flowchart LR
 
 ---
 
-## 9. Platform Coverage Matrix
+## 10. Platform Coverage Matrix
 
 | Experiment | Backend | Web | Android | Database | AI Models | Edge | External APIs | Dev Tooling |
 |-----------|---------|-----|---------|----------|-----------|------|---------------|-------------|
@@ -1025,7 +1033,7 @@ flowchart LR
 
 ---
 
-## 10. Category Legend & Color Key
+## 11. Category Legend & Color Key
 
 Reference for Mermaid diagram styling in Section 3.
 
@@ -1049,7 +1057,7 @@ Reference for Mermaid diagram styling in Section 3.
 
 ---
 
-## 11. Change Log
+## 12. Change Log
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
