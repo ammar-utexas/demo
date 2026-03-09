@@ -364,6 +364,16 @@ _No bug fixes documented yet._
 - [GSD Developer Tutorial](experiments/61-GSD-Developer-Tutorial.md) — Hands-on onboarding: build a Clinic Operating Hours API using the full GSD lifecycle (new-project, discuss, plan, execute, verify, complete-milestone) with parallel wave execution and atomic commits end-to-end
 - [GSD vs Spec Kit Comparative Tutorial](experiments/61-GSD-vs-SpecKit-Comparative-Tutorial.md) — Side-by-side build of the same feature with GSD and GitHub Spec Kit, architectural comparison (execution-layer vs specification-layer), ISO 13485 DHF mapping, scoring rubric, and combined workflow recommendation
 
+### GitHub Spec Kit (Specification-Driven AI Development)
+- [PRD: Spec Kit PMS Integration](experiments/62-PRD-SpecKit-PMS-Integration.md) — GitHub's open-source SDD toolkit (40.6K stars, MIT) with five-phase workflow (Constitution → Specify → Plan → Tasks → Implement), PMS constitution encoding HIPAA/ISO 13485 guardrails, requirement traceability bridge, and API contract generation — complementary specification layer to GSD's execution layer
+- [Spec Kit Setup Guide](experiments/62-SpecKit-PMS-Developer-Setup-Guide.md) — specify CLI installation, PMS constitution creation with HIPAA and architectural rules, Claude Code /speckit command integration, and custom PMS templates for spec.md, plan.md, and tasks.md
+- [Spec Kit Developer Tutorial](experiments/62-SpecKit-Developer-Tutorial.md) — Hands-on onboarding: build a Patient Allergies feature using the full SDD pipeline — specification with HIPAA review, technical plan with RLS and API contracts, atomic tasks with verification, and constitution-guided implementation end-to-end
+
+### A2A Protocol (Agent-to-Agent Interoperability)
+- [PRD: A2A PMS Integration](experiments/63-PRD-A2A-PMS-Integration.md) — Google/Linux Foundation open protocol (Apache 2.0, v0.3.0, 150+ orgs) enabling cross-organizational agent collaboration via Agent Cards, stateful tasks, and JSON-RPC — complementary to MCP (agent-to-tool) as the agent-to-agent layer for PA delegation, referral coordination, and lab result routing with HIPAA-compliant audit logging
+- [A2A Setup Guide](experiments/63-A2A-PMS-Developer-Setup-Guide.md) — a2a-sdk installation, Agent Card serving at /.well-known/agent-card.json, A2A Gateway router, PMSAgentExecutor with clinical skills, mock external agent, and Next.js Agent Dashboard
+- [A2A Developer Tutorial](experiments/63-A2A-Developer-Tutorial.md) — Hands-on onboarding: build a multi-agent referral coordination workflow with PMS agent discovery, specialist scheduling agent, A2A task lifecycle, and MCP vs A2A comparison end-to-end
+
 ---
 
 ## Documentation Views
