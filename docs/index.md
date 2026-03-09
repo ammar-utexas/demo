@@ -325,6 +325,11 @@ _No bug fixes documented yet._
 - [InfraNodus Setup Guide](experiments/41-InfraNodus-PMS-Developer-Setup-Guide.md) — Cloud API configuration via RapidAPI, MCP Server setup for Claude Code, PHI De-ID Gateway, Knowledge Graph Service, D3.js graph visualization, and gap analysis panel integration
 - [InfraNodus Developer Tutorial](experiments/41-InfraNodus-Developer-Tutorial.md) — Hands-on onboarding: build a clinical encounter knowledge graph analyzer with Cloud API integration, longitudinal patient documentation analysis, structural gap detection, and interactive graph visualization end-to-end
 
+### Mistral 3 Family (Open-Weight Tiered Clinical AI — Edge to Server)
+- [PRD: Mistral 3 PMS Integration](experiments/54-PRD-Mistral3-PMS-Integration.md) — Apache 2.0 open-weight model family (Ministral 3B/8B/14B dense + Mistral Large 3 675B MoE) for tiered self-hosted clinical AI spanning edge devices to GPU servers, with multimodal vision, 256K context, and reasoning variants for HIPAA-compliant encounter summarization, medication analysis, and document extraction
+- [Mistral 3 Setup Guide](experiments/54-Mistral3-PMS-Developer-Setup-Guide.md) — vLLM Docker deployment for Ministral 14B and Mistral Large 3, FastAPI MistralService integration, OpenAI-compatible API configuration, Next.js AI panel, and Prometheus metrics
+- [Mistral 3 Developer Tutorial](experiments/54-Mistral3-Developer-Tutorial.md) — Hands-on onboarding: build an ophthalmology encounter summarizer with structured SOAP note generation, ICD-10/CPT code suggestions, physician approval workflow, and model tier routing end-to-end
+
 ---
 
 ## Documentation Views
