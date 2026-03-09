@@ -348,6 +348,11 @@ _No bug fixes documented yet._
 - [Supabase + Claude Code Setup Guide](experiments/58-SupabaseClaudeCode-PMS-Developer-Setup-Guide.md) — Supabase Cloud project creation with HIPAA add-on, MCP server and Claude Code Templates installation, FastAPI/Next.js/Android client integration, and RLS-protected schema setup
 - [Supabase + Claude Code Developer Tutorial](experiments/58-SupabaseClaudeCode-Developer-Tutorial.md) — Hands-on onboarding: build a real-time vitals monitor with RLS-protected tables, PostgREST auto-API, WebSocket subscriptions, and Claude Code security auditing
 
+### Obsidian + Claude Code (AI-Powered Clinical Knowledge Management)
+- [PRD: Obsidian + Claude Code PMS Integration](experiments/59-PRD-ObsidianClaudeCode-PMS-Integration.md) — Local-first, AI-queryable clinical knowledge vault using Obsidian's markdown-based bidirectional linking with Claude Code MCP integration for protocol search, drug interaction lookup, and developer knowledge graph — with HIPAA-compliant PHI isolation and Git version control
+- [Obsidian + Claude Code Setup Guide](experiments/59-ObsidianClaudeCode-PMS-Developer-Setup-Guide.md) — Vault structure creation, Filesystem MCP and obsidian-claude-code-mcp plugin configuration, Knowledge Vault Service (FastAPI), Knowledge Search Panel (Next.js), and Obsidian CLI v1.12+ setup
+- [Obsidian + Claude Code Developer Tutorial](experiments/59-ObsidianClaudeCode-Developer-Tutorial.md) — Hands-on onboarding: build a drug interaction knowledge workflow with structured notes, wikilinks, vault search API, interaction lookup endpoint, and Claude Code automated vault curation end-to-end
+
 ---
 
 ## Documentation Views
