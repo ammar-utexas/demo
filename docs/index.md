@@ -338,6 +338,11 @@ _No bug fixes documented yet._
 ### PA Competitive Landscape & MarginLogic Positioning
 - [PA Competitive Landscape](experiments/56-PA-Competitive-Landscape.md) — Maps Abridge ($5.3B ambient→PA), Amazon Connect Health ($99/mo platform), Dragon Copilot (partner marketplace), and Epic AI Charting (62.6% ambient adoption) against MarginLogic's defensible wedge: specialty-specific, explainable PA prediction with payer-pattern learning
 
+### notebooklm-py (Programmatic Clinical Content Generation)
+- [PRD: notebooklm-py PMS Integration](experiments/57-PRD-NotebookLM-Py-PMS-Integration.md) — Unofficial Python SDK (MIT, v0.3.2) for Google NotebookLM enabling automated generation of audio podcasts, quizzes, flashcards, study guides, and slide decks from clinical protocols and guidelines — with PHI de-identification gateway and HIPAA audit logging
+- [notebooklm-py Setup Guide](experiments/57-NotebookLM-Py-PMS-Developer-Setup-Guide.md) — Cookie-based Google authentication via Playwright, NotebookLMService async wrapper for FastAPI, REST API endpoints, Next.js Content Library page, and end-to-end verification
+- [notebooklm-py Developer Tutorial](experiments/57-NotebookLM-Py-Developer-Tutorial.md) — Hands-on onboarding: build a Clinical Protocol Podcast Generator that creates notebooks, ingests guidelines, generates audio briefings and comprehension quizzes, and queries sources via grounded Q&A
+
 ---
 
 ## Documentation Views
