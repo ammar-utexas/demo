@@ -1,8 +1,8 @@
 # Qwen 3.5 Setup Guide for PMS Integration
 
 **Document ID:** PMS-EXP-QWEN35-001
-**Version:** 1.1
-**Date:** March 2, 2026
+**Version:** 1.2
+**Date:** March 9, 2026
 **Applies To:** PMS project (all platforms)
 **Prerequisites Level:** Intermediate
 
@@ -100,19 +100,28 @@ flowchart LR
 
 ### 2.2 GPU Requirements
 
-| Model | Min VRAM (Q4) | Recommended GPU |
-|-------|---------------|-----------------|
-| Qwen3.5-9B | ~6 GB | RTX 3060 12GB, RTX 4060 Ti |
-| Qwen3.5-27B (dense) | ~17 GB | RTX 4090 24GB, RTX 3090 |
-| Qwen3.5-35B-A3B (MoE) | ~24 GB | RTX 4090 24GB — **consumer sweet spot** |
-| Qwen3-32B | ~18 GB | RTX 4090, A6000, L40 |
-| Qwen3.5-122B-A10B | ~81 GB | 2x A100 80GB |
-| Qwen3.5-397B-A17B (FP8) | ~400 GB | 8x H200 80GB or 4x GB200 |
-| Qwen3.5-397B-A17B (NVFP4) | ~200 GB | 4x H100 80GB |
+**Small Series (Dense — edge to single GPU):**
 
-> **Getting started:** This guide uses **Qwen3.5-35B-A3B** (the new consumer sweet spot — 3B active params in 24 GB, outperforms the previous Qwen3-235B-A22B). The 397B flagship requires multi-GPU setup and is covered as an advanced option.
+| Model | Min VRAM (Q4) | Recommended Hardware | Best For |
+|-------|---------------|---------------------|----------|
+| **Qwen3.5-0.8B** | **~0.5 GB** | CPU-only / phone / Apple Watch | Text classification, triage routing |
+| **Qwen3.5-2B** | **~1.3 GB** | Raspberry Pi 5 / M1 Mac / 4 GB GPU | Mobile agent, basic extraction |
+| **Qwen3.5-4B** | **~2.5 GB** | RTX 3050 / M2 Mac / integrated GPU | Edge kiosk, document OCR, multimodal agent |
+| **Qwen3.5-9B** | **~5 GB** | RTX 3060 12GB / RTX 4060 Ti / M2 Pro | **Small Series flagship** — reasoning, extraction, doc understanding |
+
+**Medium/Flagship Series (Dense + MoE — workstation to datacenter):**
+
+| Model | Min VRAM (Q4) | Recommended GPU | Best For |
+|-------|---------------|-----------------|----------|
+| Qwen3.5-27B (dense) | ~17 GB | RTX 4090 24GB, RTX 3090 | Dense reasoning alternative |
+| Qwen3.5-35B-A3B (MoE) | ~24 GB | RTX 4090 24GB — **MoE sweet spot** | MoE-class reasoning on single GPU |
+| Qwen3.5-122B-A10B (MoE) | ~81 GB | 2x A100 80GB | Agentic tool use, mid-tier reasoning |
+| Qwen3.5-397B-A17B (FP8) | ~400 GB | 8x H200 80GB or 4x GB200 | Frontier reasoning, 1M context |
+| Qwen3.5-397B-A17B (NVFP4) | ~200 GB | 4x H100 80GB | Frontier reasoning (quantized) |
+
+> **Getting started:** This guide uses **Qwen3.5-9B** (Small Series flagship — 5 GB Q4, GPQA 81.7, beats GPT-OSS-120B at 13x the size) as the default model, with **Qwen3.5-35B-A3B** as the upgrade path for teams with RTX 4090 GPUs. Small models (0.8B–4B) are deployed via Ollama for edge/mobile scenarios.
 >
-> **New since v1.0:** The Qwen3.5 medium series (February 24, 2026) and small series (March 2, 2026) offer more deployment options. Qwen3.5-35B-A3B is now the recommended default over Qwen3-32B.
+> **New since v1.1:** The Qwen3.5 Small Series (March 2, 2026) adds four dense models (0.8B/2B/4B/9B) — all natively multimodal with 262K context. The 9B is now the recommended starting point for most PMS deployments due to its exceptional quality-to-cost ratio.
 
 ### 2.3 Verify Existing PMS Services
 
@@ -258,9 +267,51 @@ curl -s http://localhost:8080/v1/chat/completions \
 
 You should see a structured reasoning chain followed by a ranked differential diagnosis.
 
-### Step 7: Optional — Add Qwen3.5-9B for Real-Time Tasks
+### Step 7: Deploy Qwen 3.5 Small Series via Ollama
 
-To run a second model for fast, real-time tasks, you can start a second vLLM instance:
+The Small Series models (0.8B–9B) are best deployed via Ollama, which handles model swapping automatically and has simpler setup than vLLM for smaller dense models:
+
+```bash
+# Pull Small Series models via the existing Ollama instance
+docker exec pms-ollama ollama pull qwen3.5:9b       # ~5 GB — flagship small model
+docker exec pms-ollama ollama pull qwen3.5:4b       # ~2.5 GB — edge/kiosk
+docker exec pms-ollama ollama pull qwen3.5:2b       # ~1.3 GB — mobile
+docker exec pms-ollama ollama pull qwen3.5:0.8b     # ~0.5 GB — phone/IoT
+
+# Verify models are available
+docker exec pms-ollama ollama list | grep qwen3.5
+```
+
+Test the 9B model (Small Series flagship):
+
+```bash
+curl -s http://localhost:11434/api/chat \
+  -d '{
+    "model": "qwen3.5:9b",
+    "messages": [
+      {"role": "system", "content": "Think step by step."},
+      {"role": "user", "content": "A 45-year-old diabetic patient presents with foot ulcer and fever. What workup is needed?"}
+    ],
+    "stream": false
+  }' | python3 -m json.tool
+```
+
+Test the 4B model (edge/kiosk):
+
+```bash
+curl -s http://localhost:11434/api/chat \
+  -d '{
+    "model": "qwen3.5:4b",
+    "messages": [
+      {"role": "user", "content": "Extract the medication name and dose from: Patient takes metformin 1000mg twice daily"}
+    ],
+    "stream": false
+  }' | python3 -m json.tool
+```
+
+### Step 8: Optional — Add Qwen3.5-9B via vLLM for High-Throughput
+
+If you need concurrent requests to the 9B model (not just Ollama's sequential serving), add a dedicated vLLM instance:
 
 ```yaml
   # Add to docker-compose.yml
@@ -289,7 +340,7 @@ To run a second model for fast, real-time tasks, you can start a second vLLM ins
       --served-model-name qwen3.5-9b
 ```
 
-> **GPU sharing:** If running both models on one GPU, set `--gpu-memory-utilization` to 0.45 for each to avoid OOM. Alternatively, use Ollama to serve the smaller model (it handles model swapping automatically).
+> **GPU sharing:** If running both 35B and 9B on one GPU via vLLM, set `--gpu-memory-utilization` to 0.45 for each. For most setups, running 9B/4B via Ollama alongside 35B via vLLM is simpler — Ollama handles model swapping automatically.
 
 **Checkpoint:** vLLM is running with Qwen3.5-35B-A3B, serving OpenAI-compatible chat completions on port 8080. Thinking mode is working and producing reasoning chains.
 
@@ -313,10 +364,14 @@ MODEL_MAP = {
     "gemma3-27b": {"tag": "gemma3:27b", "backend": "ollama"},
     "medgemma-4b": {"tag": "medgemma:4b", "backend": "ollama"},
     "medgemma-27b": {"tag": "medgemma:27b", "backend": "ollama"},
-    # Qwen 3.5 models (via vLLM)
-    "qwen3.5-9b": {"tag": "qwen3.5-9b", "backend": "vllm"},
+    # Qwen 3.5 Medium/Flagship models (via vLLM)
     "qwen3.5-35b": {"tag": "qwen3.5-35b", "backend": "vllm"},
     "qwen3.5-397b": {"tag": "qwen3.5-397b", "backend": "vllm"},
+    # Qwen 3.5 Small Series (via Ollama — simpler for dense models)
+    "qwen3.5-9b": {"tag": "qwen3.5:9b", "backend": "ollama"},
+    "qwen3.5-4b": {"tag": "qwen3.5:4b", "backend": "ollama"},
+    "qwen3.5-2b": {"tag": "qwen3.5:2b", "backend": "ollama"},
+    "qwen3.5-0.8b": {"tag": "qwen3.5:0.8b", "backend": "ollama"},
 }
 
 # Task-type to model routing
@@ -326,9 +381,12 @@ TASK_ROUTING = {
     "code-generation": "qwen3.5-35b",
     "summarization": "gemma3-27b",
     "medical-qa": "medgemma-27b",
-    "extraction": "qwen3.5-35b",
-    "autocomplete": "qwen3.5-9b",
+    "extraction": "qwen3.5-9b",          # 9B excels at structured extraction
+    "autocomplete": "qwen3.5-4b",         # 4B: fast + capable for completions
     "imaging": "medgemma-4b",
+    "document-ocr": "qwen3.5-9b",         # OmniDocBench 87.7 — best-in-class
+    "triage": "qwen3.5-0.8b",             # Ultra-fast classification
+    "intake-form": "qwen3.5-2b",          # Mobile-friendly form processing
 }
 ```
 

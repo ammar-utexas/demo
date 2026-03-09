@@ -5,8 +5,8 @@
 This tutorial will take you from zero to building your first Qwen 3.5 integration with the PMS. By the end, you will understand how Qwen 3.5's Mixture-of-Experts architecture works, how it complements Gemma 3 for clinical AI, and have built and tested a clinical reasoning pipeline end-to-end.
 
 **Document ID:** PMS-EXP-QWEN35-002
-**Version:** 1.1
-**Date:** 2026-03-02
+**Version:** 1.2
+**Date:** 2026-03-09
 **Applies To:** PMS project (all platforms)
 **Prerequisite:** [Qwen 3.5 Setup Guide](20-Qwen35-PMS-Developer-Setup-Guide.md)
 **Estimated time:** 2-3 hours
@@ -17,15 +17,16 @@ This tutorial will take you from zero to building your first Qwen 3.5 integratio
 ## What You Will Learn
 
 1. What Qwen 3.5 is and why its MoE architecture matters for on-premise healthcare AI
-2. How Qwen 3.5 complements Gemma 3 in the PMS dual-model strategy
-3. How Mixture-of-Experts routing activates only 17B of 397B parameters per token (or 3B of 35B in the consumer model)
-4. How thinking mode produces auditable clinical reasoning chains
-5. How to build a differential diagnosis pipeline with Qwen 3.5
-6. How to use function calling for structured medication interaction analysis
-7. How to generate clinical rule engine code with Qwen 3.5
-8. How to compare Qwen 3.5 vs Gemma 3 output quality on clinical tasks
-9. When to route tasks to Qwen 3.5 vs Gemma 3 in the AI Gateway
-10. HIPAA security considerations for dual-model on-premise deployment
+2. How the **Small Series** (0.8B–9B) enables edge, mobile, and single-GPU deployment
+3. How to choose the right model from the full Qwen 3.5 family (0.8B to 397B)
+4. How Qwen 3.5 complements Gemma 3 in the PMS dual-model strategy
+5. How thinking mode produces auditable clinical reasoning chains
+6. How to build a differential diagnosis pipeline with Qwen 3.5
+7. How to use function calling for structured medication interaction analysis
+8. How to generate clinical rule engine code with Qwen 3.5
+9. How to compare Qwen 3.5 vs Gemma 3 output quality on clinical tasks
+10. When to route tasks to Qwen 3.5 vs Gemma 3 in the AI Gateway
+11. HIPAA security considerations for dual-model on-premise deployment
 
 ---
 
@@ -108,6 +109,8 @@ flowchart TB
 
 **The key insight:** Each token only activates a small subset of experts. In the 397B flagship, 10 of 512 experts activate (~17B active params). In the consumer-friendly 35B-A3B, 4 of 128 experts activate (~3B active params) — achieving strong reasoning on a single RTX 4090 24GB GPU. Both use Gated DeltaNet linear attention for efficient long-context processing.
 
+**The Small Series (0.8B–9B) uses dense architecture** — no expert routing, all parameters active. They share the same Gated DeltaNet hybrid (3:1 linear:softmax attention ratio) for efficient long-context, but are simpler to deploy and optimize. The 9B achieves GPQA Diamond 81.7, beating GPT-OSS-120B (71.5) — a model 13x its size.
+
 ### 1.3 How Qwen 3.5 Fits with Other PMS Technologies
 
 | Experiment | Technology | Relationship to Qwen 3.5 |
@@ -125,7 +128,52 @@ flowchart TB
 | 27 — Claude Code | AI coding tool | **Complementary** — Claude Code for development workflow; Qwen for on-premise production inference |
 | 28 — AI Coding Tools | Landscape comparison | **Reference** — Emergency transition roadmap if cloud tools become unavailable |
 
-### 1.4 Key Vocabulary
+### 1.4 The Qwen 3.5 Small Series — Edge to Single GPU
+
+The Small Series (released March 2, 2026) adds four **dense** models to the Qwen 3.5 family. Unlike the MoE models (35B-A3B, 122B-A10B, 397B-A17B), these are straightforward dense transformers — simpler to deploy, no expert routing overhead.
+
+**Why the Small Series matters for the PMS:**
+
+```mermaid
+flowchart LR
+    subgraph SmallSeries["Qwen 3.5 Small Series"]
+        Q08["0.8B<br/>0.5 GB<br/>CPU-viable"]
+        Q2B["2B<br/>1.3 GB<br/>Phone/Tablet"]
+        Q4B["4B<br/>2.5 GB<br/>Edge Kiosk"]
+        Q9B["9B<br/>5 GB<br/>GPQA 81.7"]
+    end
+
+    subgraph PMSUseCases["PMS Edge Deployment Scenarios"]
+        PHONE["Patient Self-Check-In<br/>on Phone"]
+        TABLET["Waiting Room<br/>Triage Kiosk"]
+        LAPTOP["Clinician Laptop<br/>Offline Mode"]
+        DESKTOP["Clinical Workstation<br/>Multi-Task"]
+    end
+
+    Q08 --> PHONE
+    Q2B --> PHONE
+    Q4B --> TABLET
+    Q9B --> LAPTOP
+    Q9B --> DESKTOP
+
+    style Q08 fill:#C8E6C9,stroke:#2E7D32,color:#000
+    style Q2B fill:#C8E6C9,stroke:#2E7D32,color:#000
+    style Q4B fill:#B3E5FC,stroke:#0277BD,color:#000
+    style Q9B fill:#B3E5FC,stroke:#0277BD,color:#000
+```
+
+| Model | Architecture | VRAM (Q4) | Key Benchmarks | PMS Use Case |
+|-------|-------------|-----------|----------------|-------------|
+| **Qwen3.5-0.8B** | Dense | ~0.5 GB | First sub-1B with video processing | Vitals classification, text routing, triage labels |
+| **Qwen3.5-2B** | Dense | ~1.3 GB | First 2B with video; 201 languages | Patient intake forms on mobile; basic extraction |
+| **Qwen3.5-4B** | Dense | ~2.5 GB | Strong multimodal + doc understanding | Waiting room kiosk agent; offline form OCR |
+| **Qwen3.5-9B** | Dense | ~5 GB | GPQA 81.7, MMLU-Pro 82.5, MMMU-Pro 70.1, OmniDocBench 87.7 | **Small Series flagship** — reasoning, extraction, doc OCR |
+
+**9B headline numbers:** Beats GPT-OSS-120B (a model 13x its size) on GPQA Diamond (81.7 vs 71.5), HMMT Feb 2025 (83.2 vs 76.7), and MMMU-Pro (70.1 vs 59.7). Beats previous-gen Qwen3-30B on GPQA Diamond by 8 points.
+
+**All small models share:** 262K native context (extendable to 1M+), native multimodal (text + image + video via early fusion), thinking mode support, multi-token prediction for faster inference, 248K-token vocabulary (201 languages), Apache 2.0 license.
+
+### 1.5 Key Vocabulary
 
 | Term | Meaning |
 |------|---------|
@@ -168,7 +216,12 @@ flowchart TB
 
     subgraph VLLM["vLLM :8080"]
         Q35["Qwen3.5-35B-A3B"]
+    end
+
+    subgraph OllamaQwen["Ollama (Qwen Small)"]
         Q9["Qwen3.5-9B"]
+        Q4["Qwen3.5-4B"]
+        Q08x["Qwen3.5-0.8B/2B"]
     end
 
     DB[(PostgreSQL :5432)]
@@ -182,6 +235,7 @@ flowchart TB
     AI_RULE --> ROUTER
     ROUTER -->|"Summarization,<br/>imaging"| Ollama
     ROUTER -->|"Reasoning,<br/>code gen"| VLLM
+    ROUTER -->|"Extraction,<br/>triage, edge"| OllamaQwen
     ROUTER --> CACHE
     PMS --> DB
 
@@ -196,6 +250,8 @@ flowchart TB
     style MG fill:#FFF59D,stroke:#F9A825,color:#000
     style Q35 fill:#B3E5FC,stroke:#0277BD,color:#000
     style Q9 fill:#B3E5FC,stroke:#0277BD,color:#000
+    style Q4 fill:#C8E6C9,stroke:#2E7D32,color:#000
+    style Q08x fill:#C8E6C9,stroke:#2E7D32,color:#000
     style DB fill:#FFB74D,stroke:#F57C00,color:#000
     style CACHE fill:#A5D6A7,stroke:#2E7D32,color:#000
 ```
@@ -663,36 +719,73 @@ export function MedicationInteractions({
 1. **Reasoning Quality:** Qwen 3.5's thinking mode produces multi-step clinical reasoning chains that are auditable — critical for healthcare AI where "why" matters as much as "what"
 2. **Code Generation:** SWE-bench Verified 76.4%, HumanEval 99.0% — generated clinical rules, alert logic, and data transformations are reliably correct
 3. **MoE Efficiency:** 397B total parameters but only 17B active — you get frontier reasoning at mid-tier compute costs
-4. **262K Native Context (1M with YaRN):** Process entire patient histories without chunking, preserving longitudinal patterns that chunked summarization would lose
-5. **Structured Output:** JSON schema mode enforces valid JSON structure, eliminating parsing failures in extraction pipelines
-6. **Apache 2.0 License:** No usage restrictions, no telemetry, no BAA needed — most permissive license in the open-weight frontier model space. Full model family from 0.8B to 397B under same license
-7. **vLLM Optimization:** Native vLLM support with MoE-specific kernels, continuous batching, and tensor parallelism
+4. **Small Series Edge Deployment:** Four dense models (0.8B–9B) enable AI on phones, tablets, kiosks, and laptops without datacenter GPUs. The 9B beats GPT-OSS-120B (13x larger) on GPQA Diamond (81.7 vs 71.5)
+5. **262K Native Context (1M with YaRN):** Process entire patient histories without chunking — available across the entire family including 0.8B
+6. **Native Multimodal from 0.8B:** First model family where a sub-1B model processes video (60s at 8 FPS). All models handle text + image + video via early fusion
+7. **Structured Output:** JSON schema mode enforces valid JSON structure, eliminating parsing failures in extraction pipelines
+8. **Apache 2.0 License:** No usage restrictions, no telemetry, no BAA needed — most permissive license in the open-weight frontier model space. Full model family from 0.8B to 397B under same license
+9. **Flexible Deployment:** vLLM for MoE models (35B+), Ollama for dense small models (0.8B–9B) — use both simultaneously behind the AI Gateway
 
 ### 4.2 Weaknesses
 
 1. **No Official Healthcare Variant:** Unlike Gemma 3 (which has MedGemma), Qwen 3.5 has no official medical fine-tune. Community medical fine-tunes exist (e.g., Qwen-3-32B-Medical-Reasoning, Qwen3-Medical-SFT) but are not clinically validated
 2. **Multimodal Limitations:** While Qwen 3.5 supports image input via early fusion, it hasn't been validated on medical imaging (CXR, dermoscopy, pathology) — MedGemma is far superior here
-3. **GPU Requirements for 397B:** The flagship model requires 8x H200 (FP8) or 4x H100 (NVFP4). The new 35B-A3B model fits on a single RTX 4090 24GB, making it the practical default
+3. **GPU Requirements for 397B:** The flagship model requires 8x H200 (FP8) or 4x H100 (NVFP4). The Small Series 9B (~5 GB Q4) and 35B-A3B (24 GB) are the practical defaults for most deployments
 4. **MoE Memory Bandwidth:** MoE models are memory-bandwidth bound, not compute-bound. Inference speed depends heavily on GPU memory bandwidth, not just FLOPS
 5. **Thinking Mode Latency:** Thinking mode roughly doubles response time. Acceptable for reasoning tasks but too slow for real-time autocomplete
 6. **JSON Schema + Thinking Incompatibility:** JSON schema mode (strict structured output) disables thinking mode. You must choose between auditable reasoning chains and guaranteed JSON structure
 7. **Geopolitical Risk:** Alibaba Cloud is subject to Chinese government regulations. While Apache 2.0 allows unrestricted use of downloaded weights, future model updates could be affected
 
-### 4.3 When to Use Qwen 3.5 vs Alternatives
+### 4.3 When to Use Which Qwen 3.5 Model — Complete Decision Guide
 
-| Scenario | Best Model | Why |
-|----------|-----------|-----|
-| Differential diagnosis with reasoning | **Qwen 3.5** (thinking mode) | Multi-step reasoning with auditable chains |
-| Encounter note summarization | **Gemma 3 27B** | Gemma excels at concise clinical summarization |
-| Medical image analysis | **MedGemma** | Trained specifically on clinical images |
-| Drug interaction analysis (5+ drugs) | **Qwen 3.5** | Complex cascade reasoning |
-| ICD-10 code extraction | **Qwen 3.5** (JSON schema) | Guaranteed valid JSON structure |
-| Clinical rule code generation | **Qwen 3.5** | Top-1% CodeForces code quality |
-| Real-time autocomplete during charting | **Qwen3.5-9B** or **Gemma 3 4B** | Fastest TTFT, lowest latency |
-| Longitudinal patient analysis (years of data) | **Qwen 3.5** (262K native) | Largest context window among on-premise models |
-| Medical QA ("What's the first-line treatment for...") | **MedGemma 27B** | 87.7% MedQA — trained for this |
-| Needs to work without any internet | **Either** | Both are fully local after model download |
-| Needs smallest possible GPU | **Gemma 3 4B** (2.6 GB) | Qwen3.5-4B needs ~3 GB |
+```mermaid
+flowchart TD
+    START["Clinical AI Task"] --> MEDICAL{"Requires medical<br/>training data?"}
+
+    MEDICAL -->|"Yes — imaging,<br/>clinical QA"| GEMMA["Use Gemma 3 / MedGemma<br/>(Experiment 13)"]
+
+    MEDICAL -->|"No — reasoning,<br/>extraction, code"| DEPLOY{"Deployment<br/>environment?"}
+
+    DEPLOY -->|"Phone / IoT"| SIZE1{"Task complexity?"}
+    SIZE1 -->|"Classification only"| Q08["Qwen3.5-0.8B<br/>0.5 GB · CPU-viable"]
+    SIZE1 -->|"Forms + extraction"| Q2B["Qwen3.5-2B<br/>1.3 GB · mobile GPU"]
+
+    DEPLOY -->|"Edge kiosk / tablet"| Q4B["Qwen3.5-4B<br/>2.5 GB · multimodal agent"]
+
+    DEPLOY -->|"Single GPU<br/>(12-24 GB)"| QUALITY{"Quality requirement?"}
+    QUALITY -->|"Good enough<br/>(5 GB budget)"| Q9B["Qwen3.5-9B<br/>GPQA 81.7 · best value"]
+    QUALITY -->|"Maximum on<br/>single GPU"| Q35B["Qwen3.5-35B-A3B<br/>24 GB · MoE-class"]
+
+    DEPLOY -->|"Multi-GPU<br/>server"| Q397["Qwen3.5-397B-A17B<br/>Frontier reasoning"]
+
+    style Q08 fill:#C8E6C9,stroke:#2E7D32,color:#000
+    style Q2B fill:#C8E6C9,stroke:#2E7D32,color:#000
+    style Q4B fill:#B3E5FC,stroke:#0277BD,color:#000
+    style Q9B fill:#B3E5FC,stroke:#0277BD,color:#000
+    style Q35B fill:#CE93D8,stroke:#7B1FA2,color:#000
+    style Q397 fill:#FFCCBC,stroke:#BF360C,color:#000
+    style GEMMA fill:#FFF59D,stroke:#F9A825,color:#000
+```
+
+**Full task-to-model mapping:**
+
+| Scenario | Best Model | Size | Why |
+|----------|-----------|------|-----|
+| Differential diagnosis with reasoning | **Qwen3.5-397B** (fallback: 9B) | 214 GB / 5 GB | Multi-step reasoning with auditable chains; 9B's GPQA 81.7 is a strong fallback |
+| Drug interaction analysis (5+ drugs) | **Qwen3.5-35B-A3B** (fallback: 9B) | 24 GB / 5 GB | Complex cascade reasoning |
+| Clinical rule code generation | **Qwen3.5-35B-A3B** | 24 GB | Top-1% CodeForces code quality |
+| ICD-10/CPT code extraction | **Qwen3.5-9B** (JSON schema) | 5 GB | MMLU-Pro 82.5; structured extraction at low cost |
+| Document OCR + extraction | **Qwen3.5-9B** | 5 GB | OmniDocBench 87.7 — replaces separate OCR pipeline |
+| Encounter note summarization | **Gemma 3 27B** | 14.1 GB | Gemma excels at concise clinical summarization |
+| Medical image analysis | **MedGemma** | 14.1 GB | Trained specifically on clinical images |
+| Real-time autocomplete during charting | **Qwen3.5-4B** | 2.5 GB | Fast TTFT + multimodal awareness |
+| Waiting room triage kiosk | **Qwen3.5-4B** | 2.5 GB | Multimodal agent on tablet; no network needed |
+| Patient intake form on phone | **Qwen3.5-2B** | 1.3 GB | Mobile-friendly; handles forms + basic image |
+| Vitals/labs classification routing | **Qwen3.5-0.8B** | 0.5 GB | Ultra-lightweight; CPU-only viable |
+| Longitudinal patient analysis (years) | **Qwen3.5-397B** | 214 GB | 1M token context; 9B handles 262K natively |
+| Medical QA ("first-line treatment for...") | **MedGemma 27B** | 14.1 GB | 87.7% MedQA — trained for this |
+| Offline clinic (no internet) | **Qwen3.5-9B** | 5 GB | Strong reasoning + extraction, single consumer GPU |
+| Smallest possible deployment | **Qwen3.5-0.8B** | 0.5 GB | Runs on CPU; first 0.8B with video support |
 
 ### 4.4 HIPAA / Healthcare Considerations
 
@@ -921,7 +1014,11 @@ When submitting PRs that involve Qwen 3.5:
 | Start all AI services | `cd ~/pms-ai && docker compose up -d` |
 | Check vLLM health | `curl -s http://localhost:8080/health` |
 | List vLLM models | `curl -s http://localhost:8080/v1/models \| python3 -m json.tool` |
-| Quick Qwen test | `curl -s http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"qwen3.5-35b","messages":[{"role":"user","content":"Hello"}]}'` |
+| List Ollama models (incl. Small Series) | `docker exec pms-ollama ollama list` |
+| Quick Qwen 35B test (vLLM) | `curl -s http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model":"qwen3.5-35b","messages":[{"role":"user","content":"Hello"}]}'` |
+| Quick Qwen 9B test (Ollama) | `docker exec pms-ollama ollama run qwen3.5:9b "Hello"` |
+| Quick Qwen 4B test (Ollama) | `docker exec pms-ollama ollama run qwen3.5:4b "Hello"` |
+| Pull Small Series models | `docker exec pms-ollama ollama pull qwen3.5:9b && docker exec pms-ollama ollama pull qwen3.5:4b` |
 | GPU memory usage | `nvidia-smi` |
 | vLLM logs | `docker logs -f pms-vllm` |
 | vLLM metrics | `curl -s http://localhost:8080/metrics` |
