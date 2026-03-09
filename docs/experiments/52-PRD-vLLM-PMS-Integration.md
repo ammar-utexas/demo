@@ -1,8 +1,8 @@
 # Product Requirements Document: vLLM Integration into Patient Management System (PMS)
 
 **Document ID:** PRD-PMS-VLLM-001
-**Version:** 1.0
-**Date:** 2026-03-08
+**Version:** 1.1
+**Date:** 2026-03-09
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Draft
 
@@ -12,9 +12,11 @@
 
 vLLM is a high-throughput, memory-efficient inference and serving engine for large language models (LLMs). Originally developed at UC Berkeley, it has become the most widely adopted open-source LLM serving framework with 66,800+ GitHub stars and backing from NVIDIA, AMD, Intel, and IBM. Its core innovation — PagedAttention — manages GPU memory like a virtual memory system, enabling up to 4x better memory efficiency and dramatically higher concurrent request throughput compared to alternatives.
 
+**vLLM 0.17** (the target version for this integration) brings major advancements: FlashAttention 4 for next-generation attention performance, a new `--performance-mode` flag for simplified tuning, Model Runner V2 maturation with pipeline parallelism and Eagle3 speculative decoding, Elastic Expert Parallelism for dynamic GPU scaling of MoE models, Weight Offloading V2 with prefetching to hide latency, quantized LoRA adapter loading (QLoRA), built-in ASR model support (FunASR, FireRedASR2, Qwen3-ASR), and Anthropic API compatibility with thinking blocks support.
+
 Integrating vLLM into PMS enables fully self-hosted, HIPAA-compliant AI capabilities across clinical workflows: ambient documentation summarization, ICD-10/CPT code suggestion, patient communication drafting, medication interaction analysis, and prior authorization letter generation. Unlike cloud-based LLM APIs (OpenAI, Anthropic, AWS Bedrock), vLLM keeps all PHI within the organization's infrastructure boundary — no data leaves the network.
 
-The integration positions PMS to serve healthcare-specific open-source models (Meditron, BioMistral, OpenBioLLM) through a standard OpenAI-compatible API, meaning existing and future AI features can switch between vLLM and commercial APIs without code changes. This is the "inference backbone" that all PMS AI features will route through.
+The integration positions PMS to serve healthcare-specific open-source models (Meditron, BioMistral, OpenBioLLM) and next-generation model families like Qwen3.5 (with Gated Delta Networks) through a standard OpenAI-compatible API, meaning existing and future AI features can switch between vLLM and commercial APIs without code changes. With 0.17's native ASR model support, vLLM can now also serve speech-to-text models directly — potentially consolidating the inference pipeline for both ASR and NLP tasks on a single engine. This is the "inference backbone" that all PMS AI features will route through.
 
 ## 2. Problem Statement
 
@@ -83,11 +85,13 @@ flowchart TB
 
 ### 3.2 Deployment Model
 
-- **Self-hosted Docker**: vLLM runs as a Docker container (`vllm/vllm-openai`) with NVIDIA GPU passthrough. Deployed alongside the existing PMS Docker Compose stack.
+- **Self-hosted Docker**: vLLM runs as a Docker container (`vllm/vllm-openai:v0.17.0`) with NVIDIA GPU passthrough. Deployed alongside the existing PMS Docker Compose stack.
 - **Air-gapped capable**: Models pre-downloaded and mounted as local volumes. No internet access required at runtime.
+- **Performance tuning**: Use the new `--performance-mode {balanced, interactivity, throughput}` flag (v0.17) to optimize for the deployment scenario — `interactivity` for low-latency clinical workflows, `throughput` for batch processing.
 - **TLS encryption**: vLLM supports native `--ssl-certfile`/`--ssl-keyfile` for encrypted transport between PMS backend and vLLM.
 - **API key authentication**: `--api-key` flag protects `/v1/*` endpoints with bearer token auth.
 - **Network isolation**: vLLM container exposed only on the Docker internal network — never directly accessible from clients. Only the PMS backend (FastAPI) communicates with vLLM.
+- **Weight offloading**: v0.17 Weight Offloading V2 enables serving larger models by selectively offloading weights to CPU with prefetching that hides onloading latency — useful for running 70B models on consumer GPUs.
 
 ## 4. PMS Data Sources
 
@@ -188,11 +192,12 @@ Analyzes medication lists for potential interactions and contraindications.
 ## 7. Implementation Phases
 
 ### Phase 1: Foundation (2 sprints)
-- Deploy vLLM Docker container with Llama 3.1 8B-Instruct
+- Deploy vLLM v0.17 Docker container with Llama 3.1 8B-Instruct
+- Configure `--performance-mode interactivity` for low-latency clinical workflows
 - Create `LLMService` in PMS backend with OpenAI SDK client
 - Implement audit logging middleware for all LLM requests
 - Add vLLM to Docker Compose with GPU passthrough
-- Health check endpoint and Prometheus metrics collection
+- Health check endpoint and Prometheus metrics collection (including new MFU counters)
 - Basic TLS and API key configuration
 
 ### Phase 2: Core Clinical Features (3 sprints)
@@ -206,9 +211,11 @@ Analyzes medication lists for potential interactions and contraindications.
 ### Phase 3: Advanced Features (2 sprints)
 - Prior authorization letter generation
 - Medication interaction analysis
-- Multi-model serving (general + healthcare-specialized models via LoRA)
+- Multi-model serving (general + healthcare-specialized models via quantized LoRA/QLoRA adapters — native in v0.17)
 - Model A/B testing framework
-- Performance optimization (speculative decoding, prefix caching)
+- Performance optimization (Eagle3 speculative decoding with CUDA graphs, prefix caching, FlashAttention 4)
+- Evaluate Qwen3.5 (Gated Delta Networks) as potential primary model
+- Explore native ASR model serving (FunASR/Qwen3-ASR) to consolidate speech-to-text and NLP on a single vLLM instance
 - Grafana dashboard for inference metrics
 
 ## 8. Success Metrics
@@ -231,7 +238,9 @@ Analyzes medication lists for potential interactions and contraindications.
 | Model hallucination in clinical context | Incorrect medical information | Clinician-in-the-loop review required; confidence thresholds; never auto-submit |
 | PHI leakage through model outputs | HIPAA violation | Input sanitization; output filtering; audit logging; no model training on PHI |
 | Model size exceeds available VRAM | Cannot load model | Use quantized models (AWQ/GPTQ); reduce max context length; use smaller model |
-| vLLM version incompatibility | Deployment issues | Pin Docker image versions; test upgrades in staging |
+| vLLM version incompatibility | Deployment issues | Pin Docker image to `vllm/vllm-openai:v0.17.0`; test upgrades in staging |
+| PyTorch 2.10 breaking change | Environment dependency conflicts | v0.17 requires PyTorch 2.10.0; ensure all GPU containers use matching CUDA/PyTorch versions |
+| KV Load Failure Policy change | Silent behavior change on upgrade | v0.17 defaults to "fail" instead of "recompute"; set explicitly if upgrading from older versions |
 | Clinician distrust of AI suggestions | Low adoption | Transparent confidence scores; source traceability; gradual rollout |
 | Regulatory changes (FDA SaMD) | Compliance requirements | Monitor FDA guidance on clinical decision support; document intended use |
 
@@ -239,11 +248,14 @@ Analyzes medication lists for potential interactions and contraindications.
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| vLLM | 0.17.x | LLM inference engine |
+| vLLM | 0.17.0 | LLM inference engine (FlashAttention 4, Model Runner V2, performance modes) |
+| PyTorch | 2.10.0 | Required by vLLM 0.17 (breaking change from previous versions) |
 | NVIDIA Container Toolkit | Latest | GPU passthrough for Docker |
 | NVIDIA Driver | 535+ | CUDA support |
-| openai (Python SDK) | 1.x | Client library for OpenAI-compatible API |
+| openai (Python SDK) | >=1.0,<2.25 | Client library for OpenAI-compatible API (upper bound per vLLM 0.17 constraint) |
+| HuggingFace Transformers | 5.x | Model loading (vLLM 0.17 adds Transformers v5 compatibility) |
 | Llama 3.1 8B-Instruct | Latest | Primary general-purpose model |
+| Qwen3.5 (optional) | Latest | Next-gen model with Gated Delta Networks (newly supported in v0.17) |
 | Meditron-7B or BioMistral-7B | Latest | Healthcare-specialized model (Phase 2) |
 | Prometheus | 2.x | Metrics collection |
 | Grafana | 10.x | Metrics visualization |

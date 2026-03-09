@@ -1,8 +1,8 @@
 # vLLM Setup Guide for PMS Integration
 
 **Document ID:** PMS-EXP-VLLM-001
-**Version:** 1.0
-**Date:** 2026-03-08
+**Version:** 1.1
+**Date:** 2026-03-09
 **Applies To:** PMS project (all platforms)
 **Prerequisites Level:** Intermediate
 
@@ -153,7 +153,7 @@ echo "Key: $VLLM_API_KEY"
 ### Step 3: Start vLLM with Docker
 
 ```bash
-# Start vLLM server
+# Start vLLM v0.17 server
 docker run -d \
   --name vllm-server \
   --runtime nvidia \
@@ -163,10 +163,11 @@ docker run -d \
   --ipc=host \
   --restart unless-stopped \
   -e VLLM_API_KEY=$VLLM_API_KEY \
-  vllm/vllm-openai:latest \
+  vllm/vllm-openai:v0.17.0 \
   --model meta-llama/Llama-3.1-8B-Instruct \
   --max-model-len 8192 \
   --gpu-memory-utilization 0.90 \
+  --performance-mode interactivity \
   --enable-auto-tool-choice \
   --tool-call-parser llama3_json
 
@@ -174,6 +175,11 @@ docker run -d \
 docker logs -f vllm-server
 # Wait for: "INFO:     Uvicorn running on http://0.0.0.0:8000"
 ```
+
+> **New in v0.17:** The `--performance-mode` flag simplifies tuning. Options:
+> - `interactivity` — Optimizes for low latency (best for clinical workflows with real-time user interaction)
+> - `throughput` — Optimizes for maximum tokens/sec (best for batch processing, e.g., nightly report generation)
+> - `balanced` — Default, balances latency and throughput
 
 ### Step 4: Verify vLLM is running
 
@@ -455,7 +461,7 @@ Add the vLLM service to `docker-compose.yml`:
 ```yaml
 services:
   vllm:
-    image: vllm/vllm-openai:latest
+    image: vllm/vllm-openai:v0.17.0
     runtime: nvidia
     deploy:
       resources:
@@ -474,6 +480,7 @@ services:
       --model meta-llama/Llama-3.1-8B-Instruct
       --max-model-len 8192
       --gpu-memory-utilization 0.90
+      --performance-mode interactivity
     ipc: host
     restart: unless-stopped
     healthcheck:
@@ -735,11 +742,26 @@ sudo systemctl restart docker
 docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
 ```
 
+### CUBLAS_STATUS_INVALID_VALUE error (v0.17 / CUDA 12.9+)
+
+**Symptom:** `CUBLAS_STATUS_INVALID_VALUE` error when running on CUDA 12.9 or newer.
+
+**Fix:** This is a known issue in vLLM 0.17. Resolve by:
+```bash
+# Option 1: Remove system CUDA paths from LD_LIBRARY_PATH
+unset LD_LIBRARY_PATH
+
+# Option 2: Install with auto torch backend detection
+pip install vllm --torch-backend=auto
+
+# Option 3: Use the specific CUDA wheel index matching your CUDA version
+```
+
 ### Out of memory (OOM) on model loading
 
 **Symptom:** `torch.cuda.OutOfMemoryError` in vLLM logs.
 
-**Fix:** Reduce GPU memory utilization or use a quantized model:
+**Fix:** Reduce GPU memory utilization, use a quantized model, or use Weight Offloading V2 (new in v0.17):
 ```bash
 # Option 1: Lower memory utilization
 --gpu-memory-utilization 0.85
@@ -749,6 +771,9 @@ docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
 
 # Option 3: Use quantization (requires AWQ/GPTQ model variant)
 --quantization awq
+
+# Option 4 (v0.17): Use Weight Offloading V2 to offload layers to CPU
+# Enables serving larger models on smaller GPUs with prefetching to hide latency
 ```
 
 ### Slow first request after startup
@@ -761,6 +786,15 @@ curl -s http://localhost:8080/v1/chat/completions \
   -H "Authorization: Bearer $VLLM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"model":"meta-llama/Llama-3.1-8B-Instruct","messages":[{"role":"user","content":"hello"}],"max_tokens":1}'
+```
+
+### KV cache load failures after upgrading to v0.17
+
+**Symptom:** Requests fail with KV cache load errors instead of recomputing (previous behavior).
+
+**Fix:** vLLM 0.17 changed the default `kv-load-failure-policy` from `"recompute"` to `"fail"`. To restore old behavior:
+```bash
+--kv-load-failure-policy recompute
 ```
 
 ### 401 Unauthorized from PMS backend to vLLM
@@ -829,8 +863,8 @@ curl -s http://localhost:8080/v1/chat/completions \
 docker stop vllm-server && docker rm vllm-server
 docker run -d --name vllm-server ... --model Qwen/Qwen2.5-7B-Instruct
 
-# Update vLLM version
-docker pull vllm/vllm-openai:latest
+# Update vLLM version (pin to specific release)
+docker pull vllm/vllm-openai:v0.17.0
 docker stop vllm-server && docker rm vllm-server
 # Re-run docker run command
 

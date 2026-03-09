@@ -5,8 +5,8 @@
 This tutorial will take you from zero to building your first self-hosted LLM integration with the PMS. By the end, you will understand how vLLM works, have a running local inference server, and have built and tested clinical note generation, medical code suggestion, and patient communication drafting — all running on your own GPU with no data leaving your network.
 
 **Document ID:** PMS-EXP-VLLM-002
-**Version:** 1.0
-**Date:** 2026-03-08
+**Version:** 1.1
+**Date:** 2026-03-09
 **Applies To:** PMS project (all platforms)
 **Prerequisite:** [vLLM Setup Guide](52-vLLM-PMS-Developer-Setup-Guide.md)
 **Estimated time:** 2-3 hours
@@ -68,9 +68,16 @@ flowchart LR
 
 **PagedAttention** (the core innovation): Traditional LLM serving pre-allocates a fixed block of GPU memory for each request's KV cache (the model's "working memory"). This wastes 60-80% of GPU memory on padding. PagedAttention borrows the idea of virtual memory from operating systems — it splits the KV cache into small pages allocated on demand. Result: up to 4x better memory utilization, which means 4x more concurrent requests on the same GPU.
 
+**FlashAttention 4** (new in v0.17): vLLM now integrates the next-generation FlashAttention 4 backend, delivering significant attention computation speedups on modern NVIDIA GPUs. Combined with PagedAttention, this gives the best possible memory efficiency and throughput.
+
 **Continuous Batching**: Instead of waiting to form a batch of N requests, vLLM dynamically adds and removes requests from the batch at every decoding step. If one request finishes, its slot is immediately given to a waiting request. This keeps the GPU at near-100% utilization.
 
-**OpenAI-Compatible API**: vLLM serves the exact same `/v1/chat/completions`, `/v1/completions`, and `/v1/embeddings` endpoints as the OpenAI API. Any code using the OpenAI Python SDK works with vLLM by changing one line: `base_url="http://localhost:8080/v1"`.
+**Performance Modes** (new in v0.17): The `--performance-mode` flag provides pre-tuned configurations:
+- `interactivity` — Low latency, fast time-to-first-token (ideal for clinical workflows)
+- `throughput` — Maximum tokens/sec (ideal for batch processing)
+- `balanced` — Default, balances both
+
+**OpenAI-Compatible API**: vLLM serves the exact same `/v1/chat/completions`, `/v1/completions`, and `/v1/embeddings` endpoints as the OpenAI API. Any code using the OpenAI Python SDK works with vLLM by changing one line: `base_url="http://localhost:8080/v1"`. v0.17 also adds Anthropic API compatibility (thinking blocks, `count_tokens`) and a Responses API with structured outputs.
 
 ### 1.3 How vLLM Fits with Other PMS Technologies
 
@@ -96,9 +103,15 @@ flowchart LR
 | **Quantization** | Reducing model precision (FP16 → INT8/INT4) to use less memory at slight accuracy cost |
 | **Tensor Parallelism** | Splitting model weights across multiple GPUs for larger models |
 | **LoRA** | Low-Rank Adaptation — efficient fine-tuning method; vLLM can serve multiple LoRA adapters from one base model |
-| **Speculative Decoding** | Using a smaller "draft" model to predict tokens, verified by the main model for speedup |
+| **Speculative Decoding** | Using a smaller "draft" model to predict tokens, verified by the main model for speedup. v0.17 supports Eagle3 with CUDA graphs |
 | **GGUF** | Model format used by llama.cpp; vLLM supports it but prefers HuggingFace format |
 | **Structured Output** | Constraining LLM generation to valid JSON schema |
+| **Performance Mode** | v0.17 pre-tuned profiles (`interactivity`, `throughput`, `balanced`) that set multiple engine parameters at once |
+| **FlashAttention 4** | Next-generation attention computation backend, integrated in v0.17 |
+| **Weight Offloading** | Moving model layers to CPU when GPU VRAM is insufficient; v0.17 V2 adds prefetching to hide latency |
+| **Elastic Expert Parallelism** | Dynamic GPU scaling for Mixture-of-Experts models (new in v0.17) |
+| **QLoRA** | Quantized LoRA adapters; v0.17 enables loading quantized adapters directly without full-precision conversion |
+| **GDN** | Gated Delta Networks — architecture used by Qwen3.5 (newly supported in v0.17) |
 
 ### 1.5 Our Architecture
 
@@ -413,30 +426,34 @@ All running on local GPU, no data leaving the network, using the same OpenAI SDK
 ### 4.1 Strengths
 
 - **No PHI leaves the network**: All inference runs locally — the strongest HIPAA posture possible
-- **OpenAI API compatibility**: Drop-in replacement for cloud APIs; switch with one URL change
-- **Highest throughput at scale**: 14-24x faster than HuggingFace Transformers, 19x faster than Ollama under concurrency
+- **OpenAI API compatibility**: Drop-in replacement for cloud APIs; switch with one URL change. v0.17 also adds Anthropic API and Responses API support
+- **Highest throughput at scale**: 14-24x faster than HuggingFace Transformers, 19x faster than Ollama under concurrency. v0.17 adds FlashAttention 4 and pooling optimizations (13.9% throughput improvement)
 - **PagedAttention memory efficiency**: Serves 4x more concurrent users per GPU than naive approaches
-- **Extensive model support**: Llama, Mistral, Qwen, DeepSeek, healthcare models (Meditron, BioMistral, OpenBioLLM)
+- **Performance modes**: New `--performance-mode` flag (v0.17) simplifies tuning — no more manual tweaking of dozens of parameters
+- **Extensive model support**: Llama, Mistral, Qwen (including Qwen3.5 with GDN), DeepSeek, healthcare models (Meditron, BioMistral, OpenBioLLM), plus native ASR models (FunASR, Qwen3-ASR) in v0.17
+- **Quantized LoRA adapters**: v0.17 natively loads QLoRA adapters — serve multiple healthcare-specialized adaptations from a single base model without full-precision overhead
+- **Weight Offloading V2**: Serve 70B models on consumer GPUs by offloading weights to CPU with intelligent prefetching
 - **Production-ready**: Used by Amazon, IBM, Red Hat, and thousands of companies in production
 - **Apache 2.0 license**: No restrictions on commercial or healthcare use
-- **Built-in monitoring**: Prometheus metrics, OpenTelemetry tracing, no extra setup
-- **Multi-GPU scaling**: Tensor parallelism for 70B+ models across GPUs
+- **Built-in monitoring**: Prometheus metrics (including new MFU counters in v0.17), OpenTelemetry tracing, no extra setup
+- **Multi-GPU scaling**: Tensor parallelism for 70B+ models across GPUs; v0.17 adds Elastic Expert Parallelism for dynamic MoE scaling
 
 ### 4.2 Weaknesses
 
-- **Requires GPU**: Minimum 24 GB VRAM for production-quality 7B models (CPU mode is very slow)
-- **Setup complexity**: More complex than Ollama (`docker run` with GPU flags, model download, API key config)
-- **Model quality gap**: Open-source 7-8B models are less capable than GPT-4 or Claude for complex medical reasoning — though healthcare-tuned models close the gap for domain tasks
+- **Requires GPU**: Minimum 24 GB VRAM for production-quality 7B models (CPU mode is very slow). Weight Offloading V2 (v0.17) partially mitigates this but adds latency
+- **Setup complexity**: More complex than Ollama (`docker run` with GPU flags, model download, API key config) — though `--performance-mode` simplifies tuning significantly
+- **Model quality gap**: Open-source 7-8B models are less capable than GPT-4 or Claude for complex medical reasoning — though healthcare-tuned models and newer architectures like Qwen3.5 close the gap
 - **No built-in RBAC**: Authentication is limited to a single API key; fine-grained access control must be implemented in the application layer
 - **Memory management**: Long context windows can cause OOM; requires careful `max-model-len` and `gpu-memory-utilization` tuning
 - **No built-in audit logging**: vLLM logs requests at INFO level but doesn't provide HIPAA-grade audit trails — must be implemented in FastAPI middleware
-- **Rapid release cadence**: Weekly releases can introduce breaking changes; pin versions in production
+- **Breaking changes between versions**: v0.17 introduces PyTorch 2.10 requirement, changes KV Load Failure Policy default to "fail", and removes per-request logits processors. Always test upgrades in staging
+- **CUDA 12.9+ compatibility**: Known CUBLAS_STATUS_INVALID_VALUE issue on CUDA 12.9+ requires workarounds
 
 ### 4.3 When to Use vLLM vs Alternatives
 
 | Scenario | Best Choice | Why |
 |----------|-------------|-----|
-| Production multi-user clinical AI | **vLLM** | Best throughput under concurrency |
+| Production multi-user clinical AI | **vLLM** | Best throughput under concurrency; FlashAttention 4 in v0.17 |
 | Developer laptop prototyping | **Ollama** | Simplest setup, no GPU config needed |
 | Edge device / offline | **llama.cpp** | Runs on CPU, minimal dependencies |
 | Maximum NVIDIA performance | **TensorRT-LLM** | Compiled kernels, lowest latency |
@@ -444,6 +461,8 @@ All running on local GPU, no data leaving the network, using the same OpenAI SDK
 | Quick evaluation of models | **Ollama** | `ollama run model` — one command |
 | Air-gapped production | **vLLM** | Docker + local models, proven at scale |
 | Budget-constrained | **llama.cpp** or **Ollama** | No GPU required |
+| Combined ASR + NLP pipeline | **vLLM** | v0.17 native ASR model support (FunASR, Qwen3-ASR) |
+| Large models on limited VRAM | **vLLM** | v0.17 Weight Offloading V2 with prefetching |
 
 ### 4.4 HIPAA / Healthcare Considerations
 
@@ -535,6 +554,32 @@ free -h
 # If RAM is limited, use --cpu-memory-pool-size to limit CPU memory usage
 ```
 
+### Issue 6: CUBLAS_STATUS_INVALID_VALUE on CUDA 12.9+ (v0.17)
+
+**Symptom:** CUBLAS errors when running vLLM 0.17 on systems with CUDA 12.9 or newer.
+
+**Cause:** Known PyTorch 2.10 / CUDA 12.9+ compatibility issue.
+
+**Fix:**
+```bash
+# Remove system CUDA paths from LD_LIBRARY_PATH
+unset LD_LIBRARY_PATH
+# Or install with auto torch backend detection
+pip install vllm --torch-backend=auto
+```
+
+### Issue 7: KV cache failures after upgrading to v0.17
+
+**Symptom:** Requests that previously worked now fail with KV cache load errors.
+
+**Cause:** vLLM 0.17 changed the default `kv-load-failure-policy` from `"recompute"` to `"fail"`.
+
+**Fix:**
+```bash
+# Restore previous behavior
+--kv-load-failure-policy recompute
+```
+
 ---
 
 ## Part 6: Practice Exercises (45 min)
@@ -563,7 +608,7 @@ Build a system that caches LLM responses and tracks inference costs.
 
 ### Option C: Build an A/B Testing Framework
 
-Compare two models (e.g., Llama 3.1 8B vs Meditron-7B) on clinical tasks.
+Compare two models (e.g., Llama 3.1 8B vs Qwen3.5 with GDN) on clinical tasks.
 
 **Hints:**
 1. Serve both models (vLLM supports `--served-model-name` for aliasing)
@@ -571,6 +616,17 @@ Compare two models (e.g., Llama 3.1 8B vs Meditron-7B) on clinical tasks.
 3. Store both outputs and the clinician's choice (accepted/rejected)
 4. Calculate acceptance rate, edit distance, and code agreement per model
 5. Dashboard showing which model performs better per task type
+
+### Option D: Explore Native ASR + NLP Pipeline (v0.17)
+
+Build a unified speech-to-text + clinical note pipeline using vLLM's native ASR support.
+
+**Hints:**
+1. Serve a Qwen3-ASR model alongside Llama 3.1 on the same vLLM instance
+2. Pipe audio input through vLLM ASR → get transcript → pipe to Llama for SOAP note generation
+3. Compare latency vs the separate ASR (Exp 10/21) + NLP pipeline
+4. Measure GPU memory impact of serving both models simultaneously
+5. This consolidates the inference stack — one engine for all AI tasks
 
 ---
 
@@ -720,7 +776,10 @@ print(response.choices[0].message.content)
 ## Next Steps
 
 1. Review the [vLLM PRD](52-PRD-vLLM-PMS-Integration.md) for full component definitions and implementation phases
-2. Evaluate healthcare-specialized models: [Meditron](https://huggingface.co/epfl-llm/meditron-7b), [BioMistral](https://huggingface.co/BioMistral/BioMistral-7B), [OpenBioLLM](https://huggingface.co/aaditya/OpenBioLLM-Llama3-70B)
-3. Implement PHI sanitization middleware in the FastAPI layer
-4. Set up Grafana dashboard with vLLM Prometheus metrics
-5. Build the clinician feedback loop (accept/reject/edit tracking) for continuous quality improvement
+2. Evaluate Qwen3.5 (GDN architecture, newly supported in v0.17) as an alternative to Llama 3.1 for clinical tasks
+3. Evaluate healthcare-specialized models: [Meditron](https://huggingface.co/epfl-llm/meditron-7b), [BioMistral](https://huggingface.co/BioMistral/BioMistral-7B), [OpenBioLLM](https://huggingface.co/aaditya/OpenBioLLM-Llama3-70B)
+4. Test quantized LoRA adapters (QLoRA) for serving healthcare-tuned adaptations from a single base model
+5. Explore v0.17 native ASR model support (FunASR, Qwen3-ASR) to consolidate speech-to-text and NLP inference
+6. Implement PHI sanitization middleware in the FastAPI layer
+7. Set up Grafana dashboard with vLLM Prometheus metrics (including new MFU counters)
+8. Build the clinician feedback loop (accept/reject/edit tracking) for continuous quality improvement
