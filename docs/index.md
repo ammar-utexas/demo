@@ -330,6 +330,11 @@ _No bug fixes documented yet._
 - [Mistral 3 Setup Guide](experiments/54-Mistral3-PMS-Developer-Setup-Guide.md) — vLLM Docker deployment for Ministral 14B and Mistral Large 3, FastAPI MistralService integration, OpenAI-compatible API configuration, Next.js AI panel, and Prometheus metrics
 - [Mistral 3 Developer Tutorial](experiments/54-Mistral3-Developer-Tutorial.md) — Hands-on onboarding: build an ophthalmology encounter summarizer with structured SOAP note generation, ICD-10/CPT code suggestions, physician approval workflow, and model tier routing end-to-end
 
+### CrewAI (Multi-Agent Clinical Workflow Orchestration)
+- [PRD: CrewAI PMS Integration](experiments/55-PRD-CrewAI-PMS-Integration.md) — Multi-agent orchestration framework (44.6K stars, MIT license) coordinating Scribe, Coding, Compliance, and Communication agents into clinical documentation pipelines with shared memory, structured Pydantic outputs, and event-driven Flows — compared to LangGraph, AutoGen, and OpenAI Agents SDK
+- [CrewAI Setup Guide](experiments/55-CrewAI-PMS-Developer-Setup-Guide.md) — Python library installation in existing FastAPI backend, vLLM + Claude LLM provider configuration, custom PMS API tools, CrewService orchestration, and crew pipeline endpoints
+- [CrewAI Developer Tutorial](experiments/55-CrewAI-Developer-Tutorial.md) — Hands-on onboarding: build a four-agent Encounter Documentation Crew that generates SOAP notes, suggests ICD-10/CPT codes, validates compliance, and drafts patient letters — all coordinated automatically from a single trigger
+
 ---
 
 ## Documentation Views
