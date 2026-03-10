@@ -379,6 +379,11 @@ _No bug fixes documented yet._
 - [GWS CLI Setup Guide](experiments/64-GWSCLI-PMS-Developer-Setup-Guide.md) — npm installation, OAuth scope-minimized authentication, GWSService Python subprocess wrapper, FastAPI endpoints for Docs/Gmail/Calendar/Sheets, Docker credential mounting, and audit logging
 - [GWS CLI Developer Tutorial](experiments/64-GWSCLI-Developer-Tutorial.md) — Hands-on onboarding: build an end-to-encounter pipeline that generates a SOAP note, exports it as a Google Doc, emails follow-up instructions via Gmail, and schedules a follow-up on Google Calendar — all from a single trigger
 
+### FedEx API (Healthcare Shipping & Logistics Integration)
+- [PRD: FedEx API PMS Integration](experiments/65-PRD-FedExAPI-PMS-Integration.md) — FedEx REST API integration for automated prescription delivery, lab specimen transport, and medical supply chain management with OAuth 2.0 authentication, address validation, rate shopping, label generation, real-time tracking webhooks, and HIPAA-compliant audit logging
+- [FedEx API Setup Guide](experiments/65-FedExAPI-PMS-Developer-Setup-Guide.md) — Developer portal registration, sandbox credentials, FedExClient async HTTP module, TokenManager with Redis caching, PostgreSQL shipment tables, FastAPI shipping router, and Next.js shipment creation and tracking components
+- [FedEx API Developer Tutorial](experiments/65-FedExAPI-Developer-Tutorial.md) — Hands-on onboarding: build a prescription shipment workflow with address validation, rate comparison, label generation, tracking timeline, webhook event processing, and cold chain temperature flagging end-to-end
+
 ---
 
 ## Documentation Views
