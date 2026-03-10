@@ -404,6 +404,11 @@ _No bug fixes documented yet._
 - [Azure Document Intelligence Setup Guide](experiments/69-AzureDocIntel-PMS-Developer-Setup-Guide.md) — Azure resource provisioning (S0 tier), Python SDK installation, DocIntelClient wrapper, PostgreSQL extraction tables, FastAPI document endpoints, Next.js InsuranceCardUpload component, and Document Intelligence Studio verification
 - [Azure Document Intelligence Developer Tutorial](experiments/69-AzureDocIntel-Developer-Tutorial.md) — Hands-on onboarding: build an insurance card check-in workflow with image upload, Azure prebuilt model extraction, confidence-scored field review, staff approval with corrections, and database persistence end-to-end
 
+### LigoLab LIS (Read-Only MS SQL Server Direct Database Connection)
+- [PRD: LigoLab PMS Integration](experiments/70-PRD-LigoLab-PMS-Integration.md) — Read-only MS SQL Server direct connection to LigoLab LIS database via pyodbc and ODBC Driver 18 for lab result queries, specimen tracking, HbA1c/CBC/ESR trending, timestamp-based sync polling (30s), PostgreSQL local caching, and HIPAA-compliant query audit logging
+- [LigoLab Setup Guide](experiments/70-LigoLab-PMS-Developer-Setup-Guide.md) — ODBC Driver 18 installation, pyodbc connection pooling, LigoLab SQL Server Docker simulator with read-only views and seeded ophthalmology test data, LigoLabService Python class, FastAPI lab endpoints, and Next.js LabResultsPanel component
+- [LigoLab Developer Tutorial](experiments/70-LigoLab-Developer-Tutorial.md) — Hands-on onboarding: build a diabetic retinopathy lab monitoring workflow with HbA1c trending, critical value detection, sync poller, and specimen tracking against a local LigoLab MS SQL simulator end-to-end
+
 ---
 
 ## Documentation Views
