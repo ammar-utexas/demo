@@ -409,6 +409,11 @@ _No bug fixes documented yet._
 - [LigoLab Setup Guide](experiments/70-LigoLab-PMS-Developer-Setup-Guide.md) — ODBC Driver 18 installation, pyodbc connection pooling, LigoLab SQL Server Docker simulator with read-only views and seeded ophthalmology test data, LigoLabService Python class, FastAPI lab endpoints, and Next.js LabResultsPanel component
 - [LigoLab Developer Tutorial](experiments/70-LigoLab-Developer-Tutorial.md) — Hands-on onboarding: build a diabetic retinopathy lab monitoring workflow with HbA1c trending, critical value detection, sync poller, and specimen tracking against a local LigoLab MS SQL simulator end-to-end
 
+### RingCentral API (Unified Patient Communications — Voice, SMS, Fax, Video)
+- [PRD: RingCentral API PMS Integration](experiments/71-PRD-RingCentralAPI-PMS-Integration.md) — RingCentral REST API integration for unified patient communications with OAuth 2.0 JWT authentication, SMS appointment reminders, click-to-call from patient records, call recording linked to encounters, fax-based referral workflows, telehealth video visits, webhook-driven inbound event processing, and HIPAA-compliant BAA-covered voice/SMS/fax/video
+- [RingCentral API Setup Guide](experiments/71-RingCentralAPI-PMS-Developer-Setup-Guide.md) — Developer Console app creation, JWT credential generation, RingCentralClient Python SDK wrapper, CommsService FastAPI router, CallerIDResolver phone-to-patient lookup, ReminderScheduler with APScheduler, ngrok webhook tunnel, and Next.js Communications Dashboard
+- [RingCentral API Developer Tutorial](experiments/71-RingCentralAPI-Developer-Tutorial.md) — Hands-on onboarding: build an appointment reminder pipeline with PHI-free SMS templates, patient confirmation processing via inbound webhook, click-to-call with automatic logging, call recording retrieval, and communication analytics end-to-end
+
 ---
 
 ## Documentation Views
