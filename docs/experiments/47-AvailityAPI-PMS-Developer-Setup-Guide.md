@@ -1,8 +1,8 @@
 # Availity API Setup Guide for PMS Integration
 
 **Document ID:** PMS-EXP-AVAILITY-001
-**Version:** 1.0
-**Date:** 2026-03-07
+**Version:** 2.0
+**Date:** 2026-03-09
 **Applies To:** PMS project (all platforms)
 **Prerequisites Level:** Intermediate
 
@@ -21,6 +21,8 @@
 9. [Troubleshooting](#9-troubleshooting)
 10. [Reference Commands](#10-reference-commands)
 
+**New in v2.0**: E&B Value-Add APIs (Care Reminders, Member ID Card) — see Parts B, C, D, and F for additions.
+
 ---
 
 ## 1. Overview
@@ -30,6 +32,7 @@ This guide walks you through integrating Availity's multi-payer API into the PMS
 - A registered developer account with sandbox credentials
 - An OAuth 2.0 client that handles Availity's 5-minute token TTL
 - FastAPI endpoints for eligibility, PA, and claim status across all payers
+- **FastAPI endpoints for E&B value-add APIs: Care Reminders and Member ID Card**
 - A frontend panel for multi-payer eligibility and PA workflows
 - HIPAA audit logging for all transactions
 
@@ -298,6 +301,46 @@ class AvailityClient:
             },
         )
 
+    # --- E&B Value-Add: Care Reminders ---
+
+    async def get_care_reminders(self, payload: dict) -> dict:
+        """
+        Retrieve care gap data for a member (post-eligibility).
+
+        Always required: payerId, memberId
+        Payer-specific optional: stateId, lineOfBusiness (required for BCBS MI),
+            firstName, lastName, providerNPI, dateOfBirth, genderCode,
+            controlNumber, groupNumber
+        """
+        return await self._post("/pre-claim/eb-value-adds/care-reminders", payload)
+
+    # --- E&B Value-Add: Member ID Card (two-step) ---
+
+    async def initiate_member_id_card(self, payload: dict) -> dict:
+        """
+        Step 1: POST to initiate member ID card retrieval.
+        Returns GTID in data.memberCards.uris[0].
+
+        Always required: payerId, memberId
+        Payer-specific: responsePayerId (Aetna BH / Mercy Care AZ),
+            routingCode + thirdPartySystemId (Anthem), planId (BCBS NJ / Molina)
+        """
+        return await self._post("/pre-claim/eb-value-adds/member-card", payload)
+
+    async def get_member_id_card(self, gtid: str) -> bytes:
+        """
+        Step 2: GET to retrieve the PDF or PNG document bytes.
+        Pass the GTID from initiate_member_id_card().
+        """
+        headers = await self._authed_headers()
+        headers["Content-Type"] = "application/x-www-form-urlencoded"
+        resp = await self._client.get(
+            f"{self._base}/pre-claim/eb-value-adds/member-card/{gtid}",
+            headers=headers,
+        )
+        resp.raise_for_status()
+        return resp.content
+
     async def close(self):
         await self._client.aclose()
 ```
@@ -408,6 +451,69 @@ async def get_payer_config(payer_id: str, config_type: str = "270"):
         return await client.get_configuration(config_type, payer_id)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Availity error: {e}")
+
+
+# --- E&B Value-Add endpoints ---
+# Full implementation: see Tutorial Part 4 (47-AvailityAPI-Developer-Tutorial.md)
+
+@router.post("/care-reminders")
+async def get_care_reminders(req: dict):
+    """Retrieve care gap / care reminder data for a member post-eligibility."""
+    try:
+        result = await client.get_care_reminders(req)
+        log.info(f"CareReminders: payer={req.get('payer_id')} status={result.get('status')}")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Availity error: {e}")
+
+
+@router.post("/member-card/initiate")
+async def initiate_member_card(req: dict):
+    """Step 1: Initiate member ID card retrieval. Returns GTID."""
+    try:
+        result = await client.initiate_member_id_card(req)
+        log.info(f"MemberCard initiated: payer={req.get('payer_id')}")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Availity error: {e}")
+
+
+@router.get("/member-card/{gtid}")
+async def get_member_card(gtid: str):
+    """Step 2: Retrieve member ID card PDF or PNG by GTID."""
+    from fastapi.responses import Response
+    try:
+        doc_bytes = await client.get_member_id_card(gtid)
+        return Response(content=doc_bytes, media_type="application/pdf")
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Availity error: {e}")
+
+
+# --- Full PA Workflow ---
+# Full implementation: see Tutorial Part 5 (47-AvailityAPI-Developer-Tutorial.md)
+
+@router.post("/pa-workflow")
+async def run_full_pa_workflow(req: dict):
+    """
+    Execute the full 6-step PA workflow:
+    eligibility → coverage rules → PA decision → payer config →
+    UHC Gold Card (if UHC) → PA submission → result processing.
+    """
+    from app.services.pa_orchestrator import PAOrchestrator, PARequest as OrchPARequest
+    try:
+        orchestrator = PAOrchestrator(availity_client=client)
+        orch_req = OrchPARequest(**req)
+        result = await orchestrator.run(orch_req)
+        return {
+            "status": result.status,
+            "review_id": result.review_id,
+            "auth_number": result.auth_number,
+            "denial_reason": result.denial_reason,
+            "pend_reason": result.pend_reason,
+            "notes": result.notes,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"PA workflow error: {e}")
 ```
 
 Register in `app/main.py`:
@@ -447,7 +553,10 @@ CREATE TABLE availity_pa_submissions (
     procedure_code TEXT NOT NULL,
     diagnosis_codes TEXT[] NOT NULL,
     review_id TEXT,
-    status TEXT,
+    status TEXT,                     -- approved | denied | pended | no_pa_required | eligibility_failed | error
+    auth_number TEXT,                -- populated on approval
+    denial_reason TEXT,              -- populated on denial
+    pend_reason TEXT,                -- populated on pend
     response JSONB,
     submitted_by INTEGER,
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -455,8 +564,36 @@ CREATE TABLE availity_pa_submissions (
     resolved_at TIMESTAMPTZ
 );
 
+-- availity_care_reminders_log (E&B value-add)
+CREATE TABLE availity_care_reminders_log (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER,
+    payer_id TEXT NOT NULL,
+    member_id TEXT NOT NULL,
+    care_gap_count INTEGER,          -- number of rows in careReminderDetails
+    response JSONB NOT NULL,
+    retrieved_by INTEGER,
+    retrieved_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- availity_member_id_cards (E&B value-add)
+CREATE TABLE availity_member_id_cards (
+    id SERIAL PRIMARY KEY,
+    patient_id INTEGER,
+    payer_id TEXT NOT NULL,
+    member_id TEXT NOT NULL,
+    gtid TEXT NOT NULL,              -- GTID from POST response; use to GET the document
+    document_type TEXT,              -- application/pdf or image/png
+    retrieved_by INTEGER,
+    retrieved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(patient_id, payer_id, gtid)
+);
+
 CREATE INDEX idx_av_elig_payer ON availity_eligibility_log (payer_id, member_id);
 CREATE INDEX idx_av_pa_status ON availity_pa_submissions (status, submitted_at);
+CREATE INDEX idx_av_pa_review ON availity_pa_submissions (review_id);
+CREATE INDEX idx_av_cr_payer ON availity_care_reminders_log (payer_id, member_id);
+CREATE INDEX idx_av_card_patient ON availity_member_id_cards (patient_id, payer_id);
 ```
 
 **Checkpoint**: Audit tables ready for HIPAA-compliant transaction logging.
@@ -549,7 +686,7 @@ TOKEN=$(curl -s -X POST "$AVAILITY_TOKEN_URL" \
 # 2. Payer list returns results
 curl -s "http://localhost:8000/api/availity/payers" | jq '.totalCount'
 
-# 3. Demo eligibility (with mock scenario)
+# 3. Demo eligibility
 curl -s -X POST "http://localhost:8000/api/availity/eligibility" \
   -H "Content-Type: application/json" \
   -d '{"payer_id":"UHC","member_id":"TEST123","provider_npi":"1234567890","date_of_service":"2026-03-07"}' \
@@ -557,6 +694,33 @@ curl -s -X POST "http://localhost:8000/api/availity/eligibility" \
 
 # 4. Payer configuration
 curl -s "http://localhost:8000/api/availity/configurations/UHC?config_type=270" | jq '.'
+
+# 5. Care Reminders (E&B value-add)
+curl -s -X POST "http://localhost:8000/api/availity/care-reminders" \
+  -H "Content-Type: application/json" \
+  -d '{"payer_id":"00611","member_id":"SUCC123456789","first_name":"PATIENTONE","last_name":"TEST"}' \
+  | jq '.status'
+
+# 6. Member ID Card — Step 1: Initiate
+GTID=$(curl -s -X POST "http://localhost:8000/api/availity/member-card/initiate" \
+  -H "Content-Type: application/json" \
+  -d '{"payer_id":"00611","member_id":"SUCC123456789","plan_type":"Medical"}' \
+  | jq -r '.data.memberCards.uris[0]')
+echo "GTID: $GTID"
+
+# 7. Member ID Card — Step 2: Retrieve
+[ -n "$GTID" ] && curl -s "http://localhost:8000/api/availity/member-card/$GTID" \
+  --output /tmp/test_card.pdf && echo "PASS: Member ID Card PDF retrieved"
+
+# 8. Full PA workflow
+curl -s -X POST "http://localhost:8000/api/availity/pa-workflow" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "patient_id": 101, "member_id": "UHC123456", "payer_id": "UHC",
+    "patient_first_name": "John", "patient_last_name": "Smith", "patient_dob": "1965-04-15",
+    "encounter_id": 5001, "procedure_code": "67028", "diagnosis_codes": ["H35.31"],
+    "date_of_service": "2026-03-10", "provider_npi": "1234567890"
+  }' | jq '{status, auth_number, denial_reason, pend_reason}'
 ```
 
 **Checkpoint**: All Availity endpoints work against the Demo sandbox.
@@ -618,8 +782,10 @@ curl -s "http://localhost:8000/api/availity/configurations/UHC?config_type=270" 
 
 1. Complete the [Availity API Developer Tutorial](47-AvailityAPI-Developer-Tutorial.md)
 2. Test eligibility and PA flows against sandbox for all 6 payers
-3. Contact Availity (partnermanagement@availity.com) for Standard plan contract
-4. Execute BAA with Availity for production PHI access
+3. Test E&B value-add APIs (Care Reminders, Member ID Card) for supported payers
+4. Wire up PA orchestrator integration points (Exp 44, 45, 46)
+5. Contact Availity (partnermanagement@availity.com) for Standard plan contract
+6. Execute BAA with Availity for production PHI access
 
 ## Resources
 

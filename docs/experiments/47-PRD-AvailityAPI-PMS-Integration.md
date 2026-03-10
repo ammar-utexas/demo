@@ -1,8 +1,8 @@
 # Product Requirements Document: Availity API Integration into Patient Management System (PMS)
 
 **Document ID:** PRD-PMS-AVAILITY-001
-**Version:** 1.0
-**Date:** 2026-03-07
+**Version:** 2.0
+**Date:** 2026-03-09
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Draft
 
@@ -12,9 +12,11 @@
 
 Availity is the nation's largest real-time health information network, connecting over 3.4 million providers to every major health plan nationwide. Its REST API platform provides a single integration point for HIPAA-standard X12 EDI transactions — eligibility (270/271), prior authorization (278), claim status (276/277), and claim submission (837) — across all connected payers through one set of credentials.
 
-For the PMS, Availity solves the multi-payer integration problem. While Experiment 46 (UHC API Marketplace) provides deep integration with a single payer, Availity provides broad coverage across all payers through one API. This is critical for Texas Retina Associates (TRA), which contracts with CMS Medicare, UHC, Aetna, BCBS of Texas, Humana, and Cigna — all of which are connected through Availity. Instead of building separate integrations for each payer, the PMS can route all eligibility checks, PA submissions, and claim status queries through Availity's unified API.
+For the PMS, Availity solves the multi-payer integration problem. While Experiment 46 (UHC API Marketplace) provides deep integration with a single payer, Availity provides broad coverage across all payers through one API. This is critical for Texas Retina Associates (TRA), which contracts with CMS Medicare, UHC, Aetna, BCBS of Texas, Humana, and Cigna — all of which are connected through Availity.
 
-Combined with Experiment 45 (CMS Coverage API for Medicare FFS coverage rules) and Experiment 44 (payer-specific PA policy PDFs), Availity provides the transactional backbone: verify eligibility, submit PAs, check claim status — for any payer, through one connection.
+Beyond transactional APIs, Availity also provides **E&B Value-Add APIs** — Care Reminders and Member ID Card — that surface payer-provided care gap data and digital insurance cards immediately after an eligibility check. These enable a richer pre-visit workflow without requiring separate payer portal logins.
+
+Combined with Experiment 45 (CMS Coverage API for Medicare FFS coverage rules) and Experiment 44 (payer-specific PA policy PDFs), Availity provides the transactional backbone: verify eligibility, retrieve care gaps and ID cards, submit PAs through a full 6-step orchestrated workflow, and check claim status — for any payer, through one connection.
 
 ## 2. Problem Statement
 
@@ -25,6 +27,8 @@ Without a multi-payer clearinghouse integration, the PMS faces these challenges:
 - **Eligibility verification is manual**: Staff currently check eligibility by logging into each payer's portal separately. Availity provides a single eligibility API that works across all payers.
 - **Claim status requires multiple portals**: Tracking claim status across 6 payers means logging into 6 portals. Availity unifies claim status queries.
 - **No cost estimation**: TRA cannot currently estimate patient responsibility (copay + deductible + coinsurance) before the visit. Availity's Care Cost Estimator API enables this.
+- **No care gap visibility**: Staff have no way to see payer-provided preventive care reminders (flu vaccines, wellness visits, etc.) at the time of an eligibility check. Availity's Care Reminders API surfaces this data in real time.
+- **No digital insurance card access**: Staff must ask patients for physical cards or log into payer portals to view ID cards. Availity's Member ID Card API retrieves PDF/PNG cards during the eligibility workflow.
 
 ## 3. Proposed Solution
 
@@ -300,6 +304,29 @@ flowchart TD
 - **Output**: Estimated copay, coinsurance, deductible, total patient responsibility.
 - **PMS APIs used**: `/api/encounters` (procedure/diagnosis), `/api/patients` (payer info).
 
+### 5.8 Care Reminders Service (E&B Value-Add)
+
+- **Description**: Retrieves real-time care gap and preventive care reminder data from the payer, layered on top of the 270/271 eligibility transaction. Called immediately after eligibility confirms.
+- **Input**: Member ID, payer ID, and payer-specific optional fields (stateId, lineOfBusiness, demographics).
+- **Output**: `careReminderDetails` array with care gap table (Date, Care Gap, Gap Instructions, Data Source).
+- **Endpoint**: `POST /pre-claim/eb-value-adds/care-reminders`
+- **Payer note**: Not all payers support this API. BCBS MI requires `lineOfBusiness`. Molina requires `stateId`. Empty rows is a valid response (no gaps), not an error.
+
+### 5.9 Member ID Card Service (E&B Value-Add)
+
+- **Description**: Retrieves a digital copy of the member's insurance ID card (PDF or PNG) during an eligibility inquiry. Two-step process: POST to initiate, GET to retrieve.
+- **Input**: Member ID, payer ID, and payer-specific optional fields (planType, planId, responsePayerId, routingCode).
+- **Output**: GTID token (Step 1 POST), then PDF or PNG document bytes (Step 2 GET).
+- **Endpoints**: `POST /pre-claim/eb-value-adds/member-card`, `GET /pre-claim/eb-value-adds/member-card/{GTID}`
+- **Payer note**: Aetna Better Health and Mercy Care AZ require `responsePayerId`. Anthem plans require `routingCode` and `thirdPartySystemId`. BCBS NJ and Molina plans require `planId`.
+
+### 5.10 PA Orchestrator
+
+- **Description**: Implements the full 6-step PA workflow as a single orchestrated service, combining data from Availity (Exp 47), CMS Coverage API (Exp 45), Payer Policy Rules (Exp 44), and UHC API (Exp 46).
+- **Steps**: Eligibility → Coverage Rule Lookup → PA Decision → Payer Configuration → UHC Gold Card → PA Submission → Result Processing.
+- **Output**: Structured PAResult with status (`approved` | `denied` | `pended` | `no_pa_required` | `eligibility_failed` | `error`), auth number, denial reason, or pend reason.
+- **Endpoint**: `POST /api/availity/pa-workflow`
+
 ## 6. Non-Functional Requirements
 
 ### 6.1 Security and HIPAA Compliance
@@ -337,12 +364,14 @@ flowchart TD
 - Build Coverages Service (eligibility 270/271)
 - Create multi-payer eligibility panel on frontend
 
-### Phase 2: Prior Authorization (Sprint 2 — 2 weeks)
+### Phase 2: E&B Value-Add + Prior Authorization (Sprint 2 — 2 weeks)
 
+- Build Care Reminders Service (E&B value-add)
+- Build Member ID Card Service — two-step POST/GET (E&B value-add)
 - Build Service Reviews Service (PA 278)
-- Implement PA submission workflow with payer-specific configurations
-- Build PA status tracking with polling
-- Integrate with PA Decision Engine (combine with Exp 44 rules + Exp 45 CMS data)
+- Implement PA Orchestrator (6-step workflow: eligibility → coverage rules → PA decision → payer config → Gold Card → submission → result processing)
+- Integrate with PA Decision Engine (Exp 44 rules + Exp 45 CMS data + Exp 46 UHC Gold Card)
+- Handle all three PA result states: Approved, Denied, Pended
 
 ### Phase 3: Claims and Production (Sprint 3 — 2 weeks)
 
@@ -359,6 +388,9 @@ flowchart TD
 | Payers supported | 6 (CMS, UHC, Aetna, BCBS, Humana, Cigna) | Payer List API verification |
 | Eligibility check time | < 5 sec (from 3-5 min per-portal) | API response time |
 | PA submission coverage | All 6 payers via single API | PA submission success rate by payer |
+| PA result handling | 100% of Approved / Denied / Pended states handled | Status code coverage in orchestrator |
+| Care Reminders availability | All supported payers surface care gaps | Care Reminders API success rate |
+| Member ID Card retrieval | PDF/PNG retrieved for supported payers | Successful GTID → document retrieval rate |
 | Claim status access | All payers, one dashboard | Claim status query success rate |
 | Staff portal logins | -90% reduction | Payer portal login count |
 
@@ -397,6 +429,10 @@ flowchart TD
 | **Data type** | Policy documents | Coverage rules | Real-time transactions | **Real-time transactions** |
 | **Eligibility** | No | No | UHC only | **All payers** |
 | **PA submission** | No | No | UHC only (beta) | **All payers (278)** |
+| **Full PA orchestration** | No | No | No | **Yes (6-step workflow)** |
+| **PA result handling** | No | No | Partial | **Approved / Denied / Pended** |
+| **Care Reminders** | No | No | No | **Yes (E&B value-add)** |
+| **Member ID Card** | No | No | No | **Yes (E&B value-add, PDF/PNG)** |
 | **Claim status** | No | No | UHC only | **All payers (276/277)** |
 | **Cost estimation** | No | No | No | **Yes (837P/I predetermination)** |
 | **Authentication** | None | License token | OAuth 2.0 | OAuth 2.0 (5-min TTL) |
