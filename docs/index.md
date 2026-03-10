@@ -384,6 +384,11 @@ _No bug fixes documented yet._
 - [FedEx API Setup Guide](experiments/65-FedExAPI-PMS-Developer-Setup-Guide.md) — Developer portal registration, sandbox credentials, FedExClient async HTTP module, TokenManager with Redis caching, PostgreSQL shipment tables, FastAPI shipping router, and Next.js shipment creation and tracking components
 - [FedEx API Developer Tutorial](experiments/65-FedExAPI-Developer-Tutorial.md) — Hands-on onboarding: build a prescription shipment workflow with address validation, rate comparison, label generation, tracking timeline, webhook event processing, and cold chain temperature flagging end-to-end
 
+### UPS API (Healthcare Shipping & Specimen Logistics)
+- [PRD: UPS API PMS Integration](experiments/66-PRD-UPSAPI-PMS-Integration.md) — UPS REST API integration for specimen kit shipping (UN3373 biological substances), prescription delivery tracking, medical device logistics, and address validation with OAuth 2.0 authentication, dangerous goods pre-check, cold chain support via UPS Healthcare, and HIPAA-compliant shipment audit logging
+- [UPS API Setup Guide](experiments/66-UPSAPI-PMS-Developer-Setup-Guide.md) — UPS Developer account registration, OAuth 2.0 client credentials, UPSService Python client, PostgreSQL shipment schema, FastAPI shipping endpoints, Next.js ShippingPanel component, and sandbox verification
+- [UPS API Developer Tutorial](experiments/66-UPSAPI-Developer-Tutorial.md) — Hands-on onboarding: build a specimen collection kit shipping workflow with address validation, dangerous goods compliance check, rate comparison, label generation, and real-time tracking end-to-end
+
 ---
 
 ## Documentation Views
