@@ -414,6 +414,11 @@ _No bug fixes documented yet._
 - [RingCentral API Setup Guide](experiments/71-RingCentralAPI-PMS-Developer-Setup-Guide.md) — Developer Console app creation, JWT credential generation, RingCentralClient Python SDK wrapper, CommsService FastAPI router, CallerIDResolver phone-to-patient lookup, ReminderScheduler with APScheduler, ngrok webhook tunnel, and Next.js Communications Dashboard
 - [RingCentral API Developer Tutorial](experiments/71-RingCentralAPI-Developer-Tutorial.md) — Hands-on onboarding: build an appointment reminder pipeline with PHI-free SMS templates, patient confirmation processing via inbound webhook, click-to-call with automatic logging, call recording retrieval, and communication analytics end-to-end
 
+### TinyMDM (Android Mobile Device Management for Clinical Device Fleet)
+- [PRD: TinyMDM PMS Integration](experiments/72-PRD-TinyMDM-PMS-Integration.md) — TinyMDM MDM integration for centralized Android device management: zero-touch enrollment, silent PMS app deployment, kiosk mode for patient intake tablets, security policy enforcement (encryption, screen lock, app restrictions), remote lock/wipe, compliance monitoring via REST API, and device lifecycle audit logging for HIPAA compliance
+- [TinyMDM Setup Guide](experiments/72-TinyMDM-PMS-Developer-Setup-Guide.md) — TinyMDM account setup, API key generation, device group configuration, Python API client, PostgreSQL device tracking tables, FastAPI device management endpoints, Next.js device dashboard, and test device enrollment via QR code
+- [TinyMDM Developer Tutorial](experiments/72-TinyMDM-Developer-Tutorial.md) — Hands-on onboarding: build an automated app deployment pipeline with silent APK install via TinyMDM API, deployment tracking, compliance monitoring, kiosk mode configuration, and CI/CD integration for continuous device fleet management
+
 ---
 
 ## Documentation Views
