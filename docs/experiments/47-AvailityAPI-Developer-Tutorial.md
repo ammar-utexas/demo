@@ -5,8 +5,8 @@
 This tutorial will take you from zero to building your first multi-payer eligibility verification and prior authorization submission using Availity's REST APIs. By the end, you will understand how Availity connects to all major payers, have tested eligibility and PA flows in the sandbox, and built a unified workflow that works for UHC, Aetna, BCBS, Humana, and Cigna through a single API.
 
 **Document ID:** PMS-EXP-AVAILITY-002
-**Version:** 2.0
-**Date:** 2026-03-09
+**Version:** 2.1
+**Date:** 2026-03-10
 **Applies To:** PMS project (all platforms)
 **Prerequisite:** [Availity API Setup Guide](47-AvailityAPI-PMS-Developer-Setup-Guide.md)
 **Estimated time:** 3-4 hours
@@ -29,6 +29,91 @@ This tutorial will take you from zero to building your first multi-payer eligibi
 11. How Demo mock scenarios enable comprehensive testing
 12. How Availity complements the UHC-specific API (Experiment 46)
 13. HIPAA audit requirements for multi-payer clearinghouse data
+14. The recommended API exploration order — phased from discovery to advanced value-add
+
+---
+
+## API Exploration Roadmap
+
+Before diving into the tutorial, use this roadmap to understand the **recommended order** for exploring Availity's APIs. Each phase builds on the previous one, following the clinical workflow from payer discovery to claim follow-up.
+
+```mermaid
+flowchart LR
+    subgraph Phase1["Phase 1: Discovery & Eligibility"]
+        PL["Payer List API"]
+        COV["Coverages API\n(270/271)"]
+        PL -->|payer IDs feed into| COV
+    end
+
+    subgraph Phase2["Phase 2: PA Submission"]
+        CFG["Configurations API"]
+        SR["Service Reviews API\n(278)"]
+        CFG -->|required fields feed into| SR
+    end
+
+    subgraph Phase3["Phase 3: Claim Follow-Up"]
+        CS["Claim Statuses API\n(276/277)"]
+    end
+
+    subgraph Phase4["Phase 4: Value-Add"]
+        CR["Care Reminders"]
+        MIC["Member ID Card"]
+    end
+
+    Phase1 -->|eligible patients need| Phase2
+    Phase2 -->|submitted claims need| Phase3
+    Phase1 -->|eligible patients unlock| Phase4
+
+    style Phase1 fill:#e8f5e9,stroke:#2e7d32
+    style Phase2 fill:#e3f2fd,stroke:#1565c0
+    style Phase3 fill:#fff3e0,stroke:#e65100
+    style Phase4 fill:#f3e5f5,stroke:#7b1fa2
+```
+
+### Phase 1: Discovery & Eligibility (Start Here)
+
+| Order | API | Reference Doc | Why First |
+|-------|-----|---------------|-----------|
+| 1 | **Payer List API** | [Payer List API Reference](47-AvailityAPI-PayerList-API-Reference.md) | Discover valid `payerId` values — every other API call requires one |
+| 2 | **Coverages API** (X12 270/271) | [Coverages API Reference](47-AvailityAPI-Coverages-API-Reference.md) | Verify patient eligibility — the gate to all downstream transactions |
+
+**Dependency**: Payer List gives you `payerId` values. Coverages uses those IDs to check eligibility. Every clinical workflow starts here.
+
+### Phase 2: Prior Authorization Submission
+
+| Order | API | Reference Doc | Why Next |
+|-------|-----|---------------|----------|
+| 3 | **Configurations API** | [PRD Section 5](47-PRD-AvailityAPI-PMS-Integration.md) | Fetch payer-specific required fields before building a PA request |
+| 4 | **Service Reviews API** (X12 278) | [Service Reviews API Reference](47-AvailityAPI-ServiceReviews-API-Reference.md) | Submit prior authorization — the core revenue-cycle transaction |
+
+**Dependency**: Configurations tells you *what fields each payer requires*. Service Reviews uses those fields to submit the PA. Skipping Configurations leads to Issue 4 (missing required fields).
+
+### Phase 3: Claim Follow-Up
+
+| Order | API | Reference Doc | Why Here |
+|-------|-----|---------------|----------|
+| 5 | **Claim Statuses API** (X12 276/277) | [Claim Statuses API Reference](47-AvailityAPI-ClaimStatuses-API-Reference.md) | Track claim adjudication after services are rendered |
+
+**Dependency**: Claims follow encounters. You need to have submitted claims (via 837) or PAs (via 278) before tracking their status.
+
+### Phase 4: E&B Value-Add APIs (Advanced)
+
+| Order | API | Reference Doc | Why Last |
+|-------|-----|---------------|----------|
+| 6 | **Care Reminders** | [E&B Value-Add Guide](47-Availity_EB_ValueAdd_API_Guide.docx) | Surface open care gaps — runs after eligibility confirms |
+| 7 | **Member ID Card** | [E&B Value-Add Guide](47-Availity_EB_ValueAdd_API_Guide.docx) | Retrieve digital insurance card — runs after eligibility confirms |
+
+**Dependency**: Both require a confirmed `memberId` from a successful eligibility (270/271) response. They are additive — not required for core workflows but high-value for pre-visit automation.
+
+### Supporting References
+
+| Resource | Link | Use When |
+|----------|------|----------|
+| **X12 Libraries Reference** | [X12 Libraries Reference](47-AvailityAPI-X12-Libraries-Reference.md) | You need to parse raw X12 segments (835, 837, 270, 271, 276, 277, 278) |
+| **Test Data & Sandbox Guide** | [Test Data & Sandbox Guide](47-AvailityAPI-TestData-SandboxGuide.md) | Setting up sandbox credentials, mock scenarios, and test member IDs |
+| **Setup Guide** | [Developer Setup Guide](47-AvailityAPI-PMS-Developer-Setup-Guide.md) | Initial environment setup, OAuth configuration, Docker integration |
+
+> **Tip**: Work through Phases 1-2 in a single day. Phase 3 can wait until you have real claims to track. Phase 4 is optional but delivers the highest patient-experience value.
 
 ---
 
@@ -1351,13 +1436,38 @@ pms-backend/
 
 ## Next Steps
 
-1. **Register on Availity**: Create developer account, subscribe to Demo plan
-2. **Map TRA's payer IDs**: Query Payer List API for all 6 payers
-3. **Test eligibility and PA**: Run sandbox flows for each payer
-4. **Test E&B value-add APIs**: Care Reminders + Member ID Card for supported payers
-5. **Wire up PA orchestrator integration points**:
+1. **Register on Availity**: Create developer account, subscribe to Demo plan — see [Test Data & Sandbox Guide](47-AvailityAPI-TestData-SandboxGuide.md)
+2. **Map TRA's payer IDs**: Query Payer List API for all 6 payers — see [Payer List API Reference](47-AvailityAPI-PayerList-API-Reference.md)
+3. **Test eligibility**: Run sandbox flows for each payer — see [Coverages API Reference](47-AvailityAPI-Coverages-API-Reference.md)
+4. **Test PA submission**: Submit PAs with correct payer-specific fields — see [Service Reviews API Reference](47-AvailityAPI-ServiceReviews-API-Reference.md)
+5. **Test claim status tracking**: Query claim adjudication statuses — see [Claim Statuses API Reference](47-AvailityAPI-ClaimStatuses-API-Reference.md)
+6. **Test E&B value-add APIs**: Care Reminders + Member ID Card for supported payers
+7. **Learn X12 parsing**: If you need to process raw EDI segments — see [X12 Libraries Reference](47-AvailityAPI-X12-Libraries-Reference.md)
+8. **Wire up PA orchestrator integration points**:
    - Connect Exp 44 rules engine into `lookup_coverage_rules()` and `pa_required()`
    - Connect Exp 45 CMS Coverage API into the Medicare branch of `lookup_coverage_rules()`
    - Connect Exp 46 UHC API into `check_uhc_gold_card()`
-6. **Contact Availity for Standard plan**: partnermanagement@availity.com
-7. **Execute BAA** for production PHI access
+9. **Contact Availity for Standard plan**: partnermanagement@availity.com
+10. **Execute BAA** for production PHI access
+
+## Resources
+
+### API Reference Docs (Experiment 47)
+
+| Document | Description |
+|----------|-------------|
+| [Payer List API Reference](47-AvailityAPI-PayerList-API-Reference.md) | Payer discovery, filtering, and ID lookup |
+| [Coverages API Reference](47-AvailityAPI-Coverages-API-Reference.md) | Eligibility verification (X12 270/271) — async POST + poll |
+| [Service Reviews API Reference](47-AvailityAPI-ServiceReviews-API-Reference.md) | Prior authorization submission (X12 278) |
+| [Claim Statuses API Reference](47-AvailityAPI-ClaimStatuses-API-Reference.md) | Claim status inquiry (X12 276/277) |
+| [E&B Value-Add Guide](47-Availity_EB_ValueAdd_API_Guide.docx) | Care Reminders and Member ID Card APIs |
+| [X12 Libraries Reference](47-AvailityAPI-X12-Libraries-Reference.md) | Python/JS libraries for parsing X12 EDI segments |
+| [Test Data & Sandbox Guide](47-AvailityAPI-TestData-SandboxGuide.md) | Sandbox setup, mock scenarios, test member IDs |
+
+### Related Experiments
+
+| Experiment | Relationship |
+|-----------|-------------|
+| [Exp 44 — Payer Policy Download](44-PRD-PayerPolicy-PMS-Integration.md) | PA rules: what's required before submitting via Availity |
+| [Exp 45 — CMS Coverage API](45-PRD-CMSCoverage-PMS-Integration.md) | Medicare FFS LCD/NCD rules feed into PA decision engine |
+| [Exp 46 — UHC API Marketplace](46-PRD-UHCAPI-PMS-Integration.md) | UHC-specific Gold Card + TrackIt not available via Availity |
