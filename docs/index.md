@@ -399,6 +399,11 @@ _No bug fixes documented yet._
 - [MS Teams Setup Guide](experiments/68-MSTeams-PMS-Developer-Setup-Guide.md) — Azure Entra ID app registration, Microsoft Graph Python SDK, TeamsGraphClient wrapper, FastAPI router for send/webhook/subscribe endpoints, ngrok tunnel for development webhooks, and Next.js admin dashboard
 - [MS Teams Developer Tutorial](experiments/68-MSTeams-Developer-Tutorial.md) — Hands-on onboarding: build a critical lab result alert pipeline with Adaptive Card notifications, provider acknowledgment callbacks, and full round-trip from PMS event to Teams channel to provider response end-to-end
 
+### Azure Document Intelligence (Healthcare Document OCR & Structured Extraction)
+- [PRD: Azure Document Intelligence PMS Integration](experiments/69-PRD-AzureDocIntel-PMS-Integration.md) — Azure AI Document Intelligence v4.0 integration for automated insurance card extraction (prebuilt-healthInsuranceCard.us), referral letter parsing, PA decision classification, and EOB data extraction with custom neural models, confidence-based human-in-the-loop review, and HIPAA-compliant document processing pipeline
+- [Azure Document Intelligence Setup Guide](experiments/69-AzureDocIntel-PMS-Developer-Setup-Guide.md) — Azure resource provisioning (S0 tier), Python SDK installation, DocIntelClient wrapper, PostgreSQL extraction tables, FastAPI document endpoints, Next.js InsuranceCardUpload component, and Document Intelligence Studio verification
+- [Azure Document Intelligence Developer Tutorial](experiments/69-AzureDocIntel-Developer-Tutorial.md) — Hands-on onboarding: build an insurance card check-in workflow with image upload, Azure prebuilt model extraction, confidence-scored field review, staff approval with corrections, and database persistence end-to-end
+
 ---
 
 ## Documentation Views
