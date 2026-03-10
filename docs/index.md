@@ -374,6 +374,11 @@ _No bug fixes documented yet._
 - [A2A Setup Guide](experiments/63-A2A-PMS-Developer-Setup-Guide.md) — a2a-sdk installation, Agent Card serving at /.well-known/agent-card.json, A2A Gateway router, PMSAgentExecutor with clinical skills, mock external agent, and Next.js Agent Dashboard
 - [A2A Developer Tutorial](experiments/63-A2A-Developer-Tutorial.md) — Hands-on onboarding: build a multi-agent referral coordination workflow with PMS agent discovery, specialist scheduling agent, A2A task lifecycle, and MCP vs A2A comparison end-to-end
 
+### GWS CLI (Google Workspace CLI — Clinical-Administrative Automation)
+- [PRD: GWS CLI PMS Integration](experiments/64-PRD-GWSCLI-PMS-Integration.md) — Open-source Rust CLI (Apache 2.0, 17.3K stars) for all Google Workspace APIs with dynamic Discovery Service command generation, structured JSON output, 100+ AI agent skills, and built-in MCP server — bridging PMS clinical data to Docs, Gmail, Calendar, and Sheets for automated encounter documentation, patient communication, and reporting workflows
+- [GWS CLI Setup Guide](experiments/64-GWSCLI-PMS-Developer-Setup-Guide.md) — npm installation, OAuth scope-minimized authentication, GWSService Python subprocess wrapper, FastAPI endpoints for Docs/Gmail/Calendar/Sheets, Docker credential mounting, and audit logging
+- [GWS CLI Developer Tutorial](experiments/64-GWSCLI-Developer-Tutorial.md) — Hands-on onboarding: build an end-to-encounter pipeline that generates a SOAP note, exports it as a Google Doc, emails follow-up instructions via Gmail, and schedules a follow-up on Google Calendar — all from a single trigger
+
 ---
 
 ## Documentation Views
