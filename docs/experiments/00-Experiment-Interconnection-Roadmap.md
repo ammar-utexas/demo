@@ -1,8 +1,8 @@
 # PMS Experiment Interconnection Roadmap
 
 **Document ID:** PMS-EXP-ROADMAP-001
-**Version:** 4.0
-**Date:** March 9, 2026
+**Version:** 5.0
+**Date:** March 10, 2026
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Living Document
 
@@ -10,19 +10,18 @@
 
 ## 1. Executive Summary
 
-The PMS project maintains **64 experiments** (numbered 00–63) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, and developer experience. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
+The PMS project maintains **73 experiments** (numbered 00–72) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, developer experience, shipping & logistics, clinical collaboration, document processing, and device management. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
 
-Since the v2.0 roadmap (covering 00–38), **25 new experiments** (39–63) have been added. These form five major clusters:
+Since the v4.0 roadmap (covering 00–63), **9 new experiments** (64–72) have been added. These form four major clusters:
 
-1. **Prior Authorization (PA) Pipeline** (Exp 43–49, 56) — A six-experiment deep stack automating PA from CMS datasets through payer APIs to FHIR-compliant submission, plus competitive landscape analysis
-2. **AI Inference & Orchestration** (Exp 42, 52–55) — vLLM serving backbone, Llama 4 and Mistral 3 model families, GPT-5.4 benchmarking, and CrewAI multi-agent orchestration
-3. **Knowledge & Content Generation** (Exp 57–60) — NotebookLM-py content transformation, Supabase database tooling, Obsidian knowledge vaults, and Skill Creator framework
-4. **Spec-Driven Development** (Exp 61–62) — GSD execution-layer framework with fresh context isolation and parallel wave execution, and GitHub Spec Kit specification-layer toolkit with five-phase SDD workflow (Constitution → Specify → Plan → Tasks → Implement)
-5. **Agent Interoperability** (Exp 63) — A2A (Agent-to-Agent) Protocol for inter-agent communication across organizational boundaries, complementing MCP (Exp 09) for the complete agent interoperability stack
+1. **Shipping & Logistics** (Exp 65–67) — FedEx national shipping, UPS healthcare logistics with cold-chain compliance, and OnTime 360 local courier dispatch for last-mile specimen/supply delivery
+2. **Clinical Collaboration & Communications** (Exp 64, 68, 71) — Google Workspace CLI agent-to-workspace bridge, Microsoft Teams clinical messaging with adaptive cards, and RingCentral unified communications (voice, SMS, fax, video)
+3. **Document Processing & Lab Integration** (Exp 69–70) — Azure Document Intelligence for automated intake/insurance card extraction, and LigoLab MS SQL direct LIS connection complementing HL7v2
+4. **Mobile Device Management** (Exp 72) — TinyMDM Android MDM for securing PMS mobile devices with zero-touch enrollment and Samsung Knox integration
 
 This roadmap provides:
 
-- A **complete registry** of all 64 experiments with categories, platforms, and documentation inventory
+- A **complete registry** of all 73 experiments with categories, platforms, and documentation inventory
 - A **dependency graph** showing which experiments build on or complement others
 - **Execution tiers** recommending a foundation-first build order
 - **Parallel tracks** for teams that can work on independent streams simultaneously
@@ -38,7 +37,7 @@ This roadmap provides:
 
 ### Scope
 
-This roadmap covers experiments 00–63 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
+This roadmap covers experiments 00–72 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
 
 ---
 
@@ -110,6 +109,15 @@ This roadmap covers experiments 00–63 as documented in `docs/experiments/`. It
 | 61 | [GSD](61-PRD-GSD-PMS-Integration.md) | Dev Tooling / SDD | Dev | 27-Claude Code | PRD, Setup, Tutorial, Comparative |
 | 62 | [Spec Kit](62-PRD-SpecKit-PMS-Integration.md) | Dev Tooling / SDD | Dev | 27-Claude Code | PRD, Setup, Tutorial |
 | 63 | [A2A Protocol](63-PRD-A2A-PMS-Integration.md) | Backend / Agent Interop | Backend, Web | 09-MCP | PRD, Setup, Tutorial |
+| 64 | [GWS CLI](64-PRD-GWSCLI-PMS-Integration.md) | Backend / Workspace Automation | Backend, Web, Android | 55-CrewAI | PRD, Setup, Tutorial |
+| 65 | [FedEx API](65-PRD-FedExAPI-PMS-Integration.md) | Backend / Shipping & Logistics | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 66 | [UPS API](66-PRD-UPSAPI-PMS-Integration.md) | Backend / Shipping & Logistics | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 67 | [OnTime 360](67-PRD-OnTime360API-PMS-Integration.md) | Backend / Shipping & Logistics | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 68 | [MS Teams](68-PRD-MSTeams-PMS-Integration.md) | Backend / Collaboration | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 69 | [Azure Doc Intelligence](69-PRD-AzureDocIntel-PMS-Integration.md) | Backend / Document AI | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 70 | [LigoLab MS SQL](70-PRD-LigoLab-PMS-Integration.md) | Backend / Interop (LIS) | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 71 | [RingCentral API](71-PRD-RingCentralAPI-PMS-Integration.md) | Backend / Communication | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 72 | [TinyMDM](72-PRD-TinyMDM-PMS-Integration.md) | Mobile / Device Management | Android, Backend | None | PRD, Setup, Tutorial |
 
 ---
 
@@ -172,6 +180,7 @@ flowchart TD
     subgraph INTEROP["Interoperability"]
         E16["16 FHIR"]
         E17["17 HL7v2 LIS"]
+        E70["70 LigoLab MS SQL"]
     end
 
     %% ── Subgraph: Prior Authorization ──
@@ -237,9 +246,29 @@ flowchart TD
         E62["62 Spec Kit"]
     end
 
+    %% ── Subgraph: Shipping & Logistics ──
+    subgraph SHIPPING["Shipping & Logistics"]
+        E65["65 FedEx API"]
+        E66["66 UPS API"]
+        E67["67 OnTime 360"]
+    end
+
+    %% ── Subgraph: Collaboration & Communications ──
+    subgraph COMMS["Collaboration & Communications"]
+        E64["64 GWS CLI"]
+        E68["68 MS Teams"]
+        E71["71 RingCentral"]
+    end
+
+    %% ── Subgraph: Document Processing ──
+    subgraph DOCAI["Document Processing"]
+        E69["69 Azure Doc Intel"]
+    end
+
     %% ── Subgraph: Security ──
     subgraph SECURITY["Security & Compliance"]
         E50["50 OWASP LLM Top 10"]
+        E72["72 TinyMDM"]
     end
 
     %% ── Subgraph: Reference & Analysis ──
@@ -300,6 +329,9 @@ flowchart TD
     E27 --> E40
     E09 --> E63
 
+    %% ── Hard Dependencies (solid arrows) ── New 64-72
+    E55 --> E64
+
     %% ── Complementary / Enhances (dashed arrows) ── Original
     E07 -.->|enhances| E10
     E07 -.->|enhances| E21
@@ -352,6 +384,18 @@ flowchart TD
     E63 -.->|enhances| E05
     E63 -.->|complements| E09
 
+    %% ── Complementary / Enhances (dashed arrows) ── New 64-72
+    E65 -.->|complements| E66
+    E65 -.->|complements| E67
+    E66 -.->|complements| E67
+    E68 -.->|complements| E71
+    E68 -.->|complements| E64
+    E69 -.->|enhances| E43
+    E69 -.->|enhances| E44
+    E70 -.->|enhances| E17
+    E71 -.->|enhances| E51
+    E72 -.->|enhances| E25
+
     %% ── Color Classes ──
     classDef ui fill:#818cf8,stroke:#4f46e5,color:#fff
     classDef infra fill:#38bdf8,stroke:#0284c7,color:#fff
@@ -368,13 +412,16 @@ flowchart TD
     classDef platform fill:#6ee7b7,stroke:#10b981,color:#000
     classDef knowledge fill:#fca5a5,stroke:#ef4444,color:#000
     classDef security fill:#fde047,stroke:#ca8a04,color:#000
+    classDef shipping fill:#d4a574,stroke:#a3866e,color:#000
+    classDef comms fill:#67e8f9,stroke:#22d3ee,color:#000
+    classDef docai fill:#d8b4fe,stroke:#a78bfa,color:#000
 
     class E00,E01,E02,E03 ui
     class E09,E08,E15,E29,E52,E42 infra
     class E06,E13,E20,E53,E54 models
     class E07,E10,E21,E30,E33,E35 speech
     class E11,E18 cds
-    class E16,E17 interop
+    class E16,E17,E70 interop
     class E05,E26,E34,E55,E51,E63 agents
     class E37,E38 realtime
     class E25 edge
@@ -383,7 +430,10 @@ flowchart TD
     class E43,E44,E45,E46,E47,E48,E49,E56 pa
     class E39,E58 platform
     class E57,E59,E41,E40 knowledge
-    class E50 security
+    class E50,E72 security
+    class E65,E66,E67 shipping
+    class E64,E68,E71 comms
+    class E69 docai
 ```
 
 **Legend:** Solid arrows = hard dependency (must be implemented first). Dashed arrows = complementary/enhances (benefits from but does not require).
@@ -431,6 +481,14 @@ Build on Tier 0 foundations. These experiments provide core AI, interop, securit
 | 58 | Supabase + Claude Code | 39-Docker (AI-assisted database tooling) |
 | 44 | Payer Policy Download | 39-Docker (policy document extraction) |
 | 45 | CMS Coverage API | 43-CMS PA Dataset (real-time coverage determination) |
+| 65 | FedEx API | None (national shipping for specimens/supplies) |
+| 66 | UPS API | None (healthcare logistics with cold-chain) |
+| 67 | OnTime 360 | None (local courier dispatch, last-mile delivery) |
+| 68 | MS Teams | None (clinical collaboration with adaptive cards) |
+| 69 | Azure Doc Intelligence | None (automated intake document extraction) |
+| 70 | LigoLab MS SQL | None (direct LIS database connection) |
+| 71 | RingCentral API | None (unified communications — voice, SMS, fax) |
+| 72 | TinyMDM | None (Android MDM for PMS mobile devices) |
 
 ### Tier 2 — Integration & Expansion (Weeks 6–9)
 
@@ -481,6 +539,7 @@ Complex integrations requiring multiple Tier 1–2 foundations.
 | 51 | Amazon Connect Health | 52-vLLM (contact center automation) |
 | 48 | FHIR Da Vinci PA | 47-Availity, 16-FHIR (2027 compliance) |
 | 49 | NextGen FHIR EHR | 48-FHIR DA Vinci (EHR data import) |
+| 64 | GWS CLI | 55-CrewAI (agent-to-workspace bridge) |
 
 ### Tier 4 — Capstone Integrations (Week 13+)
 
@@ -498,12 +557,15 @@ Full end-to-end clinical workflows combining multiple experiments.
 | **Clinical Knowledge Pipeline** | 55 + 57 + 59 + 41 | CrewAI generates summaries → NotebookLM transforms to audio/quiz → Obsidian stores → InfraNodus maps relationships |
 | **AI Model Deployment Stack** | 39 + 52 + 53 + 54 + 42 + 50 | Docker → vLLM → Llama/Mistral → Benchmark → Security gate |
 | **Spec-Driven Dev Pipeline** | 27 + 60 + 61 + 62 | Claude Code → Skill Creator → GSD execution + Spec Kit specification → Full SDD lifecycle |
+| **Specimen Logistics Pipeline** | 65 + 66 + 67 + 69 | FedEx/UPS national → OnTime 360 local → Azure Doc Intel for shipping docs → End-to-end specimen tracking |
+| **Clinical Communications Stack** | 64 + 68 + 71 + 51 | GWS CLI workspace bridge + MS Teams messaging + RingCentral telephony + Amazon Connect contact center |
+| **Secure Mobile Clinical Platform** | 72 + 25 + 37 | TinyMDM device policy → Edge Vision Stream capture → WebSocket real-time sync |
 
 ### Execution Timeline (Gantt)
 
 ```mermaid
 gantt
-    title Experiment Execution Tiers (v4.0)
+    title Experiment Execution Tiers (v5.0)
     dateFormat YYYY-MM-DD
     axisFormat %b %d
 
@@ -536,6 +598,14 @@ gantt
     58 Supabase                :t58, after t39, 5d
     44 Payer Policies          :t44, after t39, 5d
     45 CMS Coverage API        :t45, after t43, 7d
+    65 FedEx API               :t65, 2026-03-16, 7d
+    66 UPS API                 :t66, 2026-03-16, 7d
+    67 OnTime 360              :t67, 2026-03-16, 7d
+    68 MS Teams                :t68, 2026-03-16, 7d
+    69 Azure Doc Intel         :t69, 2026-03-16, 7d
+    70 LigoLab MS SQL          :t70, 2026-03-16, 7d
+    71 RingCentral API         :t71, 2026-03-16, 7d
+    72 TinyMDM                 :t72, 2026-03-16, 5d
 
     section Tier 2 — Integration
     05 OpenClaw                :t05, after t09, 10d
@@ -576,6 +646,7 @@ gantt
     51 Amazon Connect          :t51, after t52, 10d
     48 FHIR DA Vinci PA        :t48, after t47, 10d
     49 NextGen FHIR            :t49, after t48, 7d
+    64 GWS CLI                 :t64, after t55, 7d
 
     section Tier 4 — Capstone
     Clinical Doc Pipeline      :t_cdp, after t55, 14d
@@ -587,13 +658,16 @@ gantt
     Clinical Knowledge Pipeline:t_ckp, after t55, 10d
     AI Model Deploy Stack      :t_ams, after t42, 7d
     Spec-Driven Dev Pipeline   :t_sdp, after t62, 7d
+    Specimen Logistics Pipeline:t_slp, after t67, 10d
+    Clinical Comms Stack       :t_ccs, after t64, 10d
+    Secure Mobile Platform     :t_smp, after t72, 10d
 ```
 
 ---
 
 ## 6. Parallel Execution Tracks
 
-Eight independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
+Ten independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
 
 ### Track A — UI/UX
 ```
@@ -630,6 +704,8 @@ Eight independent tracks that can be staffed and executed simultaneously. Cross-
 39-Docker → 52-vLLM → {53-Llama 4, 54-Mistral 3, 42-GPT-5.4 Benchmark}
                 ↓
          {55-CrewAI, 51-Amazon Connect}
+                ↓
+         64-GWS CLI  (agent-to-workspace bridge — depends on CrewAI)
 ```
 
 ### Track E — Developer Experience
@@ -672,6 +748,23 @@ Eight independent tracks that can be staffed and executed simultaneously. Cross-
 60-Skill Creator  (skill framework — needs 27-Claude Code from Track E)
 
 Integration point: CrewAI (Track D) feeds content → notebooklm-py transforms it
+```
+
+### Track I — Shipping & Logistics _(new)_
+```
+{65-FedEx API, 66-UPS API}  (national shipping — parallel, complementary)
+67-OnTime 360               (local courier dispatch — complements 65/66)
+
+Integration point: 69-Azure Doc Intel (Track J) enhances shipping document processing
+```
+
+### Track J — Clinical Collaboration & Document Processing _(new)_
+```
+{68-MS Teams, 71-RingCentral}  (collaboration & communications — parallel)
+64-GWS CLI                     (agent workspace bridge — needs 55-CrewAI from Track D)
+69-Azure Doc Intelligence      (document extraction — standalone)
+70-LigoLab MS SQL              (direct LIS connection — enhances 17-HL7v2 from Track C)
+72-TinyMDM                     (Android MDM — standalone, enhances 25-Edge Vision from Track B)
 ```
 
 ### Cross-Track Dependencies
@@ -790,6 +883,21 @@ flowchart LR
         H2["41 InfraNodus"]
     end
 
+    subgraph I["Track I: Shipping"]
+        I1["65 FedEx"]
+        I2["66 UPS"]
+        I3["67 OnTime 360"]
+    end
+
+    subgraph J["Track J: Collaboration"]
+        J1["64 GWS CLI"]
+        J2["68 MS Teams"]
+        J3["71 RingCentral"]
+        J4["69 Azure Doc Intel"]
+        J5["70 LigoLab"]
+        J6["72 TinyMDM"]
+    end
+
     %% Cross-track dependencies
     D1 -.->|"required"| A4
     C1 -.->|"enhances"| D3
@@ -802,6 +910,11 @@ flowchart LR
     C1 -.->|"required"| G5
     D9 -.->|"orchestrates"| H1
     D9 -.->|"orchestrates"| G4
+    D9 -.->|"required"| J1
+    J5 -.->|"enhances"| C2
+    J6 -.->|"enhances"| B7
+    J4 -.->|"enhances"| G1
+    J3 -.->|"enhances"| D10
 
     style A fill:#eef2ff,stroke:#818cf8
     style B fill:#ecfdf5,stroke:#34d399
@@ -811,6 +924,8 @@ flowchart LR
     style F fill:#fffbeb,stroke:#fbbf24
     style G fill:#faf5ff,stroke:#c084fc
     style H fill:#fff1f2,stroke:#fca5a5
+    style I fill:#fef3e2,stroke:#d4a574
+    style J fill:#ecfeff,stroke:#67e8f9
 ```
 
 ---
@@ -893,6 +1008,20 @@ _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 2
 | **62 Spec Kit** | 27-Claude Code | Complements 61-GSD (specification layer vs execution layer — Spec Kit generates constitutions and specs that GSD can execute). Enhances 55-CrewAI (constitution-driven specification for agent workflows). Enhances 48-FHIR DA Vinci PA (requirement traceability for compliance). Five-phase SDD workflow (Constitution → Specify → Plan → Tasks → Implement) |
 | **63 A2A Protocol** | 09-MCP | Complements 09-MCP (MCP = agent-to-tool, A2A = agent-to-agent — complete interoperability stack). Enhances 55-CrewAI (PMS agents can delegate to external agents via A2A). Enhances 26-LangGraph (PA agent graph can communicate with payer agents). Enhances 05-OpenClaw (clinical agents gain cross-org collaboration). Enables PA pipeline (43–49) to interact with payer AI agents, not just REST APIs |
 
+### Experiments 64–72 — Relationships to All Others
+
+| Experiment | Hard Dependencies | Complementary / Enhances |
+|-----------|------------------|--------------------------|
+| **64 GWS CLI** | 55-CrewAI | Agent-to-workspace bridge for Google Docs, Sheets, Calendar. Complements 68-MS Teams (Google vs Microsoft collaboration). CrewAI agents can auto-generate clinical reports in Google Docs, schedule follow-ups in Calendar |
+| **65 FedEx API** | None | Complements 66-UPS (carrier comparison for specimen shipping). Complements 67-OnTime 360 (national + local delivery pair). Enhances clinical workflows with specimen tracking and Clinical Pak cold-chain packaging |
+| **66 UPS API** | None | Complements 65-FedEx (multi-carrier shipping strategy). Complements 67-OnTime 360 (national + local). UPS Healthcare cold-chain with UN3373 biological substance compliance |
+| **67 OnTime 360** | None | Complements 65-FedEx, 66-UPS (last-mile local courier dispatch). Handles same-day specimen delivery, inter-office supply runs, STAT lab pickups. 500+ API properties for dispatch optimization |
+| **68 MS Teams** | None | Complements 64-GWS CLI (Microsoft vs Google workspace). Complements 71-RingCentral (messaging + telephony). Enhances clinical communication with adaptive cards for patient alerts, care coordination channels, Bot Framework integration |
+| **69 Azure Doc Intelligence** | None | Enhances 43-CMS PA Dataset (automated extraction of PA forms). Enhances 44-Payer Policies (OCR/classification of payer documents). Enhances intake workflows (insurance card scanning, referral letter extraction). Prebuilt health insurance card model |
+| **70 LigoLab MS SQL** | None | Enhances 17-HL7v2 LIS (direct SQL connection bypasses HL7v2 message latency for LigoLab-specific queries). Complements 16-FHIR (raw LIS data can feed FHIR Observation resources). Direct MS SQL connection via pyodbc with TLS 1.2+ |
+| **71 RingCentral API** | None | Complements 68-MS Teams (telephony + messaging). Enhances 51-Amazon Connect (RingCentral for outbound calls, Connect for inbound contact center). Unified voice, SMS/MMS, fax, video with HIPAA BAA. Webhook-driven call event integration |
+| **72 TinyMDM** | None | Enhances 25-Edge Vision Stream (MDM secures Android devices running clinical camera apps). Enhances 37-WebSocket (MDM policies ensure devices maintain secure WebSocket connections). Zero-touch enrollment, Samsung Knox, kiosk mode for clinical tablets |
+
 ---
 
 ## 8. Critical Path Analysis
@@ -906,9 +1035,9 @@ Path 1 (PA Pipeline — 77 days):
 43-CMS Dataset → 45-CMS API → 46-UHC → 47-Availity → 48-FHIR DA Vinci → 49-NextGen → PA Automation Pipeline
      7d              7d          7d         7d              10d               7d             14d
 
-Path 2 (AI Model Stack — 59 days):
-39-Docker → 52-vLLM → 55-CrewAI → Clinical Knowledge Pipeline
-    7d         7d         10d              10d
+Path 2 (AI Model Stack — 66 days):
+39-Docker → 52-vLLM → 55-CrewAI → 64-GWS CLI → Clinical Communications Stack
+    7d         7d         10d          7d              10d
 
 Path 3 (Original — 44 days):
 09-MCP → 05-OpenClaw → 26-LangGraph → Clinical Documentation Pipeline
@@ -923,8 +1052,8 @@ These experiments **gate the most downstream work** and should be prioritized:
 |-----------|-----------------|--------|
 | **27 Claude Code** | 12 | 19-Superpowers, 14-Agent Teams (via 19), 24-Knowledge Plugins (via 14), 28-AI Coding Tools, 31-VS Code, 32-GitHub Agent HQ (via 31), 36-Claude Context Mode, 40-ExcalidrawSkill, 59-Obsidian, 60-Skill Creator, 61-GSD, 62-Spec Kit |
 | **09 MCP** | 8 | 00-Tambo, 05-OpenClaw, 08-Adaptive, 15-Model Selection, 26-LangGraph, 34-n8n, 63-A2A Protocol, (+ Tier 4 pipelines) |
-| **52 vLLM** | 6 | 53-Llama 4, 54-Mistral 3, 42-GPT-5.4 Benchmark, 55-CrewAI, 51-Amazon Connect, (+ Tier 4 pipelines) |
-| **39 Docker** | 4 (+transitive) | 52-vLLM, 58-Supabase, 44-Payer Policies, (+ everything downstream of vLLM) |
+| **52 vLLM** | 7 | 53-Llama 4, 54-Mistral 3, 42-GPT-5.4 Benchmark, 55-CrewAI, 51-Amazon Connect, 64-GWS CLI (via 55), (+ Tier 4 pipelines) |
+| **39 Docker** | 4 (+transitive) | 52-vLLM, 58-Supabase, 44-Payer Policies, (+ everything downstream of vLLM including 64-GWS CLI) |
 | **45 CMS Coverage API** | 4 | 46-UHC, 47-Availity, 48-FHIR DA Vinci (via 47), 49-NextGen (via 48) |
 | **16 FHIR** | 4 | 11-Sanford Guide, 17-HL7v2 LIS, 48-FHIR DA Vinci PA, 49-NextGen (via 48) |
 | **13 Gemma 3** | 3 | 18-ISIC, 20-Qwen 3.5, 25-Edge Vision |
@@ -948,6 +1077,8 @@ flowchart LR
     E39["39 Docker<br/>7d"]:::bottleneck --> E52["52 vLLM<br/>7d"]:::bottleneck
     E52 --> E55["55 CrewAI<br/>10d"]:::bottleneck
     E55 --> CAP_CK["Clinical Knowledge<br/>Pipeline<br/>10d"]:::bottleneck
+    E55 --> E64["64 GWS CLI<br/>7d"]
+    E64 --> CAP_CC["Clinical Comms<br/>Stack<br/>10d"]
     E52 --> E53["53 Llama 4<br/>7d"]
     E52 --> E54["54 Mistral 3<br/>7d"]
 
@@ -993,18 +1124,18 @@ flowchart LR
 |------|-------|-------------|
 | 1 | Infrastructure | 09-MCP + 16-FHIR + 37-WebSocket + 39-Docker + 43-CMS Dataset (parallel) |
 | 2 | AI Foundation + PA Data | 52-vLLM + 13-Gemma 3 + 08-Adaptive + 45-CMS API + 44-Payer Policies (parallel) |
-| 3 | Agents + Models + PA | 05-OpenClaw + 53-Llama 4 + 54-Mistral 3 + 46-UHC + 07-MedASR (parallel) |
-| 4 | Dev + UI + PA Integration | 27-Claude Code + 01-Storybook + 19-Superpowers + 47-Availity + 38-Kafka (parallel) |
+| 3 | Agents + Models + PA + Shipping | 05-OpenClaw + 53-Llama 4 + 54-Mistral 3 + 46-UHC + 65-FedEx + 66-UPS (parallel) |
+| 4 | Dev + UI + Comms + PA | 27-Claude Code + 01-Storybook + 68-MS Teams + 71-RingCentral + 47-Availity + 38-Kafka (parallel) |
 
 ### 1-Quarter Plan (16 Weeks)
 
 | Weeks | Tier | Experiments |
 |-------|------|-------------|
 | 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23, 27, 28, 39, 43, 50 |
-| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45 |
+| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45, 65, 66, 67, 68, 69, 70, 71, 72 |
 | 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41, 61, 62, 63 |
-| 10–13 | 3 — Advanced | 18, 25, 26, 24, 32, 55, 51, 48, 49 |
-| 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack |
+| 10–13 | 3 — Advanced | 18, 25, 26, 24, 32, 55, 51, 48, 49, 64 |
+| 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack, Specimen Logistics Pipeline, Clinical Comms Stack, Secure Mobile Platform |
 
 ---
 
@@ -1076,7 +1207,16 @@ flowchart LR
 | 61 GSD | | | | | | | | X |
 | 62 Spec Kit | | | | | | | | X |
 | 63 A2A Protocol | X | X | | | | | X | |
-| **Total** | **40** | **32** | **10** | **19** | **25** | **4** | **15** | **19** |
+| 64 GWS CLI | X | X | X | | | | X | |
+| 65 FedEx API | X | X | X | | | | X | |
+| 66 UPS API | X | X | X | | | | X | |
+| 67 OnTime 360 | X | X | X | | | | X | |
+| 68 MS Teams | X | X | X | | | | X | |
+| 69 Azure Doc Intel | X | X | X | | X | | X | |
+| 70 LigoLab MS SQL | X | X | X | X | | | X | |
+| 71 RingCentral API | X | X | X | | | | X | |
+| 72 TinyMDM | X | | X | | | | X | |
+| **Total** | **49** | **40** | **19** | **20** | **26** | **4** | **24** | **19** |
 
 ---
 
@@ -1091,16 +1231,19 @@ Reference for Mermaid diagram styling in Section 3.
 | On-Premise Models | Emerald | `#34d399` | 06, 13, 20, 53, 54 |
 | Speech & Voice AI | Amber | `#fbbf24` | 07, 10, 21, 30, 33, 35 |
 | Clinical Decision Support | Red | `#f87171` | 11, 18 |
-| Interoperability | Violet | `#a78bfa` | 16, 17 |
+| Interoperability | Violet | `#a78bfa` | 16, 17, 70 |
 | Prior Authorization | Purple | `#c084fc` | 43, 44, 45, 46, 47, 48, 49, 56 |
 | Agentic AI & Automation | Orange | `#fb923c` | 05, 26, 34, 55, 51, 63 |
 | Real-Time & Streaming | Rose | `#f472b6` | 37, 38 |
 | Edge Computing | Teal | `#2dd4bf` | 25 |
 | Infrastructure | Mint | `#6ee7b7` | 39, 58 |
 | Knowledge & Content | Coral | `#fca5a5` | 40, 41, 57, 59 |
-| Security & Compliance | Yellow | `#fde047` | 50 |
+| Security & Compliance | Yellow | `#fde047` | 50, 72 |
 | Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27, 28, 31, 32, 36, 60, 61, 62 |
 | Reference & Analysis | Light Gray | `#e2e8f0` | 04, 22, 23 |
+| Shipping & Logistics | Sand | `#d4a574` | 65, 66, 67 |
+| Collaboration & Communications | Cyan | `#67e8f9` | 64, 68, 71 |
+| Document Processing | Light Purple | `#d8b4fe` | 69 |
 
 ---
 
@@ -1108,6 +1251,7 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 5.0 | 2026-03-10 | Ammar | Added Experiments 64–72 (GWS CLI workspace automation, FedEx API, UPS API, OnTime 360 local courier, MS Teams collaboration, Azure Document Intelligence, LigoLab MS SQL LIS, RingCentral unified comms, TinyMDM Android MDM). Four new clusters: Shipping & Logistics (65–67), Clinical Collaboration & Communications (64, 68, 71), Document Processing & Lab Integration (69–70), Mobile Device Management (72). New Tracks I (Shipping) and J (Collaboration). Three new Tier 4 capstones: Specimen Logistics Pipeline, Clinical Communications Stack, Secure Mobile Clinical Platform. Updated Path 2 critical path (59→66 days with GWS CLI). Three new color categories (Shipping, Communications, Document AI). Updated bottleneck counts: 52-vLLM (6→7). Experiment count: 64 → 73 |
 | 4.0 | 2026-03-09 | Ammar | Added Experiments 61–63 (GSD spec-driven execution, Spec Kit specification-layer SDD, A2A Protocol inter-agent communication). New cluster: Spec-Driven Development (61–62) and Agent Interoperability (63). Updated Track D with A2A, Track E with GSD/Spec Kit. New Tier 4 capstone: Spec-Driven Dev Pipeline. Updated bottleneck counts: 27-Claude Code (10→12), 09-MCP (7→8). Experiment count: 61 → 64 |
 | 3.0 | 2026-03-09 | Ammar | Major update: added Experiments 39–60 (Docker, ExcalidrawSkill, InfraNodus, GPT-5.4 Benchmark, CMS PA Dataset, Payer Policies, CMS Coverage API, UHC API, Availity, FHIR DA Vinci PA, NextGen FHIR, OWASP LLM Top 10, Amazon Connect, vLLM, Llama 4, Mistral 3, CrewAI, PA Competitive Landscape, notebooklm-py, Supabase, Obsidian, Skill Creator). New categories: Prior Authorization, Infrastructure, Knowledge & Content, Security & Compliance. New Tracks G (PA Pipeline) and H (Knowledge & Content). Three new Tier 4 capstone pipelines (PA Automation, Clinical Knowledge, AI Model Deploy). PA Pipeline is now the longest critical path (77 days). Updated all dependency graphs, execution tiers, platform coverage, bottleneck analysis, and quick-start recommendations. Experiment count: 39 → 61 |
 | 2.0 | 2026-03-03 | Ammar | Major update: added Experiments 29–38 (Gemini Interactions, ElevenLabs, VS Code Multi-Agent, GitHub Agent HQ, Speechmatics Flow, n8n 2.0+, Kintsugi, Claude Context Mode, WebSocket, Apache Kafka). New categories: Real-Time & Streaming, Voice AI expansion. New Track F (Voice AI). New Tier 4 capstone pipelines. Updated all dependency graphs, execution tiers, platform coverage, and bottleneck analysis |
