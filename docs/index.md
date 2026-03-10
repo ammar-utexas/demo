@@ -389,6 +389,16 @@ _No bug fixes documented yet._
 - [UPS API Setup Guide](experiments/66-UPSAPI-PMS-Developer-Setup-Guide.md) — UPS Developer account registration, OAuth 2.0 client credentials, UPSService Python client, PostgreSQL shipment schema, FastAPI shipping endpoints, Next.js ShippingPanel component, and sandbox verification
 - [UPS API Developer Tutorial](experiments/66-UPSAPI-Developer-Tutorial.md) — Hands-on onboarding: build a specimen collection kit shipping workflow with address validation, dangerous goods compliance check, rate comparison, label generation, and real-time tracking end-to-end
 
+### OnTime 360 API (Local Courier Dispatch & Medical Delivery Management)
+- [PRD: OnTime 360 API PMS Integration](experiments/67-PRD-OnTime360API-PMS-Integration.md) — OnTime 360 REST API integration for local courier dispatch of lab specimens, prescription medications, and medical supplies with 90+ API endpoints, real-time driver GPS tracking, proof-of-delivery capture, PHI de-identification gateway, and HIPAA-compliant audit logging
+- [OnTime 360 API Setup Guide](experiments/67-OnTime360API-PMS-Developer-Setup-Guide.md) — Enterprise account setup, API key provisioning, OnTimeClient async Python client, CourierService FastAPI router, StatusPoller background task, PostgreSQL courier schema, and Next.js Delivery Dashboard
+- [OnTime 360 API Developer Tutorial](experiments/67-OnTime360API-Developer-Tutorial.md) — Hands-on onboarding: build a lab specimen courier workflow with PHI-safe order creation, real-time status tracking, proof-of-delivery retrieval, delivery cost reporting, and intelligent routing between OnTime 360 (local) and FedEx (national) end-to-end
+
+### Microsoft Teams (Bi-Directional Clinical Collaboration)
+- [PRD: MS Teams PMS Integration](experiments/68-PRD-MSTeams-PMS-Integration.md) — Microsoft Graph API integration for bi-directional Teams channel communication with Adaptive Cards for interactive clinical notifications (lab alerts, PA decisions, refill approvals), webhook-based channel listening, and HIPAA-compliant PHI handling via Azure Entra ID OAuth 2.0
+- [MS Teams Setup Guide](experiments/68-MSTeams-PMS-Developer-Setup-Guide.md) — Azure Entra ID app registration, Microsoft Graph Python SDK, TeamsGraphClient wrapper, FastAPI router for send/webhook/subscribe endpoints, ngrok tunnel for development webhooks, and Next.js admin dashboard
+- [MS Teams Developer Tutorial](experiments/68-MSTeams-Developer-Tutorial.md) — Hands-on onboarding: build a critical lab result alert pipeline with Adaptive Card notifications, provider acknowledgment callbacks, and full round-trip from PMS event to Teams channel to provider response end-to-end
+
 ---
 
 ## Documentation Views
