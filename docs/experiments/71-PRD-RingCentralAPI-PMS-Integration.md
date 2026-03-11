@@ -189,7 +189,27 @@ flowchart TB
 - **Features**: Caller ID patient screen-pop, click-to-call from patient records, SMS compose with template selection, fax inbox with patient matching, video visit link generation
 - **PMS APIs Used**: Patient Records (display), Encounter Records (link)
 
-### 5.8 Android Communications Module
+### 5.8 TranscriptionService
+
+**Description**: Processes call recordings through RingCentral's Audio AI Speech-to-Text API, producing speaker-diarized transcripts with timestamps that are linked to patient encounters.
+
+- **Input**: Call recording ID (from `comms_call_log`), patient ID, encounter ID
+- **Output**: Structured transcript with speaker labels ("Provider" / "Patient"), word-level timestamps, confidence scores, stored in `comms_transcriptions` table
+- **Key Methods**: `transcribe_recording()`, `get_transcript()`, `generate_encounter_note()`
+- **API**: `POST /ai/audio/v1/async/speech-to-text` (async with webhook callback)
+- **PMS APIs Used**: Encounter Records API (attach transcript as encounter note)
+
+### 5.9 CallAnalyticsService
+
+**Description**: Aggregates communication statistics from RingCentral's Business Analytics API and local PMS data to produce operational dashboards and trend reports.
+
+- **Input**: Date range, grouping parameters (by user, department, day/week/month)
+- **Output**: Aggregated metrics — call volume, average duration, SMS delivery rates, no-show correlation, recording transcription coverage
+- **Key Methods**: `get_call_volume_stats()`, `get_sms_delivery_stats()`, `get_no_show_correlation()`, `get_recording_coverage()`
+- **APIs**: `POST /analytics/calls/v1/accounts/~/aggregation/fetch`, `POST /analytics/calls/v1/accounts/~/timeline/fetch`, local PostgreSQL aggregation
+- **PMS APIs Used**: Reporting API (write analytics), Encounter Records API (no-show correlation)
+
+### 5.10 Android Communications Module
 
 **Description**: Patient-facing communication features in the PMS Android app — appointment reminder display, SMS opt-in/out, video visit join button.
 
@@ -221,6 +241,9 @@ flowchart TB
 | Caller ID resolution | < 500ms patient lookup from phone number |
 | Webhook event processing | < 1 second from receipt to database write |
 | Call recording retrieval | < 3 seconds for playback initiation |
+| Transcription processing | < 2 minutes for a 10-minute call |
+| Analytics aggregation query | < 5 seconds for 30-day rollup |
+| Sentiment analysis processing | < 3 minutes per call recording |
 | Fax transmission | < 2 minutes for standard 5-page document |
 | Video meeting creation | < 2 seconds to generate join URL |
 | Reminder scheduler throughput | 500 SMS/hour (within rate limits) |
@@ -237,7 +260,7 @@ flowchart TB
 | Webhook Endpoint | Publicly accessible HTTPS URL (ngrok for dev, production domain for prod) |
 | PMS Backend | Existing FastAPI container — no new services |
 | Redis | Cache OAuth tokens (1-hour TTL), patient phone lookups (5-minute TTL) |
-| PostgreSQL | New tables: `comms_call_log`, `comms_sms_log`, `comms_fax_inbox`, `comms_recordings`, `comms_audit_log` |
+| PostgreSQL | New tables: `comms_call_log`, `comms_sms_log`, `comms_fax_inbox`, `comms_recordings`, `comms_transcriptions`, `comms_call_analytics`, `comms_audit_log` |
 
 ## 7. Implementation Phases
 
@@ -264,14 +287,40 @@ flowchart TB
 - SMS conversation history per patient
 - Patient opt-in/opt-out management for SMS reminders
 
-### Phase 3: Advanced Features (Sprints 5-6)
+### Phase 3: Voice Recording Evaluation, Auto-Transcription & Analytics (Sprints 5-6)
 
+- **TranscriptionService** with RingCentral Audio AI Speech-to-Text (`POST /ai/audio/v1/async/speech-to-text`):
+  - Async transcription with webhook callback for completed recordings
+  - Speaker diarization (provider vs. patient) with `audioType: "CallCenter"`
+  - Word-level timestamps and per-utterance confidence scores
+  - Punctuation and voice activity detection enabled
+  - Transcript stored in `comms_transcriptions` table linked to call log and encounter
+  - Auto-generated encounter notes from transcripts using extractive summarization
+- **Interaction Analytics** via `POST /ai/insights/v1/async/analyze-interaction`:
+  - Sentiment analysis (positive/negative/neutral) per speaker per call
+  - Emotion detection for patient satisfaction monitoring
+  - Results stored in `comms_call_analytics` table
+- **CallAnalyticsService** with RingCentral Business Analytics API:
+  - `POST /analytics/calls/v1/accounts/~/aggregation/fetch` — aggregate call volume, duration, and result metrics
+  - `POST /analytics/calls/v1/accounts/~/timeline/fetch` — time-series trends (hourly/daily/weekly/monthly)
+  - SMS delivery analytics via Message Store API export
+  - No-show correlation: cross-reference SMS reminder delivery with appointment attendance
+  - Recording transcription coverage rate tracking
+- **Analytics Dashboard** (Next.js):
+  - Call volume trends by day/week/month with chart visualization
+  - SMS delivery success/failure rates
+  - Average call duration by department/provider
+  - No-show rate trend correlated with reminder SMS delivery
+  - Transcription coverage percentage
+  - Patient sentiment trends from interaction analytics
+- **Recording Evaluation Workflow**:
+  - Quality scoring: transcription confidence as proxy for call audio quality
+  - Recording completeness audit: flag calls without recordings
+  - Storage analytics: recording size, retention status, archive eligibility
 - Video API integration for telehealth visits with waiting room and recording
-- Audio AI transcription for call recordings → encounter note generation
 - Android app: appointment reminder push notifications, video visit join, SMS view
 - After-hours IVR configuration with clinical triage routing
 - Bulk SMS campaigns for injection series recall (patients overdue for treatment)
-- Analytics dashboard: call volume trends, SMS delivery rates, no-show reduction metrics
 - Integration with Microsoft Teams (Experiment 68) for internal clinical escalation
 
 ## 8. Success Metrics
@@ -284,8 +333,13 @@ flowchart TB
 | Caller ID resolution rate | > 85% of inbound calls matched to patients | CallerIDResolver match rate |
 | Fax processing time | < 2 min from receipt to patient queue (from 5-10 min manual) | FaxIngestService timestamps |
 | Call recording coverage | 100% of clinical phone consultations recorded | comms_call_log recording_url not null |
+| Transcription coverage | > 95% of recordings auto-transcribed | comms_transcriptions count / comms_call_log with recordings |
+| Transcription accuracy | > 85% average confidence score | comms_transcriptions avg(confidence_score) |
+| Encounter note auto-generation | > 80% of transcribed calls produce draft notes | encounter notes linked to transcription_id |
 | SMS response rate (confirmations) | > 60% of patients reply to reminders | SMS conversation analysis |
 | Average hold time | < 45 seconds | RingCentral call queue analytics |
+| Analytics dashboard adoption | > 90% of managers use weekly | Dashboard access logs |
+| Patient sentiment positive rate | > 75% of calls scored positive/neutral | comms_call_analytics sentiment data |
 
 ## 9. Risks and Mitigations
 
@@ -353,6 +407,15 @@ ElevenLabs provides **AI voice synthesis and speech-to-text**. RingCentral provi
 - [RingCentral for Healthcare](https://developers.ringcentral.com/solutions/healthcare) — HIPAA compliance, EHR integration, telehealth capabilities
 - [RingCentral HIPAA Compliance](https://support.ringcentral.com/article-v2/RingCentral-HIPAA-Compliance.html?brand=RC_US&product=RingEX&language=en_US) — BAA program, encryption, security layers
 - [RingCentral HIPAA-Compliant VoIP Guide](https://www.ringcentral.com/us/en/blog/hipaa-compliant-voip/) — Healthcare VoIP security requirements
+
+### AI & Analytics
+- [RingCentral Audio & Video AI APIs](https://developers.ringcentral.com/ai-api) — Speech-to-text, speaker diarization, interaction analytics
+- [Speech-to-Text Developer Guide](https://developers.ringcentral.com/guide/ai/speech-to-text) — Async transcription API with webhook callbacks
+- [Speaker Diarization Guide](https://developers.ringcentral.com/guide/ai/speaker-diarization) — Multi-speaker identification in call recordings
+- [Interaction Analytics Guide](https://developers.ringcentral.com/guide/ai/interaction-analytics) — Sentiment and emotion detection
+- [RingSense / AI Conversation Expert](https://developers.ringcentral.com/guide/ai/ringsense) — AI-generated summaries, action items, highlights
+- [Business Analytics API](https://developers.ringcentral.com/guide/analytics) — Aggregate and timeline call/SMS analytics
+- [Conversation Summaries Guide](https://developers.ringcentral.com/guide/ai/text-summary) — Abstractive and extractive summarization
 
 ### Pricing & Ecosystem
 - [RingCentral Developer Pricing](https://developers.ringcentral.com/pricing) — Sandbox ($10/mo) and production plan pricing

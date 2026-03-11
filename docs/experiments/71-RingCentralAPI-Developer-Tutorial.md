@@ -23,9 +23,13 @@ This tutorial will take you from zero to building your first patient communicati
 5. How to receive and process inbound call and SMS events via webhooks
 6. How caller ID resolution maps phone numbers to patient records
 7. How to retrieve and play call recordings linked to encounters
-8. How to send and receive faxes for referral workflows
-9. How RingCentral complements Teams (internal) and Amazon Connect (contact center)
-10. HIPAA security requirements for healthcare telephony integrations
+8. How to auto-transcribe call recordings with RingCentral Audio AI (speech-to-text, speaker diarization)
+9. How to generate encounter notes from call transcripts
+10. How to analyze call sentiment and emotion using Interaction Analytics
+11. How to build communication statistics dashboards (call volume, SMS delivery, no-show correlation)
+12. How to send and receive faxes for referral workflows
+13. How RingCentral complements Teams (internal) and Amazon Connect (contact center)
+14. HIPAA security requirements for healthcare telephony integrations
 
 ## Part 1: Understanding RingCentral (15 min read)
 
@@ -97,6 +101,10 @@ flowchart LR
 
 **Concept 3: Call Log & Recordings** — Every call is logged with metadata (from, to, duration, direction, result) and optionally recorded. Recordings are stored in RingCentral's cloud and accessible via API for playback or download. The call log serves as the authoritative call history.
 
+**Concept 4: Audio AI & Transcription** — RingCentral's Audio AI provides async speech-to-text transcription (`POST /ai/audio/v1/async/speech-to-text`) that converts call recordings into speaker-diarized transcripts with word-level timestamps and confidence scores. Transcripts are delivered via webhook callback. This enables auto-generated encounter notes from phone consultations.
+
+**Concept 5: Interaction Analytics & Sentiment** — The Interaction Analytics API (`POST /ai/insights/v1/async/analyze-interaction`) analyzes call recordings for sentiment (positive/negative/neutral) and emotion detection. Combined with the Business Analytics API (`POST /analytics/calls/v1/accounts/~/aggregation/fetch`), this provides operational dashboards: call volume trends, SMS delivery rates, recording coverage, and patient satisfaction signals.
+
 ### 1.3 How RingCentral Fits with Other PMS Technologies
 
 | Technology | Layer | Relationship to RingCentral |
@@ -126,6 +134,11 @@ flowchart LR
 | Caller ID | Phone number of an incoming caller — used to match to patient records in the PMS |
 | IVR | Interactive Voice Response — automated phone menu system for call routing |
 | BAA | Business Associate Agreement — legal requirement for HIPAA-covered services |
+| Speech-to-Text | RingCentral Audio AI API that converts call recordings into speaker-diarized transcripts with timestamps |
+| Speaker Diarization | AI identification of different speakers in a recording — labels each utterance with a speaker ID |
+| Interaction Analytics | AI analysis of call recordings for sentiment (positive/negative/neutral) and emotion detection |
+| Business Analytics | RingCentral API for aggregated call statistics — volume, duration, direction, result by time period |
+| Utterance | A single segment of speech from one speaker — includes text, start/end timestamps, and confidence score |
 
 ### 1.5 Our Architecture
 
@@ -720,51 +733,61 @@ elif len(normalized) == 11 and normalized.startswith("1"):
 
 ## Part 6: Practice Exercise (45 min)
 
-### Option A: Fax Referral Workflow
+### Option A: Call Recording Transcription & Encounter Note Pipeline
 
-Build a fax-based referral sending pipeline:
+Build an end-to-end transcription workflow:
 
-1. Create a `POST /api/comms/fax/referral` endpoint that accepts a patient ID and referring physician fax number
-2. Generate a referral letter PDF from PMS patient and encounter data
-3. Send the fax via RingCentral Fax API with a cover page
-4. Track delivery status and log to patient record
-
-**Hints**:
-- Use `reportlab` or `fpdf` to generate PDF from PMS data
-- RingCentral Fax API accepts multipart requests: JSON metadata + PDF attachment
-- Poll `/restapi/v1.0/account/~/extension/~/message-store/{id}` for delivery confirmation
-- Store fax status in `comms_fax_inbox` table with `direction = 'outbound'`
-
-### Option B: Telehealth Video Visit Integration
-
-Build a video visit workflow:
-
-1. Create a `POST /api/comms/video/visit` endpoint that generates a video meeting and links it to an encounter
-2. Send the patient a join link via SMS
-3. After the meeting, retrieve the recording and attach it to the encounter
-4. Build a Next.js component with a "Join Video Visit" button
+1. Query `comms_call_log` for calls with `recording_url IS NOT NULL` that have no entry in `comms_transcriptions`
+2. For each, submit the recording to RingCentral Audio AI for transcription (`POST /ai/audio/v1/async/speech-to-text`)
+3. Handle the async webhook callback — parse utterances, store the transcript with speaker labels
+4. Generate a structured encounter note from the transcript and link it to the encounter
+5. Build a "Transcription Queue" view in Next.js showing pending/completed transcriptions with confidence scores
 
 **Hints**:
-- Use RingCentral Video API `/video/conference` endpoint
-- Send the join URL via the SMS endpoint with a simple template
-- Recordings become available via the call log after the meeting ends
-- Embed the video join link in an iframe or redirect to the RingCentral Video client
+- Use `audioType: "CallCenter"` for 2-speaker (provider + patient) calls
+- Enable `enableSpeakerDiarization`, `enablePunctuation`, and `enableVoiceActivityDetection`
+- Map `speakerId` to "Provider" / "Patient" based on call direction (outbound = Speaker 1 is provider)
+- Store raw utterances as JSONB for playback-synced transcript display
+- Transcription takes 1-3 minutes per recording — poll or use webhook
 
-### Option C: After-Hours Voicemail Triage
+### Option B: Communication Analytics Dashboard
 
-Build a voicemail processing pipeline:
+Build a comprehensive analytics dashboard:
 
-1. Subscribe to voicemail webhook events (`/restapi/v1.0/account/~/extension/~/voicemail`)
-2. When a voicemail arrives, match the caller to a patient
-3. Use RingCentral's Audio AI transcription to convert voicemail to text
-4. Classify urgency (keywords: "vision change", "pain", "bleeding" → urgent) and route accordingly
-5. Display prioritized voicemail queue in the dashboard
+1. Create a `build_daily_stats` scheduled job (APScheduler, runs at midnight) that aggregates:
+   - Call volume (inbound/outbound), average duration, recording coverage
+   - SMS delivery success/failure rates
+   - Transcription completion rate and average confidence
+   - Sentiment distribution from `comms_call_analytics`
+2. Augment with RingCentral Business Analytics API data (`POST /analytics/calls/v1/accounts/~/aggregation/fetch`)
+3. Build a no-show correlation analysis: compare no-show rates for patients who received SMS reminders vs. those who didn't
+4. Create a Next.js `CommsAnalyticsDashboard` component with stat cards and trend indicators
+5. Add a CSV export endpoint for monthly reporting
 
 **Hints**:
-- Voicemail events include a link to the audio content
-- Transcription is available via the Audio & Video AI API
-- Build a simple keyword classifier for urgency (regex-based is sufficient)
-- Urgent voicemails should trigger a Teams notification (Experiment 68) to the on-call provider
+- Use `comms_stats_daily` table with `ON CONFLICT (stat_date) DO UPDATE` for idempotent rebuilds
+- The Business Analytics API requires the "Analytics" permission on your RingCentral app
+- For time-series charts, use the Timeline API with `interval: "Day"` or `"Week"`
+- No-show correlation query joins `appointments` with `comms_sms_log` filtered by `template_id LIKE 'appt_reminder%'`
+
+### Option C: Sentiment-Driven Patient Satisfaction Monitoring
+
+Build a patient sentiment analysis pipeline:
+
+1. After each call recording is transcribed, submit it for Interaction Analytics (`POST /ai/insights/v1/async/analyze-interaction`)
+2. Parse the response for sentiment (positive/negative/neutral) and emotion data per speaker
+3. Store results in `comms_call_analytics` linked to the call and patient
+4. Build a "Patient Satisfaction" view that shows:
+   - Per-patient sentiment history across all calls
+   - Provider-level sentiment trends
+   - Alerts for calls flagged as negative sentiment (trigger staff follow-up)
+5. Integrate with the no-show correlation: do patients with negative call sentiment have higher no-show rates?
+
+**Hints**:
+- Set `insights: ["All"]` to get sentiment, emotion, and topic detection
+- The emotion detection identifies specific emotions (frustration, satisfaction, confusion)
+- Build a simple alert: if sentiment = "negative" and patient has an upcoming appointment, flag for provider review
+- Store per-speaker emotions as JSONB for granular analysis
 
 ## Part 7: Development Workflow and Conventions
 
@@ -774,32 +797,38 @@ Build a voicemail processing pipeline:
 app/
 ├── api/
 │   └── routes/
-│       └── comms.py                   # CommsService FastAPI router
+│       └── comms.py                   # CommsService FastAPI router (SMS, voice, fax, video, transcription, analytics)
 ├── models/
 │   └── comms.py                       # SQLAlchemy models for comms tables
 ├── services/
-│   ├── ringcentral_client.py          # RingCentral SDK wrapper
+│   ├── ringcentral_client.py          # RingCentral SDK wrapper (REST + Audio AI + Analytics APIs)
 │   ├── caller_id_resolver.py          # Phone → patient lookup
 │   ├── reminder_scheduler.py          # Appointment SMS scheduler
 │   ├── sms_templates.py               # PHI-free SMS templates
 │   ├── fax_ingest_service.py          # Inbound fax processing
+│   ├── transcription_service.py       # Auto-transcription via Audio AI + encounter note generation
+│   ├── call_analytics_service.py      # Call volume, SMS delivery, sentiment, no-show correlation stats
 │   └── comms_audit.py                 # HIPAA audit logging
 └── tests/
-    └── test_comms.py                  # Communication integration tests
+    ├── test_comms.py                  # Communication integration tests
+    ├── test_transcription.py          # Transcription service tests (mocked Audio AI)
+    └── test_analytics.py             # Analytics service tests
 
 frontend/src/
 ├── lib/
-│   └── comms-api.ts                   # TypeScript API client
+│   └── comms-api.ts                   # TypeScript API client (+ transcription + analytics methods)
 ├── components/
 │   └── comms/
 │       ├── CommsDashboard.tsx          # Main communications panel
 │       ├── CallLog.tsx                 # Call history with recording playback
 │       ├── SMSCompose.tsx             # SMS compose with templates
 │       ├── FaxInbox.tsx               # Inbound fax queue
-│       └── ClickToCall.tsx            # Patient record call button
+│       ├── ClickToCall.tsx            # Patient record call button
+│       ├── TranscriptViewer.tsx       # Call transcript display + encounter note generation
+│       └── CommsAnalyticsDashboard.tsx # Communication statistics dashboard
 └── app/
     └── communications/
-        └── page.tsx                    # /communications route
+        └── page.tsx                    # /communications route (comms + analytics)
 ```
 
 ### 7.2 Naming Conventions
@@ -825,6 +854,9 @@ frontend/src/
 - [ ] Rate limit awareness: New endpoints estimated for API rate limit impact
 - [ ] Webhook security: Inbound webhooks validate RingCentral origin
 - [ ] Template review: New SMS templates reviewed for PHI-free content
+- [ ] Transcription privacy: Transcripts may contain PHI — access restricted to clinical staff roles
+- [ ] Transcription audit: Every transcript access logged to `comms_audit_log`
+- [ ] Sentiment data: Sentiment scores are operational metrics, not clinical data — do not expose to patients
 - [ ] Tests: Unit tests for client methods; integration tests for CommsService endpoints
 - [ ] Secrets: No API credentials in source code — environment variables or Docker secrets only
 
@@ -860,6 +892,16 @@ curl -X POST http://localhost:8000/api/comms/call \
 # Get call log
 curl http://localhost:8000/api/comms/calls/log -H "Authorization: Bearer $PMS_TOKEN"
 
+# Transcribe a call recording
+curl -X POST http://localhost:8000/api/comms/calls/CALL_ID/transcribe \
+  -H "Authorization: Bearer $PMS_TOKEN" -H "Content-Type: application/json" -d '{}'
+
+# Get transcript
+curl http://localhost:8000/api/comms/calls/CALL_ID/transcript -H "Authorization: Bearer $PMS_TOKEN"
+
+# Get analytics dashboard (30 days)
+curl http://localhost:8000/api/comms/analytics/dashboard?days=30 -H "Authorization: Bearer $PMS_TOKEN"
+
 # Start ngrok
 ngrok http 8000
 ```
@@ -874,8 +916,12 @@ ngrok http 8000
 | `app/services/sms_templates.py` | PHI-free message templates |
 | `app/api/routes/comms.py` | FastAPI communication endpoints |
 | `app/services/comms_audit.py` | HIPAA audit logger |
-| `frontend/src/lib/comms-api.ts` | TypeScript API client |
+| `app/services/transcription_service.py` | Audio AI transcription + encounter notes |
+| `app/services/call_analytics_service.py` | Communication statistics aggregation |
+| `frontend/src/lib/comms-api.ts` | TypeScript API client (+ transcription + analytics) |
 | `frontend/src/components/comms/CommsDashboard.tsx` | Dashboard component |
+| `frontend/src/components/comms/TranscriptViewer.tsx` | Call transcript display |
+| `frontend/src/components/comms/CommsAnalyticsDashboard.tsx` | Analytics stat cards |
 
 ### Key URLs
 
@@ -886,8 +932,12 @@ ngrok http 8000
 | API Reference | `https://developers.ringcentral.com/api-reference` |
 | Sandbox API | `https://platform.devtest.ringcentral.com/restapi/v1.0/` |
 | Production API | `https://platform.ringcentral.com/restapi/v1.0/` |
+| Speech-to-Text Guide | `https://developers.ringcentral.com/guide/ai/speech-to-text` |
+| Business Analytics Guide | `https://developers.ringcentral.com/guide/analytics` |
+| Interaction Analytics Guide | `https://developers.ringcentral.com/guide/ai/interaction-analytics` |
 | PMS Comms Dashboard | `http://localhost:3000/communications` |
 | PMS Comms API | `http://localhost:8000/api/comms/` |
+| PMS Analytics API | `http://localhost:8000/api/comms/analytics/dashboard` |
 | ngrok Dashboard | `http://localhost:4040/` |
 
 ### Starter Template: New Communication Endpoint
@@ -927,7 +977,8 @@ async def send_templated_sms(
 ## Next Steps
 
 1. Review the [PRD: RingCentral API PMS Integration](71-PRD-RingCentralAPI-PMS-Integration.md) for full requirements and success metrics
-2. Register for A2P 10DLC SMS compliance (2-4 week approval process)
-3. Configure after-hours IVR routing with clinical triage keywords
-4. Integrate with [Microsoft Teams (Experiment 68)](68-PRD-MSTeams-PMS-Integration.md) for clinical escalation from phone triage
-5. Build medication adherence SMS campaigns linked to prescription schedules from [FHIR Prior Auth (Experiment 48)](48-PRD-FHIRPriorAuth-PMS-Integration.md)
+2. Build the transcription pipeline (Practice Exercise Option A) — auto-transcribe all call recordings and generate encounter notes
+3. Deploy the analytics dashboard (Practice Exercise Option B) — track call volume, SMS delivery, and no-show correlation
+4. Set up sentiment monitoring (Practice Exercise Option C) — flag negative patient interactions for staff follow-up
+5. Register for A2P 10DLC SMS compliance (2-4 week approval process)
+6. Integrate with [Microsoft Teams (Experiment 68)](68-PRD-MSTeams-PMS-Integration.md) for clinical escalation when negative sentiment is detected
