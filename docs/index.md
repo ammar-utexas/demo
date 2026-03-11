@@ -444,6 +444,11 @@ _No bug fixes documented yet._
 - [Mirth Connect Setup Guide](experiments/77-MirthConnect-PMS-Developer-Setup-Guide.md) — Docker deployment with PostgreSQL backend, MirthClient REST API wrapper, webhook receivers for ADT events and lab results, channel creation and deployment via REST API, JavaScript transformers for HL7-to-JSON conversion, FastAPI admin router, and IntegrationDashboard React component
 - [Mirth Connect Developer Tutorial](experiments/77-MirthConnect-Developer-Tutorial.md) — Hands-on onboarding: HL7v2 message structure (MSH, PID, PV1, OBX segments), channel pipeline architecture, MLLP send/receive, end-to-end ADT admission pipeline from external EHR to PMS patient record, and FHIR R4 patient import
 
+### Paperclip (AI Agent Orchestration — Multi-Agent Company Management with Governance & Budgets)
+- [PRD: Paperclip PMS Integration](experiments/78-PRD-Paperclip-PMS-Integration.md) — Paperclip open-source AI agent orchestration platform for automating PMS clinical and administrative workflows through governed multi-agent companies with org charts, heartbeat-driven execution, atomic task checkout, per-agent budget tracking, approval gates for sensitive operations (claims, prescriptions), immutable audit trails, and multi-clinic isolation — coordinating pVerify (Exp 73), Availity (Exp 47), Xero (Exp 75), Mirth Connect (Exp 77), and RingCentral (Exp 71) integrations under a unified governance umbrella
+- [Paperclip Setup Guide](experiments/78-Paperclip-PMS-Developer-Setup-Guide.md) — Docker deployment with external PostgreSQL, PaperclipClient async Python wrapper, HTTP webhook receivers for 5 agent types (intake, billing, clinical, communications, reports), GovernanceService with approval gates for HIPAA-sensitive operations, AuditBridge for compliance log sync, company bootstrap script, and AgentCostDashboard React component with tabs for agents/tasks/costs/approvals
+- [Paperclip Developer Tutorial](experiments/78-Paperclip-Developer-Tutorial.md) — Hands-on onboarding: company creation, agent registration in org chart hierarchy, patient visit automation pipeline (intake → clinical → billing → communications), heartbeat simulation, approval gate flow for claim submission, cost tracking, and multi-clinic deployment end-to-end
+
 ---
 
 ## Documentation Views

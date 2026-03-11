@@ -1,8 +1,8 @@
 # PMS Experiment Interconnection Roadmap
 
 **Document ID:** PMS-EXP-ROADMAP-001
-**Version:** 5.0
-**Date:** March 10, 2026
+**Version:** 6.0
+**Date:** March 11, 2026
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Living Document
 
@@ -10,18 +10,21 @@
 
 ## 1. Executive Summary
 
-The PMS project maintains **73 experiments** (numbered 00–72) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, developer experience, shipping & logistics, clinical collaboration, document processing, and device management. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
+The PMS project maintains **79 experiments** (numbered 00–78) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, developer experience, shipping & logistics, clinical collaboration, document processing, and device management. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
 
-Since the v4.0 roadmap (covering 00–63), **9 new experiments** (64–72) have been added. These form four major clusters:
+Since the v4.0 roadmap (covering 00–63), **15 new experiments** (64–78) have been added. These form seven major clusters:
 
 1. **Shipping & Logistics** (Exp 65–67) — FedEx national shipping, UPS healthcare logistics with cold-chain compliance, and OnTime 360 local courier dispatch for last-mile specimen/supply delivery
 2. **Clinical Collaboration & Communications** (Exp 64, 68, 71) — Google Workspace CLI agent-to-workspace bridge, Microsoft Teams clinical messaging with adaptive cards, and RingCentral unified communications (voice, SMS, fax, video)
 3. **Document Processing & Lab Integration** (Exp 69–70) — Azure Document Intelligence for automated intake/insurance card extraction, and LigoLab MS SQL direct LIS connection complementing HL7v2
 4. **Mobile Device Management** (Exp 72) — TinyMDM Android MDM for securing PMS mobile devices with zero-touch enrollment and Samsung Knox integration
+5. **Revenue Cycle & Billing** (Exp 73–75) — pVerify insurance eligibility verification, FrontRunnerHC provider discovery and network status, and Xero API cloud accounting with invoicing and company backup
+6. **Healthcare Integration Engine** (Exp 77) — Mirth Connect healthcare-specific integration engine for HL7v2, FHIR, and X12 EDI message routing
+7. **AI Agent Orchestration** (Exp 76, 78) — Redis in-memory cache/Pub/Sub infrastructure layer, and Paperclip AI agent orchestration with org charts, budgets, and governance
 
 This roadmap provides:
 
-- A **complete registry** of all 73 experiments with categories, platforms, and documentation inventory
+- A **complete registry** of all 79 experiments with categories, platforms, and documentation inventory
 - A **dependency graph** showing which experiments build on or complement others
 - **Execution tiers** recommending a foundation-first build order
 - **Parallel tracks** for teams that can work on independent streams simultaneously
@@ -37,7 +40,7 @@ This roadmap provides:
 
 ### Scope
 
-This roadmap covers experiments 00–72 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
+This roadmap covers experiments 00–78 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
 
 ---
 
@@ -118,6 +121,12 @@ This roadmap covers experiments 00–72 as documented in `docs/experiments/`. It
 | 70 | [LigoLab MS SQL](70-PRD-LigoLab-PMS-Integration.md) | Backend / Interop (LIS) | Backend, Web, Android | None | PRD, Setup, Tutorial |
 | 71 | [RingCentral API](71-PRD-RingCentralAPI-PMS-Integration.md) | Backend / Communication | Backend, Web, Android | None | PRD, Setup, Tutorial |
 | 72 | [TinyMDM](72-PRD-TinyMDM-PMS-Integration.md) | Mobile / Device Management | Android, Backend | None | PRD, Setup, Tutorial |
+| 73 | [pVerify](73-PRD-pVerify-PMS-Integration.md) | Backend / Insurance Eligibility | Backend, Web | None | PRD, Setup, Tutorial |
+| 74 | [FrontRunnerHC](74-PRD-FrontRunnerHC-PMS-Integration.md) | Backend / Provider Discovery | Backend, Web | None | PRD, Setup, Tutorial |
+| 75 | [Xero API](75-PRD-XeroAPI-PMS-Integration.md) | Backend / Cloud Accounting | Backend, Web | 47-Availity, 73-pVerify, 74-FrontRunnerHC | PRD, Setup, Tutorial |
+| 76 | [Redis](76-PRD-Redis-PMS-Integration.md) | Backend / Cache & Messaging | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 77 | [Mirth Connect](77-PRD-MirthConnect-PMS-Integration.md) | Backend / Healthcare Integration Engine | Backend, Web | 16-FHIR, 17-HL7v2 | PRD, Setup, Tutorial |
+| 78 | [Paperclip](78-PRD-Paperclip-PMS-Integration.md) | Backend / AI Agent Orchestration | Backend, Web | 73-pVerify, 47-Availity, 75-Xero, 77-Mirth, 71-RingCentral | PRD, Setup, Tutorial |
 
 ---
 
@@ -265,6 +274,28 @@ flowchart TD
         E69["69 Azure Doc Intel"]
     end
 
+    %% ── Subgraph: Revenue Cycle & Billing ──
+    subgraph REVCYCLE["Revenue Cycle & Billing"]
+        E73["73 pVerify"]
+        E74["74 FrontRunnerHC"]
+        E75["75 Xero API"]
+    end
+
+    %% ── Subgraph: Cache & Messaging ──
+    subgraph CACHE["Cache & Messaging"]
+        E76["76 Redis"]
+    end
+
+    %% ── Subgraph: Healthcare Integration Engine ──
+    subgraph HIE["Healthcare Integration Engine"]
+        E77["77 Mirth Connect"]
+    end
+
+    %% ── Subgraph: AI Agent Orchestration ──
+    subgraph ORCHESTRATION["AI Agent Orchestration"]
+        E78["78 Paperclip"]
+    end
+
     %% ── Subgraph: Security ──
     subgraph SECURITY["Security & Compliance"]
         E50["50 OWASP LLM Top 10"]
@@ -332,6 +363,18 @@ flowchart TD
     %% ── Hard Dependencies (solid arrows) ── New 64-72
     E55 --> E64
 
+    %% ── Hard Dependencies (solid arrows) ── New 73-78
+    E47 --> E75
+    E73 --> E75
+    E74 --> E75
+    E16 --> E77
+    E17 --> E77
+    E73 --> E78
+    E47 --> E78
+    E75 --> E78
+    E77 --> E78
+    E71 --> E78
+
     %% ── Complementary / Enhances (dashed arrows) ── Original
     E07 -.->|enhances| E10
     E07 -.->|enhances| E21
@@ -396,6 +439,18 @@ flowchart TD
     E71 -.->|enhances| E51
     E72 -.->|enhances| E25
 
+    %% ── Complementary / Enhances (dashed arrows) ── New 73-78
+    E73 -.->|enhances| E47
+    E73 -.->|enhances| E75
+    E74 -.->|enhances| E73
+    E74 -.->|enhances| E75
+    E76 -.->|enhances| E37
+    E76 -.->|enhances| E73
+    E76 -.->|enhances| E78
+    E77 -.->|enhances| E70
+    E77 -.->|complements| E38
+    E78 -.->|enhances| E55
+
     %% ── Color Classes ──
     classDef ui fill:#818cf8,stroke:#4f46e5,color:#fff
     classDef infra fill:#38bdf8,stroke:#0284c7,color:#fff
@@ -415,6 +470,10 @@ flowchart TD
     classDef shipping fill:#d4a574,stroke:#a3866e,color:#000
     classDef comms fill:#67e8f9,stroke:#22d3ee,color:#000
     classDef docai fill:#d8b4fe,stroke:#a78bfa,color:#000
+    classDef revcycle fill:#f9a8d4,stroke:#ec4899,color:#000
+    classDef cache fill:#a7f3d0,stroke:#34d399,color:#000
+    classDef hie fill:#c4b5fd,stroke:#8b5cf6,color:#fff
+    classDef orchestration fill:#fda4af,stroke:#f43f5e,color:#000
 
     class E00,E01,E02,E03 ui
     class E09,E08,E15,E29,E52,E42 infra
@@ -434,6 +493,10 @@ flowchart TD
     class E65,E66,E67 shipping
     class E64,E68,E71 comms
     class E69 docai
+    class E73,E74,E75 revcycle
+    class E76 cache
+    class E77 hie
+    class E78 orchestration
 ```
 
 **Legend:** Solid arrows = hard dependency (must be implemented first). Dashed arrows = complementary/enhances (benefits from but does not require).
@@ -489,6 +552,9 @@ Build on Tier 0 foundations. These experiments provide core AI, interop, securit
 | 70 | LigoLab MS SQL | None (direct LIS database connection) |
 | 71 | RingCentral API | None (unified communications — voice, SMS, fax) |
 | 72 | TinyMDM | None (Android MDM for PMS mobile devices) |
+| 73 | pVerify | None (insurance eligibility verification) |
+| 74 | FrontRunnerHC | None (provider discovery and network status) |
+| 76 | Redis | None (in-memory cache, Pub/Sub, task queues) |
 
 ### Tier 2 — Integration & Expansion (Weeks 6–9)
 
@@ -523,6 +589,8 @@ Combine Tier 1 capabilities into integrated workflows. Multiple experiments can 
 | 61 | GSD | 27-Claude Code (spec-driven execution framework) |
 | 62 | Spec Kit | 27-Claude Code (specification-layer SDD toolkit) |
 | 63 | A2A Protocol | 09-MCP (inter-agent communication protocol) |
+| 75 | Xero API | 47-Availity, 73-pVerify, 74-FrontRunnerHC (cloud accounting/invoicing) |
+| 77 | Mirth Connect | 16-FHIR, 17-HL7v2 (healthcare integration engine) |
 
 ### Tier 3 — Advanced Capabilities (Weeks 10–12)
 
@@ -540,6 +608,7 @@ Complex integrations requiring multiple Tier 1–2 foundations.
 | 48 | FHIR Da Vinci PA | 47-Availity, 16-FHIR (2027 compliance) |
 | 49 | NextGen FHIR EHR | 48-FHIR DA Vinci (EHR data import) |
 | 64 | GWS CLI | 55-CrewAI (agent-to-workspace bridge) |
+| 78 | Paperclip | 73-pVerify, 47-Availity, 75-Xero, 77-Mirth, 71-RingCentral (AI agent orchestration) |
 
 ### Tier 4 — Capstone Integrations (Week 13+)
 
@@ -560,12 +629,14 @@ Full end-to-end clinical workflows combining multiple experiments.
 | **Specimen Logistics Pipeline** | 65 + 66 + 67 + 69 | FedEx/UPS national → OnTime 360 local → Azure Doc Intel for shipping docs → End-to-end specimen tracking |
 | **Clinical Communications Stack** | 64 + 68 + 71 + 51 | GWS CLI workspace bridge + MS Teams messaging + RingCentral telephony + Amazon Connect contact center |
 | **Secure Mobile Clinical Platform** | 72 + 25 + 37 | TinyMDM device policy → Edge Vision Stream capture → WebSocket real-time sync |
+| **Revenue Cycle Automation Pipeline** | 73 + 74 + 75 + 47 + 78 | Verify eligibility → Discover providers → Invoice via Xero → Paperclip agent governance |
+| **Healthcare Agent Orchestration Stack** | 78 + 77 + 76 + 37 | Paperclip agents → Mirth Connect message routing → Redis real-time Pub/Sub → WebSocket delivery |
 
 ### Execution Timeline (Gantt)
 
 ```mermaid
 gantt
-    title Experiment Execution Tiers (v5.0)
+    title Experiment Execution Tiers (v6.0)
     dateFormat YYYY-MM-DD
     axisFormat %b %d
 
@@ -606,6 +677,9 @@ gantt
     70 LigoLab MS SQL          :t70, 2026-03-16, 7d
     71 RingCentral API         :t71, 2026-03-16, 7d
     72 TinyMDM                 :t72, 2026-03-16, 5d
+    73 pVerify                 :t73, 2026-03-16, 7d
+    74 FrontRunnerHC            :t74, 2026-03-16, 7d
+    76 Redis                    :t76, 2026-03-16, 7d
 
     section Tier 2 — Integration
     05 OpenClaw                :t05, after t09, 10d
@@ -635,6 +709,8 @@ gantt
     61 GSD                     :t61, after t27, 7d
     62 Spec Kit                :t62, after t27, 7d
     63 A2A Protocol             :t63, after t09, 10d
+    75 Xero API                :t75, after t73, 10d
+    77 Mirth Connect            :t77, after t17, 10d
 
     section Tier 3 — Advanced
     18 ISIC Archive            :t18, after t13, 10d
@@ -647,6 +723,7 @@ gantt
     48 FHIR DA Vinci PA        :t48, after t47, 10d
     49 NextGen FHIR            :t49, after t48, 7d
     64 GWS CLI                 :t64, after t55, 7d
+    78 Paperclip                :t78, after t75, 10d
 
     section Tier 4 — Capstone
     Clinical Doc Pipeline      :t_cdp, after t55, 14d
@@ -661,13 +738,15 @@ gantt
     Specimen Logistics Pipeline:t_slp, after t67, 10d
     Clinical Comms Stack       :t_ccs, after t64, 10d
     Secure Mobile Platform     :t_smp, after t72, 10d
+    Revenue Cycle Pipeline     :t_rcp, after t78, 14d
+    Agent Orchestration Stack  :t_aos, after t78, 10d
 ```
 
 ---
 
 ## 6. Parallel Execution Tracks
 
-Ten independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
+Twelve independent tracks that can be staffed and executed simultaneously. Cross-track dependencies are minimal and noted explicitly.
 
 ### Track A — UI/UX
 ```
@@ -691,6 +770,8 @@ Ten independent tracks that can be staffed and executed simultaneously. Cross-tr
 37-WebSocket → 38-Kafka
                  ↓
          (Kafka enhances FHIR event exchange, n8n automation)
+76-Redis  (cache layer — enhances WebSocket, pVerify, Paperclip)
+16-FHIR + 17-HL7v2 → 77-Mirth Connect  (healthcare integration engine — complements Kafka)
 ```
 
 ### Track D — AI Infrastructure & Agents
@@ -706,6 +787,9 @@ Ten independent tracks that can be staffed and executed simultaneously. Cross-tr
          {55-CrewAI, 51-Amazon Connect}
                 ↓
          64-GWS CLI  (agent-to-workspace bridge — depends on CrewAI)
+
+73-pVerify + 47-Availity + 75-Xero + 77-Mirth + 71-RingCentral → 78-Paperclip
+         (AI agent orchestration — governance umbrella consuming multiple experiments)
 ```
 
 ### Track E — Developer Experience
@@ -765,6 +849,33 @@ Integration point: 69-Azure Doc Intel (Track J) enhances shipping document proce
 69-Azure Doc Intelligence      (document extraction — standalone)
 70-LigoLab MS SQL              (direct LIS connection — enhances 17-HL7v2 from Track C)
 72-TinyMDM                     (Android MDM — standalone, enhances 25-Edge Vision from Track B)
+```
+
+### Track K — Revenue Cycle & Billing _(new)_
+```
+{73-pVerify, 74-FrontRunnerHC}  (eligibility & provider discovery — parallel, no hard deps)
+       ↓
+75-Xero API  (cloud accounting/invoicing — depends on 47-Availity, 73-pVerify, 74-FrontRunnerHC)
+       ↓
+78-Paperclip  (AI agent orchestration — consumes 73, 47, 75, 77, 71)
+
+Integration points:
+  - 47-Availity (Track G) feeds claims data → 75-Xero invoicing
+  - 77-Mirth Connect (Track C) feeds clinical data → 78-Paperclip Clinical Agent
+  - 71-RingCentral (Track J) feeds comms → 78-Paperclip Comms Agent
+  - 76-Redis (Track C) provides real-time agent status Pub/Sub for 78-Paperclip
+```
+
+### Track L — Healthcare Integration Engine _(new)_
+```
+{16-FHIR, 17-HL7v2 LIS} → 77-Mirth Connect
+                              ↓
+                    (message routing for HL7v2, FHIR, X12 EDI)
+
+Integration points:
+  - Enhances 70-LigoLab (Track J) with message routing alternative to direct SQL
+  - Complements 38-Kafka (Track C) — Mirth = healthcare-specific, Kafka = general streaming
+  - Consumed by 78-Paperclip (Track K) Clinical Agent
 ```
 
 ### Cross-Track Dependencies
@@ -898,6 +1009,24 @@ flowchart LR
         J6["72 TinyMDM"]
     end
 
+    subgraph K["Track K: Revenue Cycle"]
+        K1["73 pVerify"]
+        K2["74 FrontRunnerHC"]
+        K3["75 Xero API"]
+        K4["78 Paperclip"]
+        K1 --> K3
+        K2 --> K3
+        K3 --> K4
+    end
+
+    subgraph L["Track L: Integration Engine"]
+        L1["77 Mirth Connect"]
+    end
+
+    subgraph CACHE_T["Infrastructure"]
+        CACHE1["76 Redis"]
+    end
+
     %% Cross-track dependencies
     D1 -.->|"required"| A4
     C1 -.->|"enhances"| D3
@@ -915,6 +1044,18 @@ flowchart LR
     J6 -.->|"enhances"| B7
     J4 -.->|"enhances"| G1
     J3 -.->|"enhances"| D10
+    G4 -.->|"required"| K3
+    K1 -.->|"required"| K4
+    G4 -.->|"required"| K4
+    L1 -.->|"required"| K4
+    J3 -.->|"required"| K4
+    C1 -.->|"required"| L1
+    C2 -.->|"required"| L1
+    CACHE1 -.->|"enhances"| C4
+    CACHE1 -.->|"enhances"| K1
+    CACHE1 -.->|"enhances"| K4
+    L1 -.->|"enhances"| J5
+    K4 -.->|"enhances"| D9
 
     style A fill:#eef2ff,stroke:#818cf8
     style B fill:#ecfdf5,stroke:#34d399
@@ -926,6 +1067,9 @@ flowchart LR
     style H fill:#fff1f2,stroke:#fca5a5
     style I fill:#fef3e2,stroke:#d4a574
     style J fill:#ecfeff,stroke:#67e8f9
+    style K fill:#fce7f3,stroke:#f9a8d4
+    style L fill:#ede9fe,stroke:#c4b5fd
+    style CACHE_T fill:#d1fae5,stroke:#a7f3d0
 ```
 
 ---
@@ -1022,24 +1166,40 @@ _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 2
 | **71 RingCentral API** | None | Complements 68-MS Teams (telephony + messaging). Enhances 51-Amazon Connect (RingCentral for outbound calls, Connect for inbound contact center). Unified voice, SMS/MMS, fax, video with HIPAA BAA. Webhook-driven call event integration |
 | **72 TinyMDM** | None | Enhances 25-Edge Vision Stream (MDM secures Android devices running clinical camera apps). Enhances 37-WebSocket (MDM policies ensure devices maintain secure WebSocket connections). Zero-touch enrollment, Samsung Knox, kiosk mode for clinical tablets |
 
+### Experiments 73–78 — Relationships to All Others
+
+| Experiment | Hard Dependencies | Complementary / Enhances |
+|-----------|------------------|--------------------------|
+| **73 pVerify** | None | Enhances 47-Availity (verify eligibility before claim submission). Enhances 75-Xero (verify insurance before invoice generation). Consumed by 78-Paperclip (Intake Agent). Complements 74-FrontRunnerHC (eligibility + provider discovery = complete intake). Redis (76) caches eligibility results for sub-millisecond lookups |
+| **74 FrontRunnerHC** | None | Enhances 73-pVerify (discover in-network providers before eligibility check). Enhances 75-Xero (billing for discovered providers). Same revenue cycle cluster as 73, 75. Provider network status feeds intake workflows |
+| **75 Xero API** | 47-Availity, 73-pVerify, 74-FrontRunnerHC | Cloud accounting backbone for revenue cycle. Claims from 47-Availity feed invoice generation. Eligibility from 73-pVerify validates billing. Provider data from 74-FrontRunnerHC enriches contact records. Consumed by 78-Paperclip (Billing Agent). Complements 38-Kafka (invoice events on Kafka topics). PHI de-identification boundary — no HIPAA BAA |
+| **76 Redis** | None | Horizontal infrastructure layer accelerating many experiments. Enhances 37-WebSocket (cache layer for real-time delivery). Enhances 73-pVerify (cache eligibility responses). Enhances 78-Paperclip (Pub/Sub for real-time agent status). Enhances 71-RingCentral (cache call metadata). Session caching, rate limiting, and background task queues for all backend experiments |
+| **77 Mirth Connect** | 16-FHIR, 17-HL7v2 LIS | Healthcare-specific integration engine for HL7v2, FHIR R4, X12 EDI, CDA message routing. Enhances 70-LigoLab (message routing alternative to direct SQL). Complements 38-Kafka (Mirth = healthcare messaging, Kafka = general event streaming). Consumed by 78-Paperclip (Clinical Agent routes labs via Mirth). Channel-based pipeline with JavaScript transformers |
+| **78 Paperclip** | 73-pVerify, 47-Availity, 75-Xero, 77-Mirth Connect, 71-RingCentral | AI agent orchestration governance umbrella. Consumes 73-pVerify (Intake Agent), 47-Availity (Billing Agent claims), 75-Xero (Billing Agent invoices), 77-Mirth (Clinical Agent), 71-RingCentral (Comms Agent). Enhances 55-CrewAI (complementary — Paperclip = organizational governance, CrewAI = task-level multi-agent). 76-Redis provides real-time agent status Pub/Sub. Org charts, budgets, approval gates, immutable audit trail. Multi-clinic isolation via company-scoped data |
+
 ---
 
 ## 8. Critical Path Analysis
 
 ### Longest Dependency Chains
 
-Three critical paths now exist, with the **PA Pipeline** being the longest:
+Four critical paths now exist, with the **PA Pipeline** still the longest and a new **Revenue Cycle + Agent Orchestration** path:
 
 ```
 Path 1 (PA Pipeline — 77 days):
 43-CMS Dataset → 45-CMS API → 46-UHC → 47-Availity → 48-FHIR DA Vinci → 49-NextGen → PA Automation Pipeline
      7d              7d          7d         7d              10d               7d             14d
 
-Path 2 (AI Model Stack — 66 days):
+Path 2 (Revenue Cycle + Agent Orchestration — 75 days):
+73-pVerify → 75-Xero → 78-Paperclip → Revenue Cycle Pipeline
+    7d          10d        10d              14d
+                    ↑ also needs 47-Availity (from Path 1), 77-Mirth, 71-RingCentral
+
+Path 3 (AI Model Stack — 66 days):
 39-Docker → 52-vLLM → 55-CrewAI → 64-GWS CLI → Clinical Communications Stack
     7d         7d         10d          7d              10d
 
-Path 3 (Original — 44 days):
+Path 4 (Original — 44 days):
 09-MCP → 05-OpenClaw → 26-LangGraph → Clinical Documentation Pipeline
   10d        10d           10d                   14d
 ```
@@ -1055,11 +1215,13 @@ These experiments **gate the most downstream work** and should be prioritized:
 | **52 vLLM** | 7 | 53-Llama 4, 54-Mistral 3, 42-GPT-5.4 Benchmark, 55-CrewAI, 51-Amazon Connect, 64-GWS CLI (via 55), (+ Tier 4 pipelines) |
 | **39 Docker** | 4 (+transitive) | 52-vLLM, 58-Supabase, 44-Payer Policies, (+ everything downstream of vLLM including 64-GWS CLI) |
 | **45 CMS Coverage API** | 4 | 46-UHC, 47-Availity, 48-FHIR DA Vinci (via 47), 49-NextGen (via 48) |
-| **16 FHIR** | 4 | 11-Sanford Guide, 17-HL7v2 LIS, 48-FHIR DA Vinci PA, 49-NextGen (via 48) |
+
 | **13 Gemma 3** | 3 | 18-ISIC, 20-Qwen 3.5, 25-Edge Vision |
 | **01 Storybook** | 2 | 02-v0, 03-Banani |
 | **19 Superpowers** | 2 | 14-Agent Teams, 24-Knowledge Work Plugins |
-| **47 Availity** | 2 | 48-FHIR DA Vinci PA, 49-NextGen FHIR |
+| **47 Availity** | 4 | 48-FHIR DA Vinci PA, 49-NextGen FHIR, 75-Xero (invoicing), 78-Paperclip (Billing Agent) |
+| **73 pVerify** | 2 | 75-Xero, 78-Paperclip (Intake Agent) |
+| **16 FHIR** | 5 | 11-Sanford Guide, 17-HL7v2 LIS, 48-FHIR DA Vinci PA, 49-NextGen (via 48), 77-Mirth Connect |
 
 ### Critical Path Diagram
 
@@ -1096,12 +1258,25 @@ flowchart LR
     E27 --> E62["62 Spec Kit<br/>7d"]
     E09 --> E63["63 A2A<br/>10d"]
 
+    %% Path 4: Revenue Cycle + Agent Orchestration
+    E73["73 pVerify<br/>7d"]:::revcycle --> E75["75 Xero<br/>10d"]:::revcycle
+    E75 --> E78["78 Paperclip<br/>10d"]:::revcycle
+    E78 --> CAP_RC["Revenue Cycle<br/>Pipeline<br/>14d"]:::revcycle
+    E77["77 Mirth<br/>10d"] -.->|"required"| E78
+    E71["71 RingCentral"] -.->|"required"| E78
+    E47 -.->|"required"| E75
+    E47 -.->|"required"| E78
+    E76["76 Redis"] -.->|"enhances"| E78
+
     %% Cross-path connections
     E55 -.->|"orchestrates"| CAP_PA
     E16["16 FHIR<br/>10d"]:::bottleneck --> E48
+    E16 --> E77
+    E78 -.->|"enhances"| E55
 
     classDef critical fill:#dc2626,stroke:#991b1b,color:#fff
     classDef bottleneck fill:#f59e0b,stroke:#d97706,color:#000
+    classDef revcycle fill:#ec4899,stroke:#be185d,color:#fff
 ```
 
 ---
@@ -1122,20 +1297,20 @@ flowchart LR
 
 | Week | Focus | Experiments |
 |------|-------|-------------|
-| 1 | Infrastructure | 09-MCP + 16-FHIR + 37-WebSocket + 39-Docker + 43-CMS Dataset (parallel) |
-| 2 | AI Foundation + PA Data | 52-vLLM + 13-Gemma 3 + 08-Adaptive + 45-CMS API + 44-Payer Policies (parallel) |
-| 3 | Agents + Models + PA + Shipping | 05-OpenClaw + 53-Llama 4 + 54-Mistral 3 + 46-UHC + 65-FedEx + 66-UPS (parallel) |
-| 4 | Dev + UI + Comms + PA | 27-Claude Code + 01-Storybook + 68-MS Teams + 71-RingCentral + 47-Availity + 38-Kafka (parallel) |
+| 1 | Infrastructure | 09-MCP + 16-FHIR + 37-WebSocket + 39-Docker + 43-CMS Dataset + 76-Redis (parallel) |
+| 2 | AI Foundation + PA + Revenue Cycle | 52-vLLM + 13-Gemma 3 + 08-Adaptive + 45-CMS API + 44-Payer Policies + 73-pVerify + 74-FrontRunnerHC (parallel) |
+| 3 | Agents + Models + PA + Shipping | 05-OpenClaw + 53-Llama 4 + 54-Mistral 3 + 46-UHC + 65-FedEx + 66-UPS + 75-Xero + 77-Mirth (parallel) |
+| 4 | Dev + UI + Comms + PA + Orchestration | 27-Claude Code + 01-Storybook + 68-MS Teams + 71-RingCentral + 47-Availity + 38-Kafka + 78-Paperclip (parallel) |
 
 ### 1-Quarter Plan (16 Weeks)
 
 | Weeks | Tier | Experiments |
 |-------|------|-------------|
 | 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23, 27, 28, 39, 43, 50 |
-| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45, 65, 66, 67, 68, 69, 70, 71, 72 |
-| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41, 61, 62, 63 |
-| 10–13 | 3 — Advanced | 18, 25, 26, 24, 32, 55, 51, 48, 49, 64 |
-| 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack, Specimen Logistics Pipeline, Clinical Comms Stack, Secure Mobile Platform |
+| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 76 |
+| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41, 61, 62, 63, 75, 77 |
+| 10–13 | 3 — Advanced | 18, 25, 26, 24, 32, 55, 51, 48, 49, 64, 78 |
+| 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack, Specimen Logistics Pipeline, Clinical Comms Stack, Secure Mobile Platform, Revenue Cycle Automation Pipeline, Healthcare Agent Orchestration Stack |
 
 ---
 
@@ -1216,7 +1391,13 @@ flowchart LR
 | 70 LigoLab MS SQL | X | X | X | X | | | X | |
 | 71 RingCentral API | X | X | X | | | | X | |
 | 72 TinyMDM | X | | X | | | | X | |
-| **Total** | **49** | **40** | **19** | **20** | **26** | **4** | **24** | **19** |
+| 73 pVerify | X | X | | | | | X | |
+| 74 FrontRunnerHC | X | X | | | | | X | |
+| 75 Xero API | X | X | | | | | X | |
+| 76 Redis | X | X | X | X | | | | |
+| 77 Mirth Connect | X | X | | X | | | | |
+| 78 Paperclip | X | X | | | | | | |
+| **Total** | **55** | **46** | **20** | **22** | **26** | **4** | **27** | **19** |
 
 ---
 
@@ -1244,6 +1425,10 @@ Reference for Mermaid diagram styling in Section 3.
 | Shipping & Logistics | Sand | `#d4a574` | 65, 66, 67 |
 | Collaboration & Communications | Cyan | `#67e8f9` | 64, 68, 71 |
 | Document Processing | Light Purple | `#d8b4fe` | 69 |
+| Revenue Cycle & Billing | Pink | `#f9a8d4` | 73, 74, 75 |
+| Cache & Messaging | Light Green | `#a7f3d0` | 76 |
+| Healthcare Integration Engine | Light Violet | `#c4b5fd` | 77 |
+| AI Agent Orchestration | Rose | `#fda4af` | 78 |
 
 ---
 
@@ -1251,6 +1436,7 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 6.0 | 2026-03-11 | Ammar | Added Experiments 73–78 (pVerify insurance eligibility, FrontRunnerHC provider discovery, Xero API cloud accounting with company backup, Redis in-memory cache/Pub/Sub/task queues, Mirth Connect healthcare integration engine for HL7v2/FHIR/X12 EDI, Paperclip AI agent orchestration with org charts/budgets/governance). Three new clusters: Revenue Cycle & Billing (73–75), Healthcare Integration Engine (77), AI Agent Orchestration (76, 78). New Tracks K (Revenue Cycle) and L (Healthcare Integration Engine). Two new Tier 4 capstones: Revenue Cycle Automation Pipeline, Healthcare Agent Orchestration Stack. New critical path: Revenue Cycle + Agent Orchestration (75 days). Updated bottleneck counts: 47-Availity (2→4), 16-FHIR (4→5). Four new color categories (Revenue Cycle, Cache, HIE, Orchestration). Experiment count: 73 → 79 |
 | 5.0 | 2026-03-10 | Ammar | Added Experiments 64–72 (GWS CLI workspace automation, FedEx API, UPS API, OnTime 360 local courier, MS Teams collaboration, Azure Document Intelligence, LigoLab MS SQL LIS, RingCentral unified comms, TinyMDM Android MDM). Four new clusters: Shipping & Logistics (65–67), Clinical Collaboration & Communications (64, 68, 71), Document Processing & Lab Integration (69–70), Mobile Device Management (72). New Tracks I (Shipping) and J (Collaboration). Three new Tier 4 capstones: Specimen Logistics Pipeline, Clinical Communications Stack, Secure Mobile Clinical Platform. Updated Path 2 critical path (59→66 days with GWS CLI). Three new color categories (Shipping, Communications, Document AI). Updated bottleneck counts: 52-vLLM (6→7). Experiment count: 64 → 73 |
 | 4.0 | 2026-03-09 | Ammar | Added Experiments 61–63 (GSD spec-driven execution, Spec Kit specification-layer SDD, A2A Protocol inter-agent communication). New cluster: Spec-Driven Development (61–62) and Agent Interoperability (63). Updated Track D with A2A, Track E with GSD/Spec Kit. New Tier 4 capstone: Spec-Driven Dev Pipeline. Updated bottleneck counts: 27-Claude Code (10→12), 09-MCP (7→8). Experiment count: 61 → 64 |
 | 3.0 | 2026-03-09 | Ammar | Major update: added Experiments 39–60 (Docker, ExcalidrawSkill, InfraNodus, GPT-5.4 Benchmark, CMS PA Dataset, Payer Policies, CMS Coverage API, UHC API, Availity, FHIR DA Vinci PA, NextGen FHIR, OWASP LLM Top 10, Amazon Connect, vLLM, Llama 4, Mistral 3, CrewAI, PA Competitive Landscape, notebooklm-py, Supabase, Obsidian, Skill Creator). New categories: Prior Authorization, Infrastructure, Knowledge & Content, Security & Compliance. New Tracks G (PA Pipeline) and H (Knowledge & Content). Three new Tier 4 capstone pipelines (PA Automation, Clinical Knowledge, AI Model Deploy). PA Pipeline is now the longest critical path (77 days). Updated all dependency graphs, execution tiers, platform coverage, bottleneck analysis, and quick-start recommendations. Experiment count: 39 → 61 |
