@@ -419,6 +419,16 @@ _No bug fixes documented yet._
 - [TinyMDM Setup Guide](experiments/72-TinyMDM-PMS-Developer-Setup-Guide.md) — TinyMDM account setup, API key generation, device group configuration, Python API client, PostgreSQL device tracking tables, FastAPI device management endpoints, Next.js device dashboard, and test device enrollment via QR code
 - [TinyMDM Developer Tutorial](experiments/72-TinyMDM-Developer-Tutorial.md) — Hands-on onboarding: build an automated app deployment pipeline with silent APK install via TinyMDM API, deployment tracking, compliance monitoring, kiosk mode configuration, and CI/CD integration for continuous device fleet management
 
+### pVerify (Real-Time Insurance Eligibility Verification)
+- [PRD: pVerify PMS Integration](experiments/73-PRD-pVerify-PMS-Integration.md) — pVerify cloud API integration for real-time eligibility verification across 1,500+ payers (EDI + non-EDI), batch schedule verification, patient cost estimation, claim status tracking, and HIPAA-compliant audit logging — complementing Availity (Exp 47) for PA/claims with pre-encounter eligibility as the front-end revenue cycle layer
+- [pVerify Setup Guide](experiments/73-pVerify-PMS-Developer-Setup-Guide.md) — OAuth 2.0 client credentials, PVerifyClient async HTTP wrapper, PostgreSQL eligibility/audit tables, FastAPI eligibility router, Next.js EligibilityBadge component, and pVerify demo environment verification
+- [pVerify Developer Tutorial](experiments/73-pVerify-Developer-Tutorial.md) — Hands-on onboarding: build a patient check-in eligibility workflow with real-time verification, copay/deductible display, staff alerts for inactive coverage, audit logging, and Azure Doc Intel cross-validation end-to-end
+
+### FrontRunnerHC (Insurance Discovery, Eligibility Verification & Financial Clearance)
+- [PRD: FrontRunnerHC PMS Integration](experiments/74-PRD-FrontRunnerHC-PMS-Integration.md) — PatientRemedi® data automation platform integration for RPA-powered insurance discovery (finds coverage when none provided), real-time and batch eligibility verification across 3,300+ payer plans, COB resolution for Medicaid MCOs and Medicare Advantage, demographic verification, MBI lookup, HSA/FSA balance access, and financial assistance qualification — feeding verified eligibility data into MarginLogic PA prediction (Exp 56) upstream of Availity submission (Exp 47) and FHIR PA APIs (Exp 48)
+- [FrontRunnerHC Setup Guide](experiments/74-FrontRunnerHC-PMS-Developer-Setup-Guide.md) — API credential setup, FrontRunnerHC Python client with Redis caching, eligibility and insurance discovery services, PostgreSQL audit tables, FastAPI endpoints for all 7 capabilities, Next.js EligibilityPanel and InsuranceDiscoveryPanel components, and batch verification testing
+- [FrontRunnerHC Developer Tutorial](experiments/74-FrontRunnerHC-Developer-Tutorial.md) — Hands-on onboarding: build a Patient Insurance Verification Pipeline with real-time eligibility check, insurance discovery for uninsured patients, demographic correction, financial clearance assessment, and MarginLogic PA prediction enrichment end-to-end
+
 ---
 
 ## Documentation Views
