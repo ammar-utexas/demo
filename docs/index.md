@@ -455,9 +455,9 @@ _No bug fixes documented yet._
 - [OptiFreight Developer Tutorial](experiments/79-OptiFreight-Developer-Tutorial.md) — Hands-on onboarding: prescription-to-delivery shipping workflow, PrescriptionShippingService orchestration, rate comparison and mode optimization, label generation and download, tracking widget with auto-refresh, batch shipping and lab specimen chain-of-custody practice exercises
 
 ### ShipStation API (Multi-Carrier Shipping & Fulfillment)
-- [PRD: ShipStation API PMS Integration](experiments/80-PRD-ShipStationAPI-PMS-Integration.md) — Cloud-based shipping fulfillment API (200+ carriers, V1 Basic Auth + V2 API-Key, batch labels, return labels, address validation, rate shopping) for automated medical supply, DME, and test kit delivery with PHI firewall architecture ensuring no clinical data reaches ShipStation, webhook-driven tracking, encounter/prescription-linked shipment records, and HIPAA-compliant audit logging
+- [PRD: ShipStation API PMS Integration](experiments/80-PRD-ShipStationAPI-PMS-Integration.md) — Cloud-based shipping fulfillment API (200+ carriers, V1 Basic Auth + V2 API-Key, batch labels, return labels, address validation, rate shopping) for automated lab sample shipping to reference labs and medical supply delivery to patients, with webhook-driven tracking, encounter-linked shipment records, and HIPAA-compliant audit logging
 - [ShipStation API Setup Guide](experiments/80-ShipStationAPI-PMS-Developer-Setup-Guide.md) — Gold Plan account setup, API key configuration, Python httpx adapter with rate limiting, webhook receiver with RSA-SHA256 signature verification, PostgreSQL shipment schema, FastAPI shipping routes, and Next.js tracking dashboard components
-- [ShipStation API Developer Tutorial](experiments/80-ShipStationAPI-Developer-Tutorial.md) — Hands-on onboarding: build a complete medical supply shipment workflow with address validation, multi-carrier rate comparison, label creation, webhook-driven tracking, PHI firewall testing, and patient-facing delivery tracker
+- [ShipStation API Developer Tutorial](experiments/80-ShipStationAPI-Developer-Tutorial.md) — Hands-on onboarding: build a complete lab sample shipment workflow with address validation, multi-carrier rate comparison, label creation, webhook-driven tracking, and staff/patient delivery visibility
 
 ---
 
