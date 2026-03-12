@@ -459,6 +459,11 @@ _No bug fixes documented yet._
 - [ShipStation API Setup Guide](experiments/80-ShipStationAPI-PMS-Developer-Setup-Guide.md) — Gold Plan account setup, API key configuration, Python httpx adapter with rate limiting, webhook receiver with RSA-SHA256 signature verification, PostgreSQL shipment schema, FastAPI shipping routes, and Next.js tracking dashboard components
 - [ShipStation API Developer Tutorial](experiments/80-ShipStationAPI-Developer-Tutorial.md) — Hands-on onboarding: build a complete lab sample shipment workflow with address validation, multi-carrier rate comparison, label creation, webhook-driven tracking, and staff/patient delivery visibility
 
+### Amazon Textract (Intelligent Document OCR with Human-in-the-Loop Verification & Feedback)
+- [PRD: Amazon Textract PMS Integration](experiments/81-PRD-AmazonTextract-PMS-Integration.md) — ML-powered document extraction with confidence scoring, comparison engine for verifying/correcting preliminary OCR data, human review via A2I, correction feedback capture for Custom Queries adapter training, and HIPAA-compliant encrypted document processing pipeline
+- [Amazon Textract Setup Guide](experiments/81-AmazonTextract-PMS-Developer-Setup-Guide.md) — S3 bucket with KMS encryption, IAM least-privilege policies, boto3 Textract service module, FastAPI document upload/compare/correct routes, PostgreSQL extraction and correction schema, and Next.js review queue component
+- [Amazon Textract Developer Tutorial](experiments/81-AmazonTextract-Developer-Tutorial.md) — Hands-on onboarding: build a complete insurance card verification workflow with image upload, Textract extraction, preliminary JSON comparison, human review of flagged fields, and correction data export for model improvement
+
 ---
 
 ## Documentation Views
