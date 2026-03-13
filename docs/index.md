@@ -464,6 +464,16 @@ _No bug fixes documented yet._
 - [Amazon Textract Setup Guide](experiments/81-AmazonTextract-PMS-Developer-Setup-Guide.md) — S3 bucket with KMS encryption, IAM least-privilege policies, boto3 Textract service module, FastAPI document upload/compare/correct routes, PostgreSQL extraction and correction schema, and Next.js review queue component
 - [Amazon Textract Developer Tutorial](experiments/81-AmazonTextract-Developer-Tutorial.md) — Hands-on onboarding: build a complete insurance card verification workflow with image upload, Textract extraction, preliminary JSON comparison, human review of flagged fields, and correction data export for model improvement
 
+### OpenRouter (Unified AI Gateway — Multi-Model Routing, Fallback & Cost Optimization)
+- [PRD: OpenRouter PMS Integration](experiments/82-PRD-OpenRouter-PMS-Integration.md) — Unified AI gateway providing access to 500+ models from 60+ providers through a single OpenAI-compatible endpoint, with intelligent routing, automatic provider fallback, BYOK for HIPAA-eligible providers, per-feature cost optimization, and centralized usage analytics
+- [OpenRouter Setup Guide](experiments/82-OpenRouter-PMS-Developer-Setup-Guide.md) — OpenRouter account and BYOK configuration, FastAPI gateway module with provider routing and PHI-safe ZDR enforcement, PostgreSQL usage logging schema, per-feature routing config, and Next.js AI usage dashboard
+- [OpenRouter Developer Tutorial](experiments/82-OpenRouter-Developer-Tutorial.md) — Hands-on onboarding: build a clinical note generation feature with automatic model fallback, PHI-safe routing, cost tracking, and per-feature routing configuration
+
+### NullClaw (Ultra-Lightweight Autonomous AI Assistant Infrastructure)
+- [PRD: NullClaw PMS Integration](experiments/83-PRD-NullClaw-PMS-Integration.md) — 678 KB static Zig binary AI assistant runtime with 50+ LLM providers, 19 communication channels (Telegram, Slack, Signal, WhatsApp, web), vtable-driven pluggable architecture, sandbox isolation, pairing authentication, and PostgreSQL-backed audit logging for omnichannel clinical data access, edge deployment on Jetson Thor, and autonomous scheduled task execution
+- [NullClaw Setup Guide](experiments/83-NullClaw-PMS-Developer-Setup-Guide.md) — Homebrew/source installation, gateway configuration on port 3001, PostgreSQL memory and audit tables, pairing authentication, five custom PMS tools (patient lookup, encounter summary, Rx check, report generation, schedule query), FastAPI gateway adapter with token auth, and Next.js floating chat widget component
+- [NullClaw Developer Tutorial](experiments/83-NullClaw-Developer-Tutorial.md) — Hands-on onboarding: understand NullClaw's vtable architecture, build a medication interaction checker tool end-to-end, test via gateway webhook, verify audit logging, and evaluate strengths/weaknesses for healthcare AI assistant deployment
+
 ---
 
 ## Documentation Views
