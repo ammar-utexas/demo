@@ -474,6 +474,11 @@ _No bug fixes documented yet._
 - [NullClaw Setup Guide](experiments/83-NullClaw-PMS-Developer-Setup-Guide.md) — Homebrew/source installation, gateway configuration on port 3001, PostgreSQL memory and audit tables, pairing authentication, five custom PMS tools (patient lookup, encounter summary, Rx check, report generation, schedule query), FastAPI gateway adapter with token auth, and Next.js floating chat widget component
 - [NullClaw Developer Tutorial](experiments/83-NullClaw-Developer-Tutorial.md) — Hands-on onboarding: understand NullClaw's vtable architecture, build a medication interaction checker tool end-to-end, test via gateway webhook, verify audit logging, and evaluate strengths/weaknesses for healthcare AI assistant deployment
 
+### WebHaptics (Mobile Haptic Feedback for Clinical Workflows)
+- [PRD: WebHaptics PMS Integration](experiments/85-PRD-WebHaptics-PMS-Integration.md) — Client-side haptic feedback using the browser Vibration API for tactile confirmation of medication dispensing, encounter signing, critical lab alerts, and edit conflict detection with user preference controls and graceful iOS degradation
+- [WebHaptics Setup Guide](experiments/85-WebHaptics-PMS-Developer-Setup-Guide.md) — npm installation, PMS haptic preset registry, usePmsHaptics React hook, user preference toggle, FastAPI preferences endpoint, and Android device testing
+- [WebHaptics Developer Tutorial](experiments/85-WebHaptics-Developer-Tutorial.md) — Hands-on onboarding: build a medication dispensing haptic confirmation flow with clinical presets, WebSocket alert integration, user preference persistence, and multi-device testing end-to-end
+
 ---
 
 ## Documentation Views
