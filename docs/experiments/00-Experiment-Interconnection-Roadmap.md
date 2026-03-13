@@ -269,6 +269,8 @@ flowchart TD
         E65["65 FedEx API"]
         E66["66 UPS API"]
         E67["67 OnTime 360"]
+        E79["79 OptiFreight"]
+        E80["80 ShipStation API"]
     end
 
     %% ── Subgraph: Collaboration & Communications ──
@@ -281,6 +283,7 @@ flowchart TD
     %% ── Subgraph: Document Processing ──
     subgraph DOCAI["Document Processing"]
         E69["69 Azure Doc Intel"]
+        E81["81 Amazon Textract"]
     end
 
     %% ── Subgraph: Revenue Cycle & Billing ──
@@ -384,6 +387,11 @@ flowchart TD
     E77 --> E78
     E71 --> E78
 
+    %% ── Hard Dependencies (solid arrows) ── New 79-85
+    E82 --> E83
+    E39 --> E84
+    E37 --> E85
+
     %% ── Complementary / Enhances (dashed arrows) ── Original
     E07 -.->|enhances| E10
     E07 -.->|enhances| E21
@@ -460,6 +468,25 @@ flowchart TD
     E77 -.->|complements| E38
     E78 -.->|enhances| E55
 
+    %% ── Complementary / Enhances (dashed arrows) ── New 79-85
+    E79 -.->|complements| E65
+    E79 -.->|complements| E66
+    E79 -.->|complements| E67
+    E80 -.->|complements| E65
+    E80 -.->|complements| E66
+    E80 -.->|complements| E79
+    E81 -.->|complements| E69
+    E81 -.->|enhances| E78
+    E82 -.->|enhances| E15
+    E82 -.->|enhances| E52
+    E82 -.->|enhances| E29
+    E83 -.->|complements| E05
+    E83 -.->|enhances| E76
+    E84 -.->|enhances| E18
+    E84 -.->|enhances| E07
+    E84 -.->|enhances| E13
+    E85 -.->|enhances| E30
+
     %% ── Color Classes ──
     classDef ui fill:#818cf8,stroke:#4f46e5,color:#fff
     classDef infra fill:#38bdf8,stroke:#0284c7,color:#fff
@@ -484,13 +511,13 @@ flowchart TD
     classDef hie fill:#c4b5fd,stroke:#8b5cf6,color:#fff
     classDef orchestration fill:#fda4af,stroke:#f43f5e,color:#000
 
-    class E00,E01,E02,E03 ui
-    class E09,E08,E15,E29,E52,E42 infra
-    class E06,E13,E20,E53,E54 models
+    class E00,E01,E02,E03,E85 ui
+    class E09,E08,E15,E29,E52,E42,E82 infra
+    class E06,E13,E20,E53,E54,E84 models
     class E07,E10,E21,E30,E33,E35 speech
     class E11,E18 cds
     class E16,E17,E70 interop
-    class E05,E26,E34,E55,E51,E63 agents
+    class E05,E26,E34,E55,E51,E63,E83 agents
     class E37,E38 realtime
     class E25 edge
     class E12,E14,E19,E24,E27,E28,E31,E32,E36,E60,E61,E62 devtool
@@ -499,9 +526,9 @@ flowchart TD
     class E39,E58 platform
     class E57,E59,E41,E40 knowledge
     class E50,E72 security
-    class E65,E66,E67 shipping
+    class E65,E66,E67,E79,E80 shipping
     class E64,E68,E71 comms
-    class E69 docai
+    class E69,E81 docai
     class E73,E74,E75 revcycle
     class E76 cache
     class E77 hie
@@ -564,6 +591,10 @@ Build on Tier 0 foundations. These experiments provide core AI, interop, securit
 | 73 | pVerify | None (insurance eligibility verification) |
 | 74 | FrontRunnerHC | None (provider discovery and network status) |
 | 76 | Redis | None (in-memory cache, Pub/Sub, task queues) |
+| 79 | OptiFreight | None (healthcare freight management) |
+| 80 | ShipStation API | None (multi-carrier shipping) |
+| 81 | Amazon Textract | None (ML-powered document OCR) |
+| 82 | OpenRouter | None (unified AI gateway) |
 
 ### Tier 2 — Integration & Expansion (Weeks 6–9)
 
@@ -600,6 +631,9 @@ Combine Tier 1 capabilities into integrated workflows. Multiple experiments can 
 | 63 | A2A Protocol | 09-MCP (inter-agent communication protocol) |
 | 75 | Xero API | 47-Availity, 73-pVerify, 74-FrontRunnerHC (cloud accounting/invoicing) |
 | 77 | Mirth Connect | 16-FHIR, 17-HL7v2 (healthcare integration engine) |
+| 83 | NullClaw | 82-OpenRouter (ultra-lightweight AI assistant runtime) |
+| 84 | AutoResearch | 39-Docker (autonomous ML model optimization) |
+| 85 | WebHaptics | 37-WebSocket (mobile haptic feedback for clinical UX) |
 
 ### Tier 3 — Advanced Capabilities (Weeks 10–12)
 
@@ -640,12 +674,16 @@ Full end-to-end clinical workflows combining multiple experiments.
 | **Secure Mobile Clinical Platform** | 72 + 25 + 37 | TinyMDM device policy → Edge Vision Stream capture → WebSocket real-time sync |
 | **Revenue Cycle Automation Pipeline** | 73 + 74 + 75 + 47 + 78 | Verify eligibility → Discover providers → Invoice via Xero → Paperclip agent governance |
 | **Healthcare Agent Orchestration Stack** | 78 + 77 + 76 + 37 | Paperclip agents → Mirth Connect message routing → Redis real-time Pub/Sub → WebSocket delivery |
+| **Full-Stack Shipping Platform** | 65 + 66 + 67 + 79 + 80 | FedEx/UPS national + OnTime 360 local + OptiFreight freight management + ShipStation multi-carrier aggregation |
+| **Intelligent Document Pipeline** | 69 + 81 + 78 | Azure Doc Intel + Amazon Textract dual-engine OCR → Paperclip agent-orchestrated review queue |
+| **Omnichannel AI Assistant** | 82 + 83 + 76 + 37 + 05 | OpenRouter multi-model gateway → NullClaw 19-channel AI assistant → Redis cache → WebSocket real-time delivery + OpenClaw cloud complement |
+| **Self-Improving Clinical AI** | 39 + 52 + 84 + 18 + 07 | Docker → vLLM inference → AutoResearch overnight optimization → improved ISIC + MedASR models |
 
 ### Execution Timeline (Gantt)
 
 ```mermaid
 gantt
-    title Experiment Execution Tiers (v6.0)
+    title Experiment Execution Tiers (v7.0)
     dateFormat YYYY-MM-DD
     axisFormat %b %d
 
@@ -689,6 +727,10 @@ gantt
     73 pVerify                 :t73, 2026-03-16, 7d
     74 FrontRunnerHC            :t74, 2026-03-16, 7d
     76 Redis                    :t76, 2026-03-16, 7d
+    79 OptiFreight              :t79, 2026-03-16, 7d
+    80 ShipStation API          :t80, 2026-03-16, 7d
+    81 Amazon Textract          :t81, 2026-03-16, 7d
+    82 OpenRouter               :t82, 2026-03-16, 7d
 
     section Tier 2 — Integration
     05 OpenClaw                :t05, after t09, 10d
@@ -720,6 +762,9 @@ gantt
     63 A2A Protocol             :t63, after t09, 10d
     75 Xero API                :t75, after t73, 10d
     77 Mirth Connect            :t77, after t17, 10d
+    83 NullClaw                 :t83, after t82, 7d
+    84 AutoResearch             :t84, after t39, 10d
+    85 WebHaptics               :t85, after t37, 5d
 
     section Tier 3 — Advanced
     18 ISIC Archive            :t18, after t13, 10d
@@ -749,6 +794,10 @@ gantt
     Secure Mobile Platform     :t_smp, after t72, 10d
     Revenue Cycle Pipeline     :t_rcp, after t78, 14d
     Agent Orchestration Stack  :t_aos, after t78, 10d
+    Full Shipping Platform     :t_fsp, after t80, 10d
+    Intelligent Doc Pipeline   :t_idp, after t81, 10d
+    Omnichannel AI Assistant   :t_oaa, after t83, 10d
+    Self-Improving Clinical AI :t_sca, after t84, 14d
 ```
 
 ---
@@ -762,6 +811,7 @@ Twelve independent tracks that can be staffed and executed simultaneously. Cross
 01-Storybook → 02-v0 → 03-Banani → 00-Tambo
                                        ↑
                                   (needs 09-MCP from Track D)
+85-WebHaptics  (haptic feedback — needs 37-WebSocket from Track C)
 ```
 
 ### Track B — Clinical AI Models
@@ -796,6 +846,11 @@ Twelve independent tracks that can be staffed and executed simultaneously. Cross
          {55-CrewAI, 51-Amazon Connect}
                 ↓
          64-GWS CLI  (agent-to-workspace bridge — depends on CrewAI)
+
+82-OpenRouter → 83-NullClaw  (unified AI gateway → ultra-lightweight AI assistant)
+         (NullClaw complements 05-OpenClaw: NullClaw for edge/lightweight, OpenClaw for cloud)
+
+39-Docker → 84-AutoResearch  (autonomous ML optimization — enhances 18-ISIC, 07-MedASR models)
 
 73-pVerify + 47-Availity + 75-Xero + 77-Mirth + 71-RingCentral → 78-Paperclip
          (AI agent orchestration — governance umbrella consuming multiple experiments)
@@ -843,19 +898,22 @@ Twelve independent tracks that can be staffed and executed simultaneously. Cross
 Integration point: CrewAI (Track D) feeds content → notebooklm-py transforms it
 ```
 
-### Track I — Shipping & Logistics _(new)_
+### Track I — Shipping & Logistics
 ```
 {65-FedEx API, 66-UPS API}  (national shipping — parallel, complementary)
 67-OnTime 360               (local courier dispatch — complements 65/66)
+79-OptiFreight              (healthcare freight management — complements 65/66/67)
+80-ShipStation API          (multi-carrier aggregation — complements all above)
 
 Integration point: 69-Azure Doc Intel (Track J) enhances shipping document processing
+Integration point: 81-Amazon Textract (Track J) enhances shipping document OCR
 ```
 
-### Track J — Clinical Collaboration & Document Processing _(new)_
+### Track J — Clinical Collaboration & Document Processing
 ```
 {68-MS Teams, 71-RingCentral}  (collaboration & communications — parallel)
 64-GWS CLI                     (agent workspace bridge — needs 55-CrewAI from Track D)
-69-Azure Doc Intelligence      (document extraction — standalone)
+{69-Azure Doc Intelligence, 81-Amazon Textract}  (dual-engine document extraction — complementary)
 70-LigoLab MS SQL              (direct LIS connection — enhances 17-HL7v2 from Track C)
 72-TinyMDM                     (Android MDM — standalone, enhances 25-Edge Vision from Track B)
 ```
@@ -895,6 +953,7 @@ flowchart LR
         A1["01 Storybook"] --> A2["02 v0"]
         A1 --> A3["03 Banani"]
         A4["00 Tambo"]
+        A5["85 WebHaptics"]
     end
 
     subgraph B["Track B: Clinical AI"]
@@ -942,6 +1001,12 @@ flowchart LR
         D11["63 A2A"]
         D1 --> D11
         D11 -.->|"enhances"| D9
+        D12["82 OpenRouter"]
+        D13["83 NullClaw"]
+        D14["84 AutoResearch"]
+        D12 --> D13
+        D7 --> D14
+        D13 -.->|"complements"| D3
     end
 
     subgraph E["Track E: Dev Experience"]
@@ -1007,6 +1072,8 @@ flowchart LR
         I1["65 FedEx"]
         I2["66 UPS"]
         I3["67 OnTime 360"]
+        I4["79 OptiFreight"]
+        I5["80 ShipStation"]
     end
 
     subgraph J["Track J: Collaboration"]
@@ -1016,6 +1083,8 @@ flowchart LR
         J4["69 Azure Doc Intel"]
         J5["70 LigoLab"]
         J6["72 TinyMDM"]
+        J7["81 Amazon Textract"]
+        J4 -.->|"complements"| J7
     end
 
     subgraph K["Track K: Revenue Cycle"]
@@ -1065,6 +1134,11 @@ flowchart LR
     CACHE1 -.->|"enhances"| K4
     L1 -.->|"enhances"| J5
     K4 -.->|"enhances"| D9
+    C4 -.->|"required"| A5
+    D12 -.->|"enhances"| D4
+    D14 -.->|"enhances"| B4
+    CACHE1 -.->|"enhances"| D13
+    J7 -.->|"enhances"| K4
 
     style A fill:#eef2ff,stroke:#818cf8
     style B fill:#ecfdf5,stroke:#34d399
@@ -1186,6 +1260,18 @@ _Sparse matrix — only non-empty cells are shown. Experiments 04, 06, 12, 22, 2
 | **77 Mirth Connect** | 16-FHIR, 17-HL7v2 LIS | Healthcare-specific integration engine for HL7v2, FHIR R4, X12 EDI, CDA message routing. Enhances 70-LigoLab (message routing alternative to direct SQL). Complements 38-Kafka (Mirth = healthcare messaging, Kafka = general event streaming). Consumed by 78-Paperclip (Clinical Agent routes labs via Mirth). Channel-based pipeline with JavaScript transformers |
 | **78 Paperclip** | 73-pVerify, 47-Availity, 75-Xero, 77-Mirth Connect, 71-RingCentral | AI agent orchestration governance umbrella. Consumes 73-pVerify (Intake Agent), 47-Availity (Billing Agent claims), 75-Xero (Billing Agent invoices), 77-Mirth (Clinical Agent), 71-RingCentral (Comms Agent). Enhances 55-CrewAI (complementary — Paperclip = organizational governance, CrewAI = task-level multi-agent). 76-Redis provides real-time agent status Pub/Sub. Org charts, budgets, approval gates, immutable audit trail. Multi-clinic isolation via company-scoped data |
 
+### Experiments 79–85 — Relationships to All Others
+
+| Experiment | Hard Dependencies | Complementary / Enhances |
+|-----------|------------------|--------------------------|
+| **79 OptiFreight** | None | Complements 65-FedEx, 66-UPS (OptiFreight abstracts across carriers including FedEx/UPS with healthcare-specialized freight management). Complements 67-OnTime 360 (national freight vs local courier). Complements 80-ShipStation (managed freight vs multi-carrier API aggregation). 76-Redis caches rate quotes and tracking status. 77-Mirth Connect can serve as EDI X12 translation layer for OptiFreight transactions |
+| **80 ShipStation API** | None | Complements 65-FedEx, 66-UPS, 67-OnTime 360 (ShipStation aggregates 200+ carriers into single API). Complements 79-OptiFreight (ShipStation for parcel/label management, OptiFreight for freight optimization). Enhances 34-n8n (n8n can trigger ShipStation shipments from encounter events). 76-Redis caches rate comparison results. A2A (63) could enable agent-based carrier negotiation |
+| **81 Amazon Textract** | None | Complements 69-Azure Doc Intelligence (dual-engine OCR — Textract for AWS-aligned stack, Azure for multilingual fallback). Enhances 43-CMS PA Dataset (automated extraction of PA forms). Enhances 44-Payer Policies (OCR of payer policy documents). Enhances 78-Paperclip (document processing as agent-orchestrated workflow). Human-in-the-loop correction feedback creates training data for continuous improvement |
+| **82 OpenRouter** | None | Enhances 15-Claude Model Selection (expands to 500+ models via single endpoint). Enhances 52-vLLM (OpenRouter as cloud fallback when self-hosted inference is at capacity). Enhances 29-Gemini Interactions (Gemini accessible via OpenRouter alongside all other providers). Complements 83-NullClaw (OpenRouter is NullClaw's recommended provider). BYOK mode maintains HIPAA compliance with existing provider keys |
+| **83 NullClaw** | 82-OpenRouter | Complements 05-OpenClaw (NullClaw = edge/lightweight deployment at 678 KB / ~1 MB RAM, OpenClaw = cloud deployment with rich JS ecosystem). Enhances 76-Redis (NullClaw can use Redis as memory backend for conversation caching). 19 built-in channels (Telegram, Slack, Signal, WhatsApp, web) provide omnichannel clinical data access. Edge-deployable on Jetson Thor (ADR-0007) alongside vision pipeline. Sandbox isolation and pairing authentication for HIPAA compliance |
+| **84 AutoResearch** | 39-Docker | Enhances 18-ISIC Archive (autonomous optimization of dermatology CDS model). Enhances 07-MedASR (overnight fine-tuning of medical speech recognition). Enhances 13-Gemma 3 (automated architecture search for on-premise models). Complements 08-Adaptive Thinking (AutoResearch optimizes models, Adaptive Thinking optimizes reasoning). Complements 05-OpenClaw (AutoResearch improves models, OpenClaw orchestrates workflows using them). Git-native experiment tracking with ~100 experiments per overnight run |
+| **85 WebHaptics** | 37-WebSocket | Enhances 30-ElevenLabs (haptic + audio = multi-sensory feedback). Enhances 00-Tambo (haptic confirmation for conversational analytics actions). Enhances PMS mobile web and Android with tactile confirmation for medication dispensing, encounter signing, critical lab alerts. 37-WebSocket delivers real-time alert events that trigger haptic patterns. User preference toggle stored in PostgreSQL via FastAPI endpoint. Graceful iOS degradation (Vibration API not supported on iOS Safari) |
+
 ---
 
 ## 8. Critical Path Analysis
@@ -1306,9 +1392,9 @@ flowchart LR
 
 | Week | Focus | Experiments |
 |------|-------|-------------|
-| 1 | Infrastructure | 09-MCP + 16-FHIR + 37-WebSocket + 39-Docker + 43-CMS Dataset + 76-Redis (parallel) |
-| 2 | AI Foundation + PA + Revenue Cycle | 52-vLLM + 13-Gemma 3 + 08-Adaptive + 45-CMS API + 44-Payer Policies + 73-pVerify + 74-FrontRunnerHC (parallel) |
-| 3 | Agents + Models + PA + Shipping | 05-OpenClaw + 53-Llama 4 + 54-Mistral 3 + 46-UHC + 65-FedEx + 66-UPS + 75-Xero + 77-Mirth (parallel) |
+| 1 | Infrastructure | 09-MCP + 16-FHIR + 37-WebSocket + 39-Docker + 43-CMS Dataset + 76-Redis + 82-OpenRouter (parallel) |
+| 2 | AI Foundation + PA + Revenue Cycle + Docs | 52-vLLM + 13-Gemma 3 + 08-Adaptive + 45-CMS API + 44-Payer Policies + 73-pVerify + 74-FrontRunnerHC + 81-Textract + 79-OptiFreight + 80-ShipStation (parallel) |
+| 3 | Agents + Models + PA + Shipping | 05-OpenClaw + 83-NullClaw + 53-Llama 4 + 54-Mistral 3 + 84-AutoResearch + 46-UHC + 65-FedEx + 66-UPS + 75-Xero + 77-Mirth + 85-WebHaptics (parallel) |
 | 4 | Dev + UI + Comms + PA + Orchestration | 27-Claude Code + 01-Storybook + 68-MS Teams + 71-RingCentral + 47-Availity + 38-Kafka + 78-Paperclip (parallel) |
 
 ### 1-Quarter Plan (16 Weeks)
@@ -1316,10 +1402,10 @@ flowchart LR
 | Weeks | Tier | Experiments |
 |-------|------|-------------|
 | 1–2 | 0 — Foundation | 04, 09, 16, 01, 19, 22, 23, 27, 28, 39, 43, 50 |
-| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 76 |
-| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41, 61, 62, 63, 75, 77 |
+| 3–5 | 1 — Core | 08, 13, 15, 17, 07, 12, 29, 30, 35, 37, 52, 58, 44, 45, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 76, 79, 80, 81, 82 |
+| 6–9 | 2 — Integration | 05, 10, 20, 11, 00, 02, 03, 14, 21, 31, 33, 34, 36, 38, 53, 54, 42, 46, 47, 40, 57, 59, 60, 41, 61, 62, 63, 75, 77, 83, 84, 85 |
 | 10–13 | 3 — Advanced | 18, 25, 26, 24, 32, 55, 51, 48, 49, 64, 78 |
-| 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack, Specimen Logistics Pipeline, Clinical Comms Stack, Secure Mobile Platform, Revenue Cycle Automation Pipeline, Healthcare Agent Orchestration Stack |
+| 14–16 | 4 — Capstone | PA Automation Pipeline, Clinical Doc Pipeline, Clinical Knowledge Pipeline, DermaCheck+Edge, Real-Time Event Pipeline, Voice AI Full Stack, Agent Governance Stack, AI Model Deploy Stack, Specimen Logistics Pipeline, Clinical Comms Stack, Secure Mobile Platform, Revenue Cycle Automation Pipeline, Healthcare Agent Orchestration Stack, Full-Stack Shipping Platform, Intelligent Document Pipeline, Omnichannel AI Assistant, Self-Improving Clinical AI |
 
 ---
 
@@ -1406,7 +1492,14 @@ flowchart LR
 | 76 Redis | X | X | X | X | | | | |
 | 77 Mirth Connect | X | X | | X | | | | |
 | 78 Paperclip | X | X | | | | | | |
-| **Total** | **55** | **46** | **20** | **22** | **26** | **4** | **27** | **19** |
+| 79 OptiFreight | X | X | X | | | | X | |
+| 80 ShipStation API | X | X | X | X | | | X | |
+| 81 Amazon Textract | X | X | | X | X | | X | |
+| 82 OpenRouter | X | X | | X | X | | X | |
+| 83 NullClaw | X | X | X | X | | X | X | |
+| 84 AutoResearch | X | | | X | X | | | |
+| 85 WebHaptics | | X | X | X | | | | |
+| **Total** | **61** | **52** | **24** | **28** | **29** | **5** | **33** | **19** |
 
 ---
 
@@ -1416,14 +1509,14 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Category | Color | Hex | Experiments |
 |----------|-------|-----|-------------|
-| UI Tools | Indigo | `#818cf8` | 00, 01, 02, 03 |
-| AI Infrastructure | Sky Blue | `#38bdf8` | 08, 09, 15, 29, 52, 42 |
-| On-Premise Models | Emerald | `#34d399` | 06, 13, 20, 53, 54 |
+| UI Tools | Indigo | `#818cf8` | 00, 01, 02, 03, 85 |
+| AI Infrastructure | Sky Blue | `#38bdf8` | 08, 09, 15, 29, 52, 42, 82 |
+| On-Premise Models | Emerald | `#34d399` | 06, 13, 20, 53, 54, 84 |
 | Speech & Voice AI | Amber | `#fbbf24` | 07, 10, 21, 30, 33, 35 |
 | Clinical Decision Support | Red | `#f87171` | 11, 18 |
 | Interoperability | Violet | `#a78bfa` | 16, 17, 70 |
 | Prior Authorization | Purple | `#c084fc` | 43, 44, 45, 46, 47, 48, 49, 56 |
-| Agentic AI & Automation | Orange | `#fb923c` | 05, 26, 34, 55, 51, 63 |
+| Agentic AI & Automation | Orange | `#fb923c` | 05, 26, 34, 55, 51, 63, 83 |
 | Real-Time & Streaming | Rose | `#f472b6` | 37, 38 |
 | Edge Computing | Teal | `#2dd4bf` | 25 |
 | Infrastructure | Mint | `#6ee7b7` | 39, 58 |
@@ -1431,9 +1524,9 @@ Reference for Mermaid diagram styling in Section 3.
 | Security & Compliance | Yellow | `#fde047` | 50, 72 |
 | Dev Tooling | Slate | `#94a3b8` | 12, 14, 19, 24, 27, 28, 31, 32, 36, 60, 61, 62 |
 | Reference & Analysis | Light Gray | `#e2e8f0` | 04, 22, 23 |
-| Shipping & Logistics | Sand | `#d4a574` | 65, 66, 67 |
+| Shipping & Logistics | Sand | `#d4a574` | 65, 66, 67, 79, 80 |
 | Collaboration & Communications | Cyan | `#67e8f9` | 64, 68, 71 |
-| Document Processing | Light Purple | `#d8b4fe` | 69 |
+| Document Processing | Light Purple | `#d8b4fe` | 69, 81 |
 | Revenue Cycle & Billing | Pink | `#f9a8d4` | 73, 74, 75 |
 | Cache & Messaging | Light Green | `#a7f3d0` | 76 |
 | Healthcare Integration Engine | Light Violet | `#c4b5fd` | 77 |
@@ -1445,6 +1538,7 @@ Reference for Mermaid diagram styling in Section 3.
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 7.0 | 2026-03-12 | Ammar | Added Experiments 79–85 (OptiFreight Cardinal Health healthcare freight management, ShipStation multi-carrier shipping API with 200+ carriers, Amazon Textract ML-powered OCR with human-in-the-loop verification and correction feedback, OpenRouter unified AI gateway with 500+ models and BYOK mode, NullClaw 678 KB Zig-based autonomous AI assistant runtime with 19 channels and edge deployment, AutoResearch Karpathy autonomous ML experimentation framework, WebHaptics browser Vibration API for clinical haptic feedback). Five new clusters: Extended Shipping (79–80), Document Processing (81), AI Infrastructure & Gateway (82–83), Autonomous Model Optimization (84), Mobile UX (85). Four new Tier 4 capstones: Full-Stack Shipping Platform, Intelligent Document Pipeline, Omnichannel AI Assistant, Self-Improving Clinical AI. Updated Tracks A (WebHaptics), D (OpenRouter, NullClaw, AutoResearch), I (OptiFreight, ShipStation), J (Amazon Textract). Experiment count: 79 → 86 |
 | 6.0 | 2026-03-11 | Ammar | Added Experiments 73–78 (pVerify insurance eligibility, FrontRunnerHC provider discovery, Xero API cloud accounting with company backup, Redis in-memory cache/Pub/Sub/task queues, Mirth Connect healthcare integration engine for HL7v2/FHIR/X12 EDI, Paperclip AI agent orchestration with org charts/budgets/governance). Three new clusters: Revenue Cycle & Billing (73–75), Healthcare Integration Engine (77), AI Agent Orchestration (76, 78). New Tracks K (Revenue Cycle) and L (Healthcare Integration Engine). Two new Tier 4 capstones: Revenue Cycle Automation Pipeline, Healthcare Agent Orchestration Stack. New critical path: Revenue Cycle + Agent Orchestration (75 days). Updated bottleneck counts: 47-Availity (2→4), 16-FHIR (4→5). Four new color categories (Revenue Cycle, Cache, HIE, Orchestration). Experiment count: 73 → 79 |
 | 5.0 | 2026-03-10 | Ammar | Added Experiments 64–72 (GWS CLI workspace automation, FedEx API, UPS API, OnTime 360 local courier, MS Teams collaboration, Azure Document Intelligence, LigoLab MS SQL LIS, RingCentral unified comms, TinyMDM Android MDM). Four new clusters: Shipping & Logistics (65–67), Clinical Collaboration & Communications (64, 68, 71), Document Processing & Lab Integration (69–70), Mobile Device Management (72). New Tracks I (Shipping) and J (Collaboration). Three new Tier 4 capstones: Specimen Logistics Pipeline, Clinical Communications Stack, Secure Mobile Clinical Platform. Updated Path 2 critical path (59→66 days with GWS CLI). Three new color categories (Shipping, Communications, Document AI). Updated bottleneck counts: 52-vLLM (6→7). Experiment count: 64 → 73 |
 | 4.0 | 2026-03-09 | Ammar | Added Experiments 61–63 (GSD spec-driven execution, Spec Kit specification-layer SDD, A2A Protocol inter-agent communication). New cluster: Spec-Driven Development (61–62) and Agent Interoperability (63). Updated Track D with A2A, Track E with GSD/Spec Kit. New Tier 4 capstone: Spec-Driven Dev Pipeline. Updated bottleneck counts: 27-Claude Code (10→12), 09-MCP (7→8). Experiment count: 61 → 64 |
