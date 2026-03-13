@@ -48,14 +48,15 @@ HIPAA requires a minimum **6-year retention period** for compliance documentatio
 
 ## 1.1 Multi-Repository Architecture
 
-The PMS is split across three implementation repositories plus a shared documentation repository:
+The PMS is split across four implementation repositories plus a shared documentation repository:
 
 ```
 GitHub Organization
 ├── demo (docs)            # Shared documentation, specs, and requirements
 ├── pms-backend            # Python/FastAPI REST API
 ├── pms-frontend           # Next.js/TypeScript web UI
-└── pms-android            # Kotlin/Jetpack Compose mobile app
+├── pms-android            # Kotlin/Jetpack Compose mobile app
+└── pms-ai                 # AI platform (Dermatology CDS, AI Gateway)
 ```
 
 Each implementation repo includes the `demo` repo as a Git submodule at `docs/`, so all three repos share the same specifications, requirements, and traceability matrix.

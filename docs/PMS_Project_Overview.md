@@ -8,7 +8,7 @@
 
 ## 1. Project Summary
 
-The Patient Management System (PMS) is a HIPAA-compliant software suite for managing patient records, clinical workflows, medications, and reporting across a multi-facility healthcare organization. It consists of four repositories under the `utexas-demo` GitHub organization.
+The Patient Management System (PMS) is a HIPAA-compliant software suite for managing patient records, clinical workflows, medications, and reporting across a multi-facility healthcare organization. It consists of five repositories under the `utexas-demo` GitHub organization.
 
 ---
 
@@ -20,6 +20,7 @@ The Patient Management System (PMS) is a HIPAA-compliant software suite for mana
 | **pms-backend** | REST API server | Python 3.12, FastAPI, PostgreSQL, SQLAlchemy 2.0, Pydantic v2 | `main` | Clean |
 | **pms-frontend** | Web application | Next.js 15, React, TypeScript, Tailwind CSS 3 | `main` | Clean |
 | **pms-android** | Native Android app | Kotlin 2.1, Jetpack Compose, Material 3, Hilt, Room | `main` | Clean |
+| **pms-ai** | AI platform (Dermatology CDS, AI Gateway) | Python 3.12, FastAPI, ONNX Runtime, pgvector | `main` | Clean |
 
 ---
 
@@ -31,7 +32,7 @@ flowchart TB
         WebUI["Web UI<br/>(Next.js :3000)"]
         Android["Android App<br/>(Kotlin)<br/>+ TFLite on-device"]
         Backend["Backend API<br/>(FastAPI :8000)"]
-        DermCDS["Dermatology CDS<br/>(ONNX Runtime :8090)"]
+        DermCDS["Dermatology CDS<br/>(pms-ai :8090)"]
         DB[("PostgreSQL<br/>+ pgvector")]
 
         WebUI --> Backend
@@ -144,7 +145,7 @@ src/
 
 ---
 
-### 4.4 pms-android
+### 4.4 pms-android (Native Android App)
 
 **Structure:**
 ```
@@ -177,6 +178,39 @@ app/src/main/java/com/utexas/pms/
 
 ---
 
+### 4.5 pms-ai (AI Platform)
+
+**Structure:**
+```
+pms-ai/
+├── services/
+│   ├── derm-cds/           # Dermatology CDS (EfficientNet-B4, pgvector)
+│   │   ├── classifier.py, embedder.py, similarity.py
+│   │   ├── risk_scorer.py, orchestrator.py
+│   │   └── model-manifest.json
+│   └── ai-gateway/         # AI Gateway (Gemma 3, prompt routing)
+├── shared/                 # Shared AI infrastructure
+│   ├── preprocessing/      # Image preprocessing pipeline
+│   └── model_registry/     # Model version management
+├── migrations/             # Alembic (pgvector tables, lesion schema)
+├── tests/
+├── Dockerfile
+├── docker-compose.yml
+└── demo/                   # Documentation submodule
+```
+
+**Key Implementation Status:**
+- Dermatology CDS service: Architecture defined (ADR-0008 through ADR-0022)
+- EfficientNet-B4 ONNX classifier: Not started
+- pgvector similarity search: Not started
+- AI Gateway (Gemma 3): Not started
+- Shared preprocessing pipeline: Not started
+
+**Tests:** Not yet implemented
+**CI:** ci.yml, snyk-security.yml, sonarqube.yml — planned
+
+---
+
 ## 5. CI/CD Status
 
 | Repository | CI | SonarCloud | Snyk Security | Docs Validation |
@@ -185,6 +219,7 @@ app/src/main/java/com/utexas/pms/
 | pms-backend | Passing | Passing | Passing | — |
 | pms-frontend | Passing | Passing | Passing | — |
 | pms-android | Passing | Passing | Passing | — |
+| pms-ai | Planned | Planned | Planned | — |
 
 ---
 
@@ -238,6 +273,7 @@ app/src/main/java/com/utexas/pms/
 | pms-backend | 23 | 157 | 157 | 0 |
 | pms-frontend | 23 | — | All | 0 |
 | pms-android | 21 | — | All | 0 |
+| pms-ai | — | — | — | — |
 
 ### Requirements Test Coverage
 
@@ -266,8 +302,8 @@ app/src/main/java/com/utexas/pms/
 
 ### Security Scanning
 
-- **Snyk:** Dependency vulnerability scanning on all 3 platform repos
-- **SonarCloud:** Code quality and security analysis on all 3 platform repos
+- **Snyk:** Dependency vulnerability scanning on all 4 platform repos
+- **SonarCloud:** Code quality and security analysis on all 4 platform repos
 - All scans currently passing
 
 ---

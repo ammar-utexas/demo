@@ -10,9 +10,9 @@ This matrix records which combinations of repository versions have been tested t
 
 ## Certified Releases
 
-| Release Name | Backend Version | Frontend Version | Android Version | Subsystem Versions | System Test Run ID | Date | Status |
-|---|---|---|---|---|---|---|---|
-| v0.1.0-initial | 0.1.0 | 0.1.0 | 0.1.0 | SUB-PR-v0.0, SUB-CW-v0.0, SUB-MM-v0.0, SUB-RA-v0.0 | — | 2026-02-15 | Scaffold Only |
+| Release Name | Backend Version | Frontend Version | Android Version | AI Version | Subsystem Versions | System Test Run ID | Date | Status |
+|---|---|---|---|---|---|---|---|---|
+| v0.1.0-initial | 0.1.0 | 0.1.0 | 0.1.0 | — | SUB-PR-v0.0, SUB-CW-v0.0, SUB-MM-v0.0, SUB-RA-v0.0 | — | 2026-02-15 | Scaffold Only |
 
 ## How to Update
 
@@ -34,4 +34,5 @@ To find the current version of each repo:
 | pms-backend | `pyproject.toml` → `version` |
 | pms-frontend | `package.json` → `version` |
 | pms-android | `app/build.gradle.kts` → `versionName` |
+| pms-ai | `pyproject.toml` → `version` |
 | Subsystems | [Subsystem Versions](subsystem-versions.md) |

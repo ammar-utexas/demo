@@ -5,7 +5,7 @@
 
 ## Context
 
-The Patient Management System (PMS) requires three client/server applications: a Python/FastAPI backend, a Next.js web frontend, and a Kotlin/Compose Android app. We needed to decide how to organize the codebase.
+The Patient Management System (PMS) requires three client/server applications: a Python/FastAPI backend, a Next.js web frontend, and a Kotlin/Compose Android app — plus an AI platform hosting dermatology clinical decision support and other AI services. We needed to decide how to organize the codebase.
 
 ## Options Considered
 
@@ -33,15 +33,17 @@ Use **separate repositories with a shared docs submodule** (Option 2).
 | `ammar-utexas/pms-backend` | REST API server | Python, FastAPI, SQLAlchemy |
 | `ammar-utexas/pms-frontend` | Web application | Next.js, React, TypeScript |
 | `ammar-utexas/pms-android` | Android mobile app | Kotlin, Jetpack Compose |
+| `ammar-utexas/pms-ai` | AI platform (Dermatology CDS, AI Gateway) | Python, FastAPI, ONNX Runtime, pgvector |
 
 Each project repo includes `docs/` as a Git submodule pointing to `ammar-utexas/demo`.
 
 ## Rationale
 
-- **Independent release cycles**: Backend, frontend, and Android can be deployed independently.
+- **Independent release cycles**: Backend, frontend, Android, and AI platform can be deployed independently.
 - **Focused CI/CD**: Each repo has a single language toolchain, simplifying build pipelines.
 - **Shared knowledge**: The `docs/` submodule ensures all repos have access to the same architecture decisions, API contracts, and feature documentation.
 - **Team scalability**: Different team members can own different repos without merge conflicts across languages.
+- **AI isolation**: AI services (dermatology CDS, AI gateway, shared model infrastructure) live in a dedicated repository, keeping ML dependencies and GPU-heavy Docker images separate from the core backend API.
 
 ## Consequences
 

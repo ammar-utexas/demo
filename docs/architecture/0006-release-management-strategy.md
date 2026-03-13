@@ -8,7 +8,7 @@
 
 ## Context
 
-The PMS spans three implementation repositories (pms-backend, pms-frontend, pms-android) plus a shared documentation submodule (demo). The system must comply with HIPAA regulations, requiring auditable, controlled releases. All repos are currently at v0.1.0 with no CI/CD, no changelogs, no git tags, and no formal release process.
+The PMS spans four implementation repositories (pms-backend, pms-frontend, pms-android, pms-ai) plus a shared documentation submodule (demo). The system must comply with HIPAA regulations, requiring auditable, controlled releases. All repos are currently at v0.1.0 with no CI/CD, no changelogs, no git tags, and no formal release process.
 
 We need a release strategy that:
 - Allows each repo to evolve at its own pace
@@ -30,10 +30,11 @@ Versions are defined in each repo's native package manifest:
 - `pms-backend`: `pyproject.toml` → `version = "X.Y.Z"`
 - `pms-frontend`: `package.json` → `"version": "X.Y.Z"`
 - `pms-android`: `app/build.gradle.kts` → `versionName = "X.Y.Z"`
+- `pms-ai`: `pyproject.toml` → `version = "X.Y.Z"`
 
 ### 2. Subsystem-Level Version Tracking
 
-Each subsystem (SUB-PR, SUB-CW, SUB-MM, SUB-RA) has its own version tracked in `docs/specs/subsystem-versions.md`:
+Each subsystem (SUB-PR, SUB-CW, SUB-MM, SUB-RA, SUB-PM) has its own version tracked in `docs/specs/subsystem-versions.md`:
 - Format: `SUB-XX-vMAJOR.MINOR`
 - MINOR increments when a requirement is implemented and tested
 - MAJOR increments at significant milestones (e.g., all core requirements complete)

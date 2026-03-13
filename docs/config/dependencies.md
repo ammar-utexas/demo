@@ -62,3 +62,29 @@
 - Hilt over manual DI: compile-time safety, Android lifecycle awareness.
 - Room over raw SQLite: type-safe queries, Flow integration, migration support.
 - kotlinx.serialization over Gson: Kotlin-native, multiplatform, no reflection.
+
+## pms-ai (AI Platform)
+
+| Package | Version | Purpose |
+|---|---|---|
+| fastapi | >=0.115.0 | Web framework for AI service APIs |
+| uvicorn[standard] | >=0.32.0 | ASGI server |
+| onnxruntime | >=1.17.0 | EfficientNet-B4 inference runtime |
+| pgvector | >=0.3.0 | PostgreSQL vector similarity search |
+| numpy | >=1.26.0 | Numerical computation for embeddings |
+| pillow | >=10.0.0 | Image loading and preprocessing |
+| psycopg2-binary | >=2.9.0 | PostgreSQL driver |
+| sqlalchemy[asyncio] | >=2.0.36 | Async ORM |
+| asyncpg | >=0.30.0 | PostgreSQL async driver |
+| alembic | >=1.14.0 | Database migrations (pgvector tables, lesion schema) |
+| pydantic-settings | >=2.6.0 | Environment config |
+| pytest | >=8.3.0 | Testing (dev) |
+| pytest-asyncio | >=0.24.0 | Async test support (dev) |
+| httpx | >=0.28.0 | Test HTTP client (dev) |
+| ruff | >=0.8.0 | Linting (dev) |
+
+**Why these choices:**
+- ONNX Runtime over TorchServe: lighter weight, no PyTorch dependency, cross-platform (see [ADR-0009](../architecture/0009-ai-inference-runtime.md)).
+- pgvector over Pinecone/Weaviate: same PostgreSQL instance, zero additional infrastructure, HIPAA-compliant on-premise (see [ADR-0011](../architecture/0011-vector-database-pgvector.md)).
+- EfficientNet-B4 over ResNet/ViT: best accuracy-to-size ratio for ISIC classification (see [ADR-0008](../architecture/0008-derm-cds-microservice-architecture.md)).
+- FastAPI shared with backend: same framework expertise, async-native, OpenAPI docs.
