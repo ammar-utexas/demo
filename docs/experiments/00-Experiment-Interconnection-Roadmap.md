@@ -1,8 +1,8 @@
 # PMS Experiment Interconnection Roadmap
 
 **Document ID:** PMS-EXP-ROADMAP-001
-**Version:** 6.0
-**Date:** March 11, 2026
+**Version:** 7.0
+**Date:** March 12, 2026
 **Author:** Ammar (CEO, MPS Inc.)
 **Status:** Living Document
 
@@ -10,21 +10,19 @@
 
 ## 1. Executive Summary
 
-The PMS project maintains **79 experiments** (numbered 00–78) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, developer experience, shipping & logistics, clinical collaboration, document processing, and device management. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
+The PMS project maintains **86 experiments** (numbered 00–85) evaluating technologies across frontend UI tools, clinical AI models, healthcare interoperability standards, edge computing, voice AI, real-time communication, event streaming, workflow automation, prior authorization, content generation, knowledge management, spec-driven development, agent-to-agent communication, developer experience, shipping & logistics, clinical collaboration, document processing, device management, AI gateway routing, autonomous AI assistants, autonomous model optimization, and mobile haptic feedback. Each experiment has been documented independently — PRDs, setup guides, and tutorials — but this roadmap serves as the **master navigation guide** mapping how they interconnect.
 
-Since the v4.0 roadmap (covering 00–63), **15 new experiments** (64–78) have been added. These form seven major clusters:
+Since the v6.0 roadmap (covering 00–78), **7 new experiments** (79–85) have been added. These form five major clusters:
 
-1. **Shipping & Logistics** (Exp 65–67) — FedEx national shipping, UPS healthcare logistics with cold-chain compliance, and OnTime 360 local courier dispatch for last-mile specimen/supply delivery
-2. **Clinical Collaboration & Communications** (Exp 64, 68, 71) — Google Workspace CLI agent-to-workspace bridge, Microsoft Teams clinical messaging with adaptive cards, and RingCentral unified communications (voice, SMS, fax, video)
-3. **Document Processing & Lab Integration** (Exp 69–70) — Azure Document Intelligence for automated intake/insurance card extraction, and LigoLab MS SQL direct LIS connection complementing HL7v2
-4. **Mobile Device Management** (Exp 72) — TinyMDM Android MDM for securing PMS mobile devices with zero-touch enrollment and Samsung Knox integration
-5. **Revenue Cycle & Billing** (Exp 73–75) — pVerify insurance eligibility verification, FrontRunnerHC provider discovery and network status, and Xero API cloud accounting with invoicing and company backup
-6. **Healthcare Integration Engine** (Exp 77) — Mirth Connect healthcare-specific integration engine for HL7v2, FHIR, and X12 EDI message routing
-7. **AI Agent Orchestration** (Exp 76, 78) — Redis in-memory cache/Pub/Sub infrastructure layer, and Paperclip AI agent orchestration with org charts, budgets, and governance
+1. **Extended Shipping & Logistics** (Exp 79–80) — OptiFreight Cardinal Health healthcare-specialized freight management with TotalVue analytics, and ShipStation multi-carrier shipping API (200+ carriers) for lab sample and supply fulfillment
+2. **Document Processing Expansion** (Exp 81) — Amazon Textract ML-powered OCR with human-in-the-loop verification, confidence-scored extraction, and correction feedback for continuous model improvement
+3. **AI Infrastructure & Gateway** (Exp 82–83) — OpenRouter unified AI gateway (500+ models, 60+ providers, BYOK, automatic failover), and NullClaw ultra-lightweight autonomous AI assistant runtime (678 KB Zig binary, 19 channels, 50+ providers, edge-deployable)
+4. **Autonomous Model Optimization** (Exp 84) — AutoResearch (Karpathy) autonomous ML experimentation framework for overnight model improvement with git-native tracking
+5. **Mobile UX Enhancement** (Exp 85) — WebHaptics browser Vibration API library for tactile confirmation of safety-critical clinical actions
 
 This roadmap provides:
 
-- A **complete registry** of all 79 experiments with categories, platforms, and documentation inventory
+- A **complete registry** of all 86 experiments with categories, platforms, and documentation inventory
 - A **dependency graph** showing which experiments build on or complement others
 - **Execution tiers** recommending a foundation-first build order
 - **Parallel tracks** for teams that can work on independent streams simultaneously
@@ -40,7 +38,7 @@ This roadmap provides:
 
 ### Scope
 
-This roadmap covers experiments 00–78 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
+This roadmap covers experiments 00–85 as documented in `docs/experiments/`. It does not cover core PMS implementation (requirements, ADRs, platform development) — for that, see the [PMS Project Overview](../PMS_Project_Overview.md).
 
 ---
 
@@ -127,6 +125,13 @@ This roadmap covers experiments 00–78 as documented in `docs/experiments/`. It
 | 76 | [Redis](76-PRD-Redis-PMS-Integration.md) | Backend / Cache & Messaging | Backend, Web, Android | None | PRD, Setup, Tutorial |
 | 77 | [Mirth Connect](77-PRD-MirthConnect-PMS-Integration.md) | Backend / Healthcare Integration Engine | Backend, Web | 16-FHIR, 17-HL7v2 | PRD, Setup, Tutorial |
 | 78 | [Paperclip](78-PRD-Paperclip-PMS-Integration.md) | Backend / AI Agent Orchestration | Backend, Web | 73-pVerify, 47-Availity, 75-Xero, 77-Mirth, 71-RingCentral | PRD, Setup, Tutorial |
+| 79 | [OptiFreight](79-PRD-OptiFreight-PMS-Integration.md) | Backend / Shipping & Logistics | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 80 | [ShipStation API](80-PRD-ShipStationAPI-PMS-Integration.md) | Backend / Shipping & Logistics | Backend, Web, Android | None | PRD, Setup, Tutorial |
+| 81 | [Amazon Textract](81-PRD-AmazonTextract-PMS-Integration.md) | Backend / Document AI | Backend, Web | None | PRD, Setup, Tutorial |
+| 82 | [OpenRouter](82-PRD-OpenRouter-PMS-Integration.md) | Backend / AI Infrastructure | Backend, Web | None | PRD, Setup, Tutorial |
+| 83 | [NullClaw](83-PRD-NullClaw-PMS-Integration.md) | Backend / AI Assistant Runtime | Backend, Web, Android, Edge | 82-OpenRouter | PRD, Setup, Tutorial |
+| 84 | [AutoResearch](84-PRD-AutoResearch-PMS-Integration.md) | Backend / AI Model Optimization | Backend | 39-Docker | PRD, Setup, Tutorial |
+| 85 | [WebHaptics](85-PRD-WebHaptics-PMS-Integration.md) | Frontend / Mobile UX | Web, Android | 37-WebSocket | PRD, Setup, Tutorial |
 
 ---
 
@@ -148,6 +153,7 @@ flowchart TD
         E02["02 v0"]
         E03["03 Banani"]
         E00["00 Tambo"]
+        E85["85 WebHaptics"]
     end
 
     %% ── Subgraph: AI Infrastructure ──
@@ -158,6 +164,7 @@ flowchart TD
         E29["29 Gemini Interactions"]
         E52["52 vLLM"]
         E42["42 GPT-5.4 Benchmark"]
+        E82["82 OpenRouter"]
     end
 
     %% ── Subgraph: On-Premise Models ──
@@ -167,6 +174,7 @@ flowchart TD
         E20["20 Qwen 3.5"]
         E53["53 Llama 4"]
         E54["54 Mistral 3"]
+        E84["84 AutoResearch"]
     end
 
     %% ── Subgraph: Speech & Voice AI ──
@@ -212,6 +220,7 @@ flowchart TD
         E55["55 CrewAI"]
         E51["51 Amazon Connect"]
         E63["63 A2A Protocol"]
+        E83["83 NullClaw"]
     end
 
     %% ── Subgraph: Real-Time & Streaming ──
